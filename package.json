@@ -17,7 +17,6 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
     "prebuild": "bun run db:migrate deploy",
-    "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "postinstall": "bun run db:generate"
   },
   "dependencies": {
