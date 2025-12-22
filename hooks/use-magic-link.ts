@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { ErrorContext } from "better-auth/react"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import type { z } from "zod"
 import { useAuthCallbackUrl } from "~/hooks/use-auth-callback-url"
 import { signIn } from "~/lib/auth-client"
+import { createNewsletterSchema } from "~/server/web/shared/schema"
 
 type UseMagicLinkProps = {
   onSuccess?: (email: string) => void
@@ -12,17 +14,14 @@ type UseMagicLinkProps = {
 }
 
 export const useMagicLink = ({ onSuccess, onError }: UseMagicLinkProps = {}) => {
+  const t = useTranslations("schema")
   const [isPending, setIsPending] = useState(false)
   const callbackURL = useAuthCallbackUrl()
 
-  const schema = z.object({
-    email: z.email("Please enter a valid email address"),
-  })
-
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues: { email: "" },
-  })
+  const schema = createNewsletterSchema(t)
+  const resolver = zodResolver(schema)
+  const defaultValues = { captcha: "", email: "" } as const
+  const form = useForm<z.infer<typeof schema>>({ resolver, defaultValues })
 
   const handleSignIn = ({ email }: z.infer<typeof schema>) => {
     signIn.magicLink({
