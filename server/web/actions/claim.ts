@@ -1,7 +1,7 @@
 "use server"
 
 import { getDomain } from "@primoui/utils"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { headers } from "next/headers"
 import { after } from "next/server"
 import { getTranslations } from "next-intl/server"
@@ -77,8 +77,8 @@ const claimToolForUser = async (toolId: string, userId: string) => {
   })
 
   // Revalidate tools
-  revalidateTag("tools", "infinite")
-  revalidateTag(`tool-${tool.slug}`, "infinite")
+  updateTag("tools", "infinite")
+  updateTag(`tool-${tool.slug}`, "infinite")
 }
 
 /**
@@ -129,9 +129,6 @@ export const verifyToolClaimOtp = userActionClient
 
     // Claim tool and revalidate
     await claimToolForUser(tool.id, user.id)
-
-    // Revalidate tool
-    revalidateTag(`tool-${tool.slug}`, "infinite")
 
     return { success: true }
   })

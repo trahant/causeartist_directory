@@ -47,11 +47,9 @@ export const upsertTool = adminActionClient
       }
     })
 
-    after(async () => {
-      revalidate({
-        paths: ["/admin/tools"],
-        tags: ["tools", `tool-${tool.slug}`, "schedule"],
-      })
+    revalidate({
+      paths: ["/admin/tools"],
+      tags: ["tools", `tool-${tool.slug}`, "schedule"],
     })
 
     return tool

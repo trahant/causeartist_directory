@@ -27,7 +27,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return getPageMetadata({ url, metadata })
 }
 
-export default async function ({ searchParams }: PageProps<"/dashboard">) {
+export default async function (props: PageProps<"/dashboard">) {
   const { metadata } = await getData()
 
   return (
@@ -39,7 +39,7 @@ export default async function ({ searchParams }: PageProps<"/dashboard">) {
 
       <div className="flex flex-col gap-4">
         <Suspense fallback={<DataTableSkeleton />}>
-          <DashboardToolListing searchParams={searchParams} />
+          <DashboardToolListing {...props} />
         </Suspense>
       </div>
     </>

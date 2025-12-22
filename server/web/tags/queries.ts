@@ -41,7 +41,7 @@ export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhe
 
   const [tags, total] = await db.$transaction([
     db.tag.findMany({
-      orderBy: sortBy ? { [sortBy]: sortOrder } : { name: "asc" },
+      orderBy: sortBy ? { [sortBy]: sortOrder } : [{ tools: { _count: "desc" } }, { name: "asc" }],
       where: { ...whereQuery, ...where },
       select: tagManyPayload,
       take,

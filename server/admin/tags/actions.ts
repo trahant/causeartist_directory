@@ -27,11 +27,9 @@ export const upsertTag = adminActionClient
           },
         })
 
-    after(async () => {
-      revalidate({
-        paths: ["/admin/tags"],
-        tags: ["tags", `tag-${tag.slug}`],
-      })
+    revalidate({
+      paths: ["/admin/tags"],
+      tags: ["tags", `tag-${tag.slug}`],
     })
 
     return tag

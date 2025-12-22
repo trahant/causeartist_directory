@@ -73,7 +73,7 @@ const AdCard = async ({ className, type, explicitAd, fallback, ...props }: AdCar
   )
 }
 
-const AdCardSkeleton = async ({ className, ...props }: ComponentProps<typeof Card>) => {
+const AdCardSkeleton = ({ className, ...props }: ComponentProps<typeof Card>) => {
   return (
     <Card hover={false} className={cx("items-stretch select-none", className)} {...props}>
       <CardBadges>

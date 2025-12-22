@@ -49,7 +49,7 @@ export const createSubmitToolSchema = (t: TFunction) => {
 export const createNewsletterSchema = (t: TFunction) => {
   return z.object({
     captcha: z.literal("").optional(),
-    value: z.email({ error: t("invalidEmail") }),
+    email: z.email({ error: t("invalidEmail") }),
   })
 }
 

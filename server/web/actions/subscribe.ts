@@ -17,7 +17,7 @@ export const subscribeToNewsletter = actionClient
     const t = await getTranslations("schema")
     return createNewsletterSchema(t)
   })
-  .action(async ({ parsedInput: { value: email } }) => {
+  .action(async ({ parsedInput: { email } }) => {
     // Rate limiting check
     if (await isRateLimited("newsletter")) {
       throw new Error("Too many attempts. Please try again later.")

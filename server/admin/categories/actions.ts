@@ -27,11 +27,9 @@ export const upsertCategory = adminActionClient
           },
         })
 
-    after(async () => {
-      revalidate({
-        paths: ["/admin/categories"],
-        tags: ["categories", `category-${category.slug}`],
-      })
+    revalidate({
+      paths: ["/admin/categories"],
+      tags: ["categories", `category-${category.slug}`],
     })
 
     return category

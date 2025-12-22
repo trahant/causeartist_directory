@@ -6,6 +6,7 @@ import { OgBase } from "~/components/web/og/og-base"
 import { siteConfig } from "~/config/site"
 import { loadGoogleFont } from "~/lib/fonts"
 import { openGraphSearchParams } from "~/lib/opengraph"
+import { ComponentProps } from "react"
 
 export const contentType = "image/png"
 export const alt = "OpenGraph Image"
@@ -15,7 +16,7 @@ export const GET = async (req: NextRequest) => {
   const t = await getTranslations()
   const { title, description, faviconUrl } = createLoader(openGraphSearchParams)(req)
 
-  const params = {
+  const params: ComponentProps<typeof OgBase> = {
     title: title ?? siteConfig.name,
     description: description ?? t("brand.description"),
     faviconUrl: faviconUrl ?? `${siteConfig.url}/favicon.png`,

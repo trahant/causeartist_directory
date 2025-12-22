@@ -45,13 +45,13 @@ export const CTAForm = ({
     formProps: {
       defaultValues: {
         captcha: "",
-        value: "",
+        email: "",
       },
     },
 
     actionProps: {
       onSuccess: () => {
-        trackEvent("subscribe_newsletter", { email: form.getValues("value") })
+        trackEvent("subscribe_newsletter", { email: form.getValues("email") })
       },
 
       onSettled: () => {
@@ -82,7 +82,7 @@ export const CTAForm = ({
           <div className="flex w-full bg-background rounded-lg">
             <FormField
               control={form.control}
-              name="value"
+              name="email"
               render={({ field }) => (
                 <FormControl>
                   <Input
@@ -110,9 +110,9 @@ export const CTAForm = ({
           </div>
         </Box>
 
-        {(action.result.serverError || form.formState.errors.value) && (
+        {(action.result.serverError || form.formState.errors.email) && (
           <Hint className="-mt-1">
-            {action.result.serverError || form.formState.errors.value?.message}
+            {action.result.serverError || form.formState.errors.email?.message}
           </Hint>
         )}
 
