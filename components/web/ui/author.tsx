@@ -18,7 +18,7 @@ export const Author = ({ name, image, title, prefix, url, note, ...props }: Auth
         alt={`${name}'s profile`}
         width={48}
         height={48}
-        className="size-10 rounded-full group-hover:[&[href]]:brightness-90"
+        className="size-10 rounded-full group-hover:[[href]]:brightness-90"
       />
 
       <div className="flex-1 text-sm/normal text-secondary-foreground">
