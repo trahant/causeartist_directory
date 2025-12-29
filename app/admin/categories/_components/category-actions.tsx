@@ -6,7 +6,7 @@ import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Category } from "~/.generated/prisma/browser"
-import { CategoriesDeleteDialog } from "~/app/admin/categories/_components/categories-delete-dialog"
+import { CategoryDeleteDialog } from "~/app/admin/categories/_components/category-delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -28,14 +28,13 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
   const pathname = usePathname()
   const router = useRouter()
 
-  const categoryPath = `/admin/categories/${category.slug}`
-  const isCategoryPage = pathname === categoryPath
+  const indexPath = "/admin/categories"
+  const singlePath = `${indexPath}/${category.slug}`
+  const isSinglePage = pathname === singlePath
 
   const { executeAsync } = useAction(duplicateCategory, {
     onSuccess: ({ data }) => {
-      if (isCategoryPage) {
-        router.push(`/admin/categories/${data.slug}`)
-      }
+      isSinglePage && router.push(`${indexPath}/${data.slug}`)
     },
   })
 
@@ -71,9 +70,9 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" sideOffset={8}>
-          {!isCategoryPage && (
+          {!isSinglePage && (
             <DropdownMenuItem asChild>
-              <Link href={categoryPath}>Edit</Link>
+              <Link href={singlePath}>Edit</Link>
             </DropdownMenuItem>
           )}
 
@@ -92,9 +91,9 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CategoriesDeleteDialog
+      <CategoryDeleteDialog
         categories={[category]}
-        onExecute={() => router.push("/admin/categories")}
+        onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button
           variant="secondary"
@@ -103,7 +102,7 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
           className="text-red-500"
           {...props}
         />
-      </CategoriesDeleteDialog>
+      </CategoryDeleteDialog>
     </Stack>
   )
 }

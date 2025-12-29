@@ -2,15 +2,15 @@
 
 import type { Table } from "@tanstack/react-table"
 import { TrashIcon } from "lucide-react"
-import type { Tool } from "~/.generated/prisma/browser"
-import { ToolsDeleteDialog } from "~/app/admin/tools/_components/tools-delete-dialog"
+import type { Report } from "~/.generated/prisma/browser"
 import { Button } from "~/components/common/button"
+import { ReportDeleteDialog } from "./report-delete-dialog"
 
-interface ToolsTableToolbarActionsProps {
-  table: Table<Tool>
+interface ReportTableToolbarActionsProps {
+  table: Table<Report>
 }
 
-export function ToolsTableToolbarActions({ table }: ToolsTableToolbarActionsProps) {
+export const ReportTableToolbarActions = ({ table }: ReportTableToolbarActionsProps) => {
   const { rows } = table.getFilteredSelectedRowModel()
 
   if (!rows.length) {
@@ -18,10 +18,10 @@ export function ToolsTableToolbarActions({ table }: ToolsTableToolbarActionsProp
   }
 
   return (
-    <ToolsDeleteDialog tools={rows.map(row => row.original)}>
+    <ReportDeleteDialog reports={rows.map(row => row.original)}>
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})
       </Button>
-    </ToolsDeleteDialog>
+    </ReportDeleteDialog>
   )
 }

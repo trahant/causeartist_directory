@@ -4,7 +4,7 @@ import { EllipsisIcon, TrashIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import type { Report } from "~/.generated/prisma/browser"
-import { ReportsDeleteDialog } from "~/app/admin/reports/_components/reports-delete-dialog"
+import { ReportDeleteDialog } from "~/app/admin/reports/_components/report-delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -24,6 +24,10 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
   const pathname = usePathname()
   const router = useRouter()
 
+  const indexPath = "/admin/reports"
+  const singlePath = `${indexPath}/${report.id}`
+  const isSinglePage = pathname === singlePath
+
   return (
     <Stack size="sm" wrap={false}>
       <DropdownMenu modal={false}>
@@ -39,15 +43,18 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" sideOffset={8}>
-          {pathname !== `/admin/reports/${report.id}` && (
+          {!isSinglePage && (
             <DropdownMenuItem asChild>
-              <Link href={`/admin/reports/${report.id}`}>Edit</Link>
+              <Link href={singlePath}>Edit</Link>
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ReportsDeleteDialog reports={[report]} onExecute={() => router.push("/admin/reports")}>
+      <ReportDeleteDialog
+        reports={[report]}
+        onExecute={() => isSinglePage && router.push(indexPath)}
+      >
         <Button
           variant="secondary"
           size="sm"
@@ -55,7 +62,7 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
           className="text-red-500"
           {...props}
         />
-      </ReportsDeleteDialog>
+      </ReportDeleteDialog>
     </Stack>
   )
 }

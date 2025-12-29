@@ -12,8 +12,6 @@ import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { findTag, findTagSlugs } from "~/server/web/tags/queries"
 
-export const dynamicParams = false
-
 type Props = PageProps<"/tags/[slug]">
 
 // I18n page namespace

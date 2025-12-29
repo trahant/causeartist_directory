@@ -4,12 +4,12 @@ import type { Tool } from "~/.generated/prisma/browser"
 import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { deleteTools } from "~/server/admin/tools/actions"
 
-type ToolsDeleteDialogProps = PropsWithChildren<{
+type ToolDeleteDialogProps = PropsWithChildren<{
   tools: Tool[]
   onExecute?: () => void
 }>
 
-export const ToolsDeleteDialog = ({ tools, onExecute, ...props }: ToolsDeleteDialogProps) => {
+export const ToolDeleteDialog = ({ tools, onExecute, ...props }: ToolDeleteDialogProps) => {
   return (
     <DeleteDialog
       ids={tools.map(({ id }) => id)}

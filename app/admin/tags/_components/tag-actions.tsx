@@ -6,7 +6,7 @@ import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Tag } from "~/.generated/prisma/browser"
-import { TagsDeleteDialog } from "~/app/admin/tags/_components/tags-delete-dialog"
+import { TagDeleteDialog } from "~/app/admin/tags/_components/tag-delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -28,14 +28,13 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
   const pathname = usePathname()
   const router = useRouter()
 
-  const tagPath = `/admin/tags/${tag.slug}`
-  const isTagPage = pathname === tagPath
+  const indexPath = "/admin/tags"
+  const singlePath = `${indexPath}/${tag.slug}`
+  const isSinglePage = pathname === singlePath
 
   const { executeAsync } = useAction(duplicateTag, {
     onSuccess: ({ data }) => {
-      if (isTagPage) {
-        router.push(`/admin/tags/${data.slug}`)
-      }
+      isSinglePage && router.push(`${indexPath}/${data.slug}`)
     },
   })
 
@@ -71,9 +70,9 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" sideOffset={8}>
-          {!isTagPage && (
+          {!isSinglePage && (
             <DropdownMenuItem asChild>
-              <Link href={tagPath}>Edit</Link>
+              <Link href={singlePath}>Edit</Link>
             </DropdownMenuItem>
           )}
 
@@ -92,7 +91,7 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <TagsDeleteDialog tags={[tag]} onExecute={() => router.push("/admin/tags")}>
+      <TagDeleteDialog tags={[tag]} onExecute={() => isSinglePage && router.push(indexPath)}>
         <Button
           variant="secondary"
           size="sm"
@@ -100,7 +99,7 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
           className="text-red-500"
           {...props}
         />
-      </TagsDeleteDialog>
+      </TagDeleteDialog>
     </Stack>
   )
 }

@@ -9,7 +9,7 @@ import * as z from "zod"
 import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const toolsTableParamsSchema = {
+export const toolTableParamsSchema = {
   name: parseAsString.withDefault(""),
   sort: getSortingStateParser<Tool>().withDefault([{ id: "createdAt", desc: true }]),
   page: parseAsInteger.withDefault(1),
@@ -20,8 +20,8 @@ export const toolsTableParamsSchema = {
   status: parseAsArrayOf(parseAsStringEnum(Object.values(ToolStatus))).withDefault([]),
 }
 
-export const toolsTableParamsCache = createSearchParamsCache(toolsTableParamsSchema)
-export type ToolsTableSchema = Awaited<ReturnType<typeof toolsTableParamsCache.parse>>
+export const toolTableParamsCache = createSearchParamsCache(toolTableParamsSchema)
+export type ToolTableSchema = Awaited<ReturnType<typeof toolTableParamsCache.parse>>
 
 export const toolSchema = z.object({
   id: z.string().optional(),

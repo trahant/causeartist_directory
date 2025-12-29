@@ -8,7 +8,7 @@ import * as z from "zod"
 import type { Category } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const categoriesTableParamsSchema = {
+export const categoryTableParamsSchema = {
   name: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(25),
@@ -18,8 +18,8 @@ export const categoriesTableParamsSchema = {
   operator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 }
 
-export const categoriesTableParamsCache = createSearchParamsCache(categoriesTableParamsSchema)
-export type CategoriesTableSchema = Awaited<ReturnType<typeof categoriesTableParamsCache.parse>>
+export const categoryTableParamsCache = createSearchParamsCache(categoryTableParamsSchema)
+export type CategoryTableSchema = Awaited<ReturnType<typeof categoryTableParamsCache.parse>>
 
 export const categorySchema = z.object({
   id: z.string().optional(),

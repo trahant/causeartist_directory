@@ -9,7 +9,7 @@ import { z } from "zod"
 import type { Report } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const reportsTableParamsSchema = {
+export const reportTableParamsSchema = {
   message: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(50),
@@ -20,8 +20,8 @@ export const reportsTableParamsSchema = {
   type: parseAsArrayOf(parseAsString).withDefault([]),
 }
 
-export const reportsTableParamsCache = createSearchParamsCache(reportsTableParamsSchema)
-export type ReportsTableSchema = Awaited<ReturnType<typeof reportsTableParamsCache.parse>>
+export const reportTableParamsCache = createSearchParamsCache(reportTableParamsSchema)
+export type ReportTableSchema = Awaited<ReturnType<typeof reportTableParamsCache.parse>>
 
 export const reportSchema = z.object({
   id: z.string().optional(),

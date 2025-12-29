@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { type ComponentProps, useTransition } from "react"
 import { toast } from "sonner"
 import type { User } from "~/.generated/prisma/browser"
-import { UsersDeleteDialog } from "~/app/admin/users/_components/users-delete-dialog"
+import { UserDeleteDialog } from "~/app/admin/users/_components/user-delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -36,6 +36,10 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
   const [isUpdatePending, startUpdateTransition] = useTransition()
   const roles = ["admin", "user"] as const
 
+  const indexPath = "/admin/users"
+  const singlePath = `${indexPath}/${user.id}`
+  const isSinglePage = pathname === singlePath
+
   if (user.id === session?.user.id) {
     return null
   }
@@ -55,9 +59,9 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" sideOffset={8}>
-          {pathname !== `/admin/users/${user.id}` && (
+          {!isSinglePage && (
             <DropdownMenuItem asChild>
-              <Link href={`/admin/users/${user.id}`}>Edit</Link>
+              <Link href={singlePath}>Edit</Link>
             </DropdownMenuItem>
           )}
 
@@ -144,7 +148,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
       </DropdownMenu>
 
       {user.role !== "admin" && (
-        <UsersDeleteDialog users={[user]} onExecute={() => router.push("/admin/users")}>
+        <UserDeleteDialog users={[user]} onExecute={() => isSinglePage && router.push(indexPath)}>
           <Button
             variant="secondary"
             size="sm"
@@ -152,7 +156,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
             className="text-red-500"
             {...props}
           />
-        </UsersDeleteDialog>
+        </UserDeleteDialog>
       )}
     </Stack>
   )

@@ -8,7 +8,7 @@ import * as z from "zod"
 import type { Tag } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const tagsTableParamsSchema = {
+export const tagTableParamsSchema = {
   name: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(25),
@@ -18,8 +18,8 @@ export const tagsTableParamsSchema = {
   operator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 }
 
-export const tagsTableParamsCache = createSearchParamsCache(tagsTableParamsSchema)
-export type TagsTableSchema = Awaited<ReturnType<typeof tagsTableParamsCache.parse>>
+export const tagTableParamsCache = createSearchParamsCache(tagTableParamsSchema)
+export type TagTableSchema = Awaited<ReturnType<typeof tagTableParamsCache.parse>>
 
 export const tagSchema = z.object({
   id: z.string().optional(),

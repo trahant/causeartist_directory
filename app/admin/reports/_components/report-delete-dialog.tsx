@@ -4,12 +4,12 @@ import type { Report } from "~/.generated/prisma/client"
 import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { deleteReports } from "~/server/admin/reports/actions"
 
-type ReportsDeleteDialogProps = PropsWithChildren<{
+type ReportDeleteDialogProps = PropsWithChildren<{
   reports: Report[]
   onExecute?: () => void
 }>
 
-export const ReportsDeleteDialog = ({ reports, onExecute, ...props }: ReportsDeleteDialogProps) => {
+export const ReportDeleteDialog = ({ reports, onExecute, ...props }: ReportDeleteDialogProps) => {
   return (
     <DeleteDialog
       ids={reports.map(({ id }) => id)}

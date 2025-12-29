@@ -14,8 +14,6 @@ import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { findCategory, findCategorySlugs } from "~/server/web/categories/queries"
 
-export const dynamicParams = false
-
 type Props = PageProps<"/categories/[slug]">
 
 // I18n page namespace

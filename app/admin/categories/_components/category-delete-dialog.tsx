@@ -4,16 +4,16 @@ import type { Category } from "~/.generated/prisma/client"
 import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { deleteCategories } from "~/server/admin/categories/actions"
 
-type CategoriesDeleteDialogProps = PropsWithChildren<{
+type CategoryDeleteDialogProps = PropsWithChildren<{
   categories: Category[]
   onExecute?: () => void
 }>
 
-export const CategoriesDeleteDialog = ({
+export const CategoryDeleteDialog = ({
   categories,
   onExecute,
   ...props
-}: CategoriesDeleteDialogProps) => {
+}: CategoryDeleteDialogProps) => {
   return (
     <DeleteDialog
       ids={categories.map(({ id }) => id)}

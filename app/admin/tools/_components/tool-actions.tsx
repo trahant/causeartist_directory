@@ -7,7 +7,7 @@ import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Tool } from "~/.generated/prisma/browser"
-import { ToolsDeleteDialog } from "~/app/admin/tools/_components/tools-delete-dialog"
+import { ToolDeleteDialog } from "~/app/admin/tools/_components/tool-delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -30,14 +30,13 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
   const pathname = usePathname()
   const router = useRouter()
 
-  const toolPath = `/admin/tools/${tool.slug}`
-  const isToolPage = pathname === toolPath
+  const indexPath = "/admin/tools"
+  const singlePath = `${indexPath}/${tool.slug}`
+  const isSinglePage = pathname === singlePath
 
   const { executeAsync } = useAction(duplicateTool, {
     onSuccess: ({ data }) => {
-      if (isToolPage) {
-        router.push(`/admin/tools/${data.slug}`)
-      }
+      isSinglePage && router.push(`${indexPath}/${data.slug}`)
     },
   })
 
@@ -74,9 +73,9 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" sideOffset={8}>
-          {!isToolPage && (
+          {!isSinglePage && (
             <DropdownMenuItem asChild>
-              <Link href={toolPath}>Edit</Link>
+              <Link href={singlePath}>Edit</Link>
             </DropdownMenuItem>
           )}
 
@@ -104,7 +103,7 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ToolsDeleteDialog tools={[tool]} onExecute={() => router.push("/admin/tools")}>
+      <ToolDeleteDialog tools={[tool]} onExecute={() => isSinglePage && router.push(indexPath)}>
         <Button
           variant="secondary"
           size="sm"
@@ -112,7 +111,7 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
           className="text-red-500"
           {...props}
         />
-      </ToolsDeleteDialog>
+      </ToolDeleteDialog>
     </Stack>
   )
 }

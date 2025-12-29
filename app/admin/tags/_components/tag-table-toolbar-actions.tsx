@@ -2,15 +2,15 @@
 
 import type { Table } from "@tanstack/react-table"
 import { TrashIcon } from "lucide-react"
-import type { User } from "~/.generated/prisma/browser"
+import type { Tag } from "~/.generated/prisma/browser"
+import { TagDeleteDialog } from "~/app/admin/tags/_components/tag-delete-dialog"
 import { Button } from "~/components/common/button"
-import { UsersDeleteDialog } from "./users-delete-dialog"
 
-interface UsersTableToolbarActionsProps {
-  table: Table<User>
+interface TagTableToolbarActionsProps {
+  table: Table<Tag>
 }
 
-export function UsersTableToolbarActions({ table }: UsersTableToolbarActionsProps) {
+export const TagTableToolbarActions = ({ table }: TagTableToolbarActionsProps) => {
   const { rows } = table.getFilteredSelectedRowModel()
 
   if (!rows.length) {
@@ -18,10 +18,10 @@ export function UsersTableToolbarActions({ table }: UsersTableToolbarActionsProp
   }
 
   return (
-    <UsersDeleteDialog users={rows.map(row => row.original)}>
+    <TagDeleteDialog tags={rows.map(row => row.original)}>
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})
       </Button>
-    </UsersDeleteDialog>
+    </TagDeleteDialog>
   )
 }
