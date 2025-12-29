@@ -13,7 +13,7 @@ export const ToolHoverCard = ({ tool, ...props }: ToolHoverCardProps) => {
       <HoverCardTrigger asChild {...props} />
 
       <HoverCardContent align="start" asChild>
-        <ToolCard tool={tool} />
+        <ToolCard tool={tool} className="p-5" />
       </HoverCardContent>
     </HoverCard>
   )

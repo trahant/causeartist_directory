@@ -27,7 +27,7 @@ const TableRow = ({ className, ...props }: ComponentProps<"tr">) => {
   return (
     <tr
       className={cx(
-        "relative grid grid-cols-subgrid col-span-full items-center h-9 [tbody>&:not([aria-disabled])]:hover:bg-accent data-[state=selected]:bg-accent",
+        "relative grid grid-cols-subgrid col-span-full items-center h-9 overflow-clip [tbody>&:not([aria-disabled])]:hover:bg-accent data-[state=selected]:bg-accent",
         className,
       )}
       {...props}

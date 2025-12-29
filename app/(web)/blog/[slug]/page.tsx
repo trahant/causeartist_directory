@@ -125,6 +125,7 @@ export default async function (props: Props) {
           {blogConfig.toolsMentioned.enabled && !!tools.length && (
             <TableOfContents
               title={t("posts.tools_mentioned")}
+              collapsible={false}
               headings={[
                 ...tools.map(({ slug, name, faviconUrl }) => ({
                   id: slug,

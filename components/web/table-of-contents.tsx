@@ -31,7 +31,7 @@ export const TableOfContents = ({ headings, ...props }: TableOfContentsProps) =>
             key={heading.id}
             href={`#${heading.id}`}
             className={cx(
-              "relative block py-1 text-sm leading-relaxed border-l-2 border-accent",
+              "relative py-1 text-sm leading-relaxed border-l-2 border-accent",
               // Indentation based on absolute level
               indentLevel === 0 && "pl-4",
               indentLevel === 1 && "pl-8",
