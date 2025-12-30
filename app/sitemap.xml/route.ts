@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { generateSitemaps } from "~/app/sitemap"
+import { sitemaps } from "~/app/sitemap/[id]/route"
 import { siteConfig } from "~/config/site"
 
 const buildSitemapIndex = (sitemaps: string[]) => {
@@ -16,10 +16,9 @@ const buildSitemapIndex = (sitemaps: string[]) => {
   return xml
 }
 
-export const GET = async () => {
+export const GET = () => {
   const { url } = siteConfig
-  const sitemaps = await generateSitemaps()
-  const sitemapIndexXML = buildSitemapIndex(sitemaps.map(({ id }) => `${url}/sitemap/${id}.xml`))
+  const sitemapIndexXML = buildSitemapIndex(sitemaps.map(id => `${url}/sitemap/${id}.xml`))
 
   return new NextResponse(sitemapIndexXML, {
     headers: {

@@ -28,6 +28,15 @@ const nextConfig: NextConfig = {
       "@content-collections/next",
     ],
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/sitemap/:id.xml",
+        destination: "/sitemap/:id",
+      },
+    ]
+  },
 }
 
 export default withContentCollections(withNextIntl(withPlausible(nextConfig)))
