@@ -43,8 +43,8 @@ export const FormMedia = <T extends FieldValues>({
             size="sm"
             variant="secondary"
             prefix={<UploadIcon />}
-            isPending={action.upload.isPending}
-            disabled={action.isPending}
+            isPending={action.isUploading}
+            disabled={action.isUploading || action.isFetching}
             onClick={() => inputRef.current?.click()}
           >
             Upload
@@ -56,8 +56,8 @@ export const FormMedia = <T extends FieldValues>({
               size="sm"
               variant="secondary"
               prefix={<DownloadCloudIcon />}
-              isPending={action.fetch?.isPending}
-              disabled={!isValidUrl(websiteUrl) || action.isPending}
+              isPending={action.isFetching}
+              disabled={!isValidUrl(websiteUrl) || action.isUploading || action.isFetching}
               onClick={() => action.handleFetch(websiteUrl)}
             >
               Fetch

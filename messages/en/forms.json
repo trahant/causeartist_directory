@@ -16,7 +16,6 @@
     "submitted_success": "{name} has been submitted.",
     "errors": {
       "rate_limited": "Too many submissions. Please try again later.",
-      "disposable_email": "Please use a valid, non-disposable email address.",
       "failed_submission": "We couldn't submit your tool. Please try again.",
       "slug_generation_failed": "We couldn't generate a unique URL for your tool. Try renaming it and resubmit."
     }

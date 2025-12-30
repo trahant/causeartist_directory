@@ -2,6 +2,7 @@
   "required": "This field is required",
   "invalidUrl": "Please enter a valid URL",
   "invalidEmail": "Please enter a valid email address",
+  "invalidPath": "File path is invalid",
   "minLength": "This field must be at least {length} {length, plural, =1 {character} other {characters}}",
   "maxLength": "This field must be less than {length} {length, plural, =1 {character} other {characters}}",
   "invalidLength": "This field must be {length} {length, plural, =1 {character} other {characters}}",

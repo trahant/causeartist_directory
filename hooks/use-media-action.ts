@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl"
 import { useAction } from "next-safe-action/hooks"
-import type { ChangeEvent } from "react"
+import { type ChangeEvent, useTransition } from "react"
 import type { FieldPath, FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
 import { fetchMedia, uploadMedia } from "~/server/web/actions/media"
@@ -23,8 +23,9 @@ export const useMediaAction = <T extends FieldValues>({
   successMessage = "Media successfully uploaded. Please save to update.",
   errorMessage = "Failed to upload media. Please try again.",
 }: MediaActionConfig<T>) => {
-  const tSchema = useTranslations("schema")
-  const schema = createFileSchema(tSchema)
+  const [isUploading, startUpload] = useTransition()
+  const t = useTranslations("schema")
+  const fileSchema = createFileSchema(t)
 
   const fetch = useAction(fetchMedia, {
     onSuccess: ({ data }) => {
@@ -37,45 +38,47 @@ export const useMediaAction = <T extends FieldValues>({
     },
   })
 
-  const upload = useAction(uploadMedia, {
-    onSuccess: ({ data }) => {
-      form.clearErrors(fieldName)
-      form.resetField(fieldName)
-      form.setValue(fieldName, data as PathValue<T, Path<T>>)
-      toast.success(successMessage)
-    },
-
-    onError: ({ error: { serverError, validationErrors } }) => {
-      const message = validationErrors?.file?._errors?.[0] ?? errorMessage
-      serverError && toast.error(serverError)
-      form.setError(fieldName, { message })
-    },
-  })
-
   const handleFetch = async (url: string) => {
     fetch.execute({ url, type: fetchType, path })
   }
 
-  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    const { data, error } = schema.safeParse(file)
 
-    if (error) {
-      const message = JSON.parse(error.message)[0]?.message ?? errorMessage
-      form.setError(fieldName, { message })
-      return
-    }
+    startUpload(async () => {
+      const { data, error } = await fileSchema.safeParseAsync(file)
 
-    form.clearErrors(fieldName)
+      if (error) {
+        const message = error.issues[0]?.message ?? errorMessage
+        form.setError(fieldName, { message })
+        return
+      }
 
-    upload.execute({ path, file: data })
+      form.clearErrors(fieldName)
+
+      const formData = new FormData()
+      formData.append("path", path)
+      formData.append("file", data)
+
+      const response = await uploadMedia(formData)
+
+      if (response.error) {
+        form.setError(fieldName, { message: response.error })
+        return
+      }
+
+      if (response.data) {
+        form.resetField(fieldName)
+        form.setValue(fieldName, response.data as PathValue<T, Path<T>>)
+        toast.success(successMessage)
+      }
+    })
   }
 
   return {
-    fetch,
-    upload,
-    handleFetch,
     handleUpload,
-    isPending: fetch.isPending || upload.isPending,
+    handleFetch,
+    isUploading,
+    isFetching: fetch.isPending,
   }
 }

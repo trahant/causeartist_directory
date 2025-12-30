@@ -24,13 +24,21 @@ export const fetchMedia = actionClient
     return await uploadToS3Storage(data, path)
   })
 
-export const uploadMedia = actionClient
-  .inputSchema(async () => {
-    const t = await getTranslations("schema")
-    return createUploadMediaSchema(t)
-  })
-  .action(async ({ parsedInput: { file, path } }) => {
-    const buffer = Buffer.from(await file.arrayBuffer())
+export async function uploadMedia(formData: FormData) {
+  const t = await getTranslations("schema")
+  const schema = createUploadMediaSchema(t)
 
-    return await uploadToS3Storage(buffer, path)
+  const { data, error } = schema.safeParse({
+    path: formData.get("path"),
+    file: formData.get("file"),
   })
+
+  if (error) {
+    return { error: error.issues[0]?.message }
+  }
+
+  const buffer = Buffer.from(await data.file.arrayBuffer())
+  const url = await uploadToS3Storage(buffer, data.path)
+
+  return { data: url }
+}

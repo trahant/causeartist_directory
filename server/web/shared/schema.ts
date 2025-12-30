@@ -12,22 +12,18 @@ export const ALLOWED_MIMETYPES = [
   "image/avif",
 ]
 
-const pathSchema = z.object({
-  path: z.string().regex(/^[a-z0-9/_-]+$/i),
-})
+const createPathSchema = (t: TFunction) => {
+  return z.object({
+    path: z.string().regex(/^[a-z0-9/_-]+$/i, { error: t("invalidPath") }),
+  })
+}
 
 export const createFileSchema = (t: TFunction) => {
   return z
     .instanceof(File)
-    .refine(async ({ size }) => size > 0, {
-      error: t("fileCannotBeEmpty"),
-    })
-    .refine(async ({ size }) => size < 1024 * 512, {
-      error: t("fileSizeTooLarge"),
-    })
-    .refine(async ({ type }) => isMimeTypeMatch(type, ALLOWED_MIMETYPES), {
-      error: t("fileTypeInvalid"),
-    })
+    .refine(({ size }) => size > 0, { error: t("fileCannotBeEmpty") })
+    .refine(({ size }) => size < 1024 * 512, { error: t("fileSizeTooLarge") })
+    .refine(({ type }) => isMimeTypeMatch(type, ALLOWED_MIMETYPES), { error: t("fileTypeInvalid") })
 }
 
 export const createSubmitToolSchema = (t: TFunction) => {
@@ -104,7 +100,7 @@ export const createAdDetailsSchema = (t: TFunction) => {
 }
 
 export const createFetchMediaSchema = (t: TFunction) => {
-  return pathSchema.extend({
+  return createPathSchema(t).extend({
     url: z
       .url({ error: t("invalidUrl") })
       .min(1, { error: t("required") })
@@ -114,7 +110,7 @@ export const createFetchMediaSchema = (t: TFunction) => {
 }
 
 export const createUploadMediaSchema = (t: TFunction) => {
-  return pathSchema.extend({
+  return createPathSchema(t).extend({
     file: createFileSchema(t),
   })
 }
