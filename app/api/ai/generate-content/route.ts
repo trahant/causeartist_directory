@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google"
-import { streamObject } from "ai"
+import { Output, streamText } from "ai"
 import { z } from "zod"
 import { withAdminAuth } from "~/lib/auth-hoc"
 import { scrapeWebsiteData } from "~/lib/scraper"
@@ -17,9 +17,9 @@ export const POST = withAdminAuth(async req => {
 
   const scrapedData = await scrapeWebsiteData(url)
 
-  const result = streamObject({
+  const result = streamText({
     model: google("gemini-2.5-pro"),
-    schema: contentSchema,
+    output: Output.object({ schema: contentSchema }),
     system: `
       You are an expert content creator specializing in reasearching and writing about tools.
       Your task is to generate high-quality, engaging content to display on a directory website.

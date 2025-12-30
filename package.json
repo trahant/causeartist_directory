@@ -20,8 +20,8 @@
     "postinstall": "bun run db:generate"
   },
   "dependencies": {
-    "@ai-sdk/google": "^2.0.51",
-    "@ai-sdk/react": "^2.0.118",
+    "@ai-sdk/google": "^3.0.0",
+    "@ai-sdk/react": "^3.0.0",
     "@aws-sdk/client-s3": "^3.958.0",
     "@aws-sdk/lib-storage": "^3.958.0",
     "@content-collections/core": "^0.12.0",
@@ -37,7 +37,7 @@
     "@react-email/components": "^1.0.2",
     "@t3-oss/env-nextjs": "^0.13.10",
     "@tanstack/react-table": "^8.21.3",
-    "ai": "^5.0.116",
+    "ai": "^6.0.0",
     "better-auth": "^1.4.9",
     "change-case": "^5.4.4",
     "cmdk": "^1.1.1",

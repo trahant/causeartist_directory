@@ -22,6 +22,7 @@ import { H3 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
+import { TextArea } from "~/components/common/textarea"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { cx } from "~/lib/utils"
 import { upsertCategory } from "~/server/admin/categories/actions"
@@ -164,7 +165,7 @@ export function CategoryForm({
             <FormItem className="col-span-full">
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <TextArea {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
