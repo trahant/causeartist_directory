@@ -4,7 +4,7 @@ import { type UseQueryStatesKeysMap, useQueryStates, type Values } from "nuqs"
 import { createContext, type PropsWithChildren, use, useTransition } from "react"
 import { isDefaultState } from "~/lib/parsers"
 
-export type FiltersContextType<T extends UseQueryStatesKeysMap> = {
+type FiltersContextType<T extends UseQueryStatesKeysMap> = {
   filters: Values<T>
   isLoading: boolean
   isDefault: boolean

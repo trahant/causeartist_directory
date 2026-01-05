@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "start": "next start",
     "build": "next build",
     "lint": "bun biome check --write .",
@@ -20,7 +20,6 @@
     "postinstall": "bun run db:generate"
   },
   "dependencies": {
-    "@ai-sdk/google": "^3.0.2",
     "@ai-sdk/react": "^3.0.6",
     "@aws-sdk/client-s3": "^3.962.0",
     "@aws-sdk/lib-storage": "^3.962.0",

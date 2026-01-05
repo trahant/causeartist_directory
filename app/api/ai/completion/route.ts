@@ -1,21 +1,17 @@
-import { google } from "@ai-sdk/google"
 import { streamText } from "ai"
 import { z } from "zod"
 import { withAdminAuth } from "~/lib/auth-hoc"
-
-const completionSchema = z.object({
-  prompt: z.string(),
-  model: z
-    .enum(["gemini-2.0-pro-exp-02-05", "gemini-2.0-flash-lite-preview-02-05"])
-    .optional()
-    .default("gemini-2.0-flash-lite-preview-02-05"),
-})
+import { getCompletionModel, isAIEnabled } from "~/services/ai"
 
 export const POST = withAdminAuth(async req => {
-  const { prompt, model } = completionSchema.parse(await req.json())
+  if (!isAIEnabled) {
+    return Response.json({ error: "AI features are not configured" }, { status: 501 })
+  }
+
+  const { prompt } = z.object({ prompt: z.string() }).parse(await req.json())
 
   const result = streamText({
-    model: google(model),
+    model: getCompletionModel(),
     prompt,
   })
 

@@ -37,7 +37,9 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     SCREENSHOTONE_ACCESS_KEY: z.string().min(1),
     PLAUSIBLE_API_KEY: z.string().min(1),
-    GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
+    AI_GATEWAY_API_KEY: z.string().optional(),
+    AI_CHAT_MODEL: z.string().default("openai/gpt-4o"),
+    AI_COMPLETION_MODEL: z.string().default("openai/gpt-4o-mini"),
     JINA_API_KEY: z.string().optional(),
   },
 

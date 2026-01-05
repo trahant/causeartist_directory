@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/common/pop
 import { Separator } from "~/components/common/separator"
 import { Stack } from "~/components/common/stack"
 import { Tooltip } from "~/components/common/tooltip"
+import { useAI } from "~/contexts/ai-context"
 import { cx } from "~/lib/utils"
 
 type Relation = {
@@ -46,6 +47,7 @@ export const RelationSelector = <T extends Relation>({
   sortFunction,
   setSelectedIds,
 }: RelationSelectorProps<T>) => {
+  const { isAIEnabled } = useAI()
   const suggestRelations = suggestedIds ? relations.filter(r => suggestedIds.includes(r.id)) : []
   const [suggestedRelations, setSuggestedRelations] = useState<T[]>(suggestRelations)
   const selectedRelations = relations?.filter(({ id }) => selectedIds.includes(id))
@@ -70,13 +72,14 @@ export const RelationSelector = <T extends Relation>({
 
   useEffect(() => {
     if (
+      isAIEnabled &&
       debouncedPrompt &&
       !!relations.length &&
       !selectedIds.length &&
       !suggestedRelations.length
     ) {
       complete(`${debouncedPrompt}
-        
+
         Only return the relation names in comma-separated format, and nothing else. If there are no relevant relations, return an empty string.
         Sort the relations by relevance to the link.
         Suggest only ${maxSuggestions} relations at most.
@@ -84,7 +87,7 @@ export const RelationSelector = <T extends Relation>({
         Available relations: ${relations.map(({ name }) => name).join(", ")}
       `)
     }
-  }, [debouncedPrompt, selectedIds])
+  }, [isAIEnabled, debouncedPrompt, selectedIds])
 
   const handleFilter = (value: string, search: string) => {
     const normalizedValue = value.toLowerCase()
@@ -189,7 +192,7 @@ export const RelationSelector = <T extends Relation>({
         </PopoverContent>
       </Popover>
 
-      {isLoading && (
+      {isAIEnabled && isLoading && (
         <AnimatedContainer height transition={{ ease: "linear", duration: 0.1 }}>
           <Stack size="xs" className="text-xs">
             <LoaderIcon className="animate-spin" />
@@ -198,7 +201,7 @@ export const RelationSelector = <T extends Relation>({
         </AnimatedContainer>
       )}
 
-      {(suggestedRelations.length || prompt) && (
+      {isAIEnabled && (suggestedRelations.length || prompt) && (
         <AnimatedContainer height transition={{ ease: "linear", duration: 0.1 }}>
           {!!suggestedRelations.length && (
             <Stack size="sm" direction="row" className="items-start">

@@ -47,7 +47,8 @@ next-env.d.ts
 # IDE Rules
 .cursor
 .claude
-claude.md
+CLAUDE.md
+AGENTS.md
 
 # sitemap
 public/sitemap*.xml

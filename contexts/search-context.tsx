@@ -2,7 +2,7 @@
 
 import { createContext, type PropsWithChildren, use, useState } from "react"
 
-export type SearchContextType = {
+type SearchContextType = {
   isOpen: boolean
   open: () => void
   close: () => void

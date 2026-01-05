@@ -11,7 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/common/dialog"
+import { Tooltip } from "~/components/common/tooltip"
 import { siteConfig } from "~/config/site"
+import { useAI } from "~/contexts/ai-context"
 
 type AIGenerateProps = ComponentProps<typeof Button> & {
   stop: () => void
@@ -27,9 +29,20 @@ export const AIGenerate = ({
   onGenerate,
   ...props
 }: AIGenerateProps) => {
+  const { isAIEnabled } = useAI()
   const key = siteConfig.slug
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [consent, setConsent] = useLocalStorage({ key: `${key}-ai-consent`, defaultValue: false })
+
+  if (!isAIEnabled) {
+    return (
+      <Tooltip tooltip="AI features are not configured. Set AI_GATEWAY_API_KEY to enable.">
+        <Button type="button" variant="secondary" size="md" prefix={<SparklesIcon />} disabled>
+          <span className="max-md:sr-only">{buttonText || "Generate"}</span>
+        </Button>
+      </Tooltip>
+    )
+  }
 
   const handleGenerate = (force = false) => {
     if (!consent && !force) {
