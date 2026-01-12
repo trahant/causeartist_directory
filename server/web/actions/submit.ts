@@ -25,25 +25,24 @@ export const submitTool = userActionClient
     return createSubmitToolSchema(t)
   })
   .action(async ({ parsedInput: { newsletterOptIn, ...data }, ctx: { user } }) => {
+    const t = await getTranslations("forms.submit.errors")
     const domain = getDomain(data.websiteUrl)
     const websiteUrl = normalizeUrl(data.websiteUrl)
 
     // Check for blocked domains (temporary hosting providers)
     if (isBlockedDomain(domain)) {
-      throw new Error(
-        "Temporary hosting domains (e.g. vercel.app, netlify.app) are not allowed. Please use a custom domain.",
-      )
+      throw new Error(t("blocked_domain"))
     }
 
     // Check if the website URL is accessible
     const isUrlAccessible = await checkUrlAvailability(websiteUrl)
     if (!isUrlAccessible) {
-      throw new Error("Website URL is not accessible. Please check the URL and try again.")
+      throw new Error(t("url_not_accessible"))
     }
 
     // Rate limiting check
     if (await isRateLimited("submission")) {
-      throw new Error("Too many submissions. Please try again later.")
+      throw new Error(t("rate_limited"))
     }
 
     if (newsletterOptIn && user.name) {
@@ -100,7 +99,7 @@ export const submitTool = userActionClient
     )
 
     if (error) {
-      throw isDev ? error : new Error("Failed to submit tool")
+      throw isDev ? error : new Error(t("failed_submission"))
     }
 
     // Notify the submitter of the tool submitted

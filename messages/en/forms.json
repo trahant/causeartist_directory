@@ -17,7 +17,9 @@
     "errors": {
       "rate_limited": "Too many submissions. Please try again later.",
       "failed_submission": "We couldn't submit your tool. Please try again.",
-      "slug_generation_failed": "We couldn't generate a unique URL for your tool. Try renaming it and resubmit."
+      "slug_generation_failed": "We couldn't generate a unique URL for your tool. Try renaming it and resubmit.",
+      "blocked_domain": "Temporary hosting domains (e.g. vercel.app, netlify.app) are not allowed. Please use a custom domain.",
+      "url_not_accessible": "Website URL is not accessible. Please check the URL and try again."
     }
   },
   "ad_details": {
