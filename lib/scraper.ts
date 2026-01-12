@@ -1,7 +1,7 @@
 import { tryCatch } from "@primoui/utils"
 import wretch from "wretch"
-import { getCache, setCache } from "~/lib/cache"
 import { env } from "~/env"
+import { getCache, setCache } from "~/lib/cache"
 
 type JinaResponse = {
   data: {
