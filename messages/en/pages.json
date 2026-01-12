@@ -114,6 +114,11 @@
   "submit": {
     "title": "Add a free listing",
     "description": "Listing on {siteName} is a great way to get more exposure for your tool. We only list high-quality tools that are useful for directory owners.",
+    "auth_required": {
+      "title": "Sign in required",
+      "description": "You need to sign in to submit a tool. This helps us maintain quality submissions and allows you to track your submissions in your dashboard.",
+      "button": "Sign in to submit"
+    },
     "feature": {
       "title": "Boost {name}'s Visibility",
       "description": "Upgrade {name}'s listing on {siteName} to get a verified featured badge, prominent placement in listings, and a do-follow backlink."
