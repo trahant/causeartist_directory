@@ -7,7 +7,7 @@
  * Run with: bun scripts/test-domain-blocking.ts
  */
 
-import { isBlockedDomain, BLOCKED_DOMAINS } from "../lib/blocked-domains"
+import { BLOCKED_DOMAINS, isBlockedDomain } from "../lib/blocked-domains"
 
 // Test cases for blocked domains
 const blockedTestCases = [
@@ -121,7 +121,7 @@ function runTests() {
     }
   }
 
-  console.log("\n" + "=".repeat(60))
+  console.log(`\n${"=".repeat(60)}`)
   console.log(`Results: ${passed} passed, ${failed} failed`)
   console.log("=".repeat(60))
 
