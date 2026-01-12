@@ -21,7 +21,6 @@ import { Input } from "~/components/common/input"
 import { TextArea } from "~/components/common/textarea"
 import { FeatureNudge } from "~/components/web/feature-nudge"
 import { useTrackEvent } from "~/hooks/use-track-event"
-import { useSession } from "~/lib/auth-client"
 import { isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import { submitTool } from "~/server/web/actions/submit"
@@ -30,7 +29,6 @@ import { createSubmitToolSchema } from "~/server/web/shared/schema"
 export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
   const router = useRouter()
   const trackEvent = useTrackEvent()
-  const { data: session } = useSession()
   const t = useTranslations("forms.submit")
   const tSchema = useTranslations("schema")
 
@@ -42,8 +40,6 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
       values: {
         name: "",
         websiteUrl: "",
-        submitterName: session?.user.name || "",
-        submitterEmail: session?.user.email || "",
         submitterNote: "",
         newsletterOptIn: true,
       },
@@ -83,39 +79,6 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
         noValidate
         {...props}
       >
-        <FormField
-          control={form.control}
-          name="submitterName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel isRequired>{t("your_name_label")}:</FormLabel>
-              <FormControl>
-                <Input size="lg" placeholder={t("your_name_placeholder")} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="submitterEmail"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel isRequired>{t("your_email_label")}:</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  size="lg"
-                  placeholder={t("your_email_placeholder")}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="name"
