@@ -46,12 +46,12 @@ export const submitTool = userActionClient
       throw new Error("Too many submissions. Please try again later.")
     }
 
-    if (newsletterOptIn) {
-      const [firstName, ...restOfName] = data.submitterName.trim().split(/\s+/)
+    if (newsletterOptIn && user.name) {
+      const [firstName, ...restOfName] = user.name.trim().split(/\s+/)
       const lastName = restOfName.join(" ")
 
       await createResendContact({
-        email: data.submitterEmail,
+        email: user.email,
         firstName,
         lastName,
       })
@@ -68,12 +68,15 @@ export const submitTool = userActionClient
     // If the tool exists, redirect to the tool or submit page
     if (existingTool) {
       if (!existingTool.submitterEmail) {
-        const { submitterEmail, submitterName, submitterNote } = data
-
-        // Update the tool with the new submitter information
+        // Update the tool with the new submitter information from authenticated user
         await db.tool.update({
           where: { id: existingTool.id },
-          data: { submitterEmail, submitterName, submitterNote, ownerId },
+          data: {
+            submitterEmail: user.email,
+            submitterName: user.name,
+            submitterNote: data.submitterNote,
+            ownerId,
+          },
         })
       }
 
@@ -83,7 +86,16 @@ export const submitTool = userActionClient
     // Save the tool to the database with Pending status for user submissions
     const { data: tool, error } = await tryCatch(
       db.tool.create({
-        data: { ...data, slug: "", websiteUrl, ownerId, status: ToolStatus.Pending },
+        data: {
+          name: data.name,
+          websiteUrl,
+          submitterEmail: user.email,
+          submitterName: user.name,
+          submitterNote: data.submitterNote,
+          slug: "",
+          ownerId,
+          status: ToolStatus.Pending,
+        },
       }),
     )
 
