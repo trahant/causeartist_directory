@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server"
 import { ToolStatus } from "~/.generated/prisma/client"
 import { isDev } from "~/env"
 import { isBlockedDomain } from "~/lib/blocked-domains"
+import { checkUrlAvailability } from "~/lib/http"
 import { notifySubmitterOfToolSubmitted } from "~/lib/notifications"
 import { isRateLimited } from "~/lib/rate-limiter"
 import { userActionClient } from "~/lib/safe-actions"
@@ -32,6 +33,12 @@ export const submitTool = userActionClient
       throw new Error(
         "Temporary hosting domains (e.g. vercel.app, netlify.app) are not allowed. Please use a custom domain.",
       )
+    }
+
+    // Check if the website URL is accessible
+    const isUrlAccessible = await checkUrlAvailability(websiteUrl)
+    if (!isUrlAccessible) {
+      throw new Error("Website URL is not accessible. Please check the URL and try again.")
     }
 
     // Rate limiting check
