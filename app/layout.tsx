@@ -1,4 +1,9 @@
+import "./styles.css"
+
+import { MotionConfig } from "motion/react"
 import type { Metadata } from "next"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getMessages, getTimeZone, getTranslations } from "next-intl/server"
 import { ThemeProvider } from "next-themes"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { Search } from "~/components/common/search"
@@ -8,9 +13,6 @@ import { metadataConfig } from "~/config/metadata"
 import { siteConfig } from "~/config/site"
 import { SearchProvider } from "~/contexts/search-context"
 import { fontSans } from "~/lib/fonts"
-import "./styles.css"
-import { NextIntlClientProvider } from "next-intl"
-import { getLocale, getMessages, getTimeZone, getTranslations } from "next-intl/server"
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations()
@@ -45,7 +47,7 @@ export default async function ({ children }: LayoutProps<"/">) {
             <TooltipProvider delayDuration={250}>
               <SearchProvider>
                 <ThemeProvider attribute="class" disableTransitionOnChange>
-                  {children}
+                  <MotionConfig reducedMotion="user">{children}</MotionConfig>
                   <Toaster />
                   <Search />
                 </ThemeProvider>
