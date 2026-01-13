@@ -1,9 +1,5 @@
 {
   "submit": {
-    "your_name_label": "Your Name",
-    "your_name_placeholder": "John Doe",
-    "your_email_label": "Your Email",
-    "your_email_placeholder": "john@doe.com",
     "name_label": "Name",
     "name_placeholder": "PostHog",
     "website_label": "Website URL",
