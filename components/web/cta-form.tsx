@@ -31,7 +31,7 @@ export const CTAForm = ({
   buttonProps,
   ...props
 }: CTAFormProps) => {
-  const t = useTranslations("forms.cta")
+  const t = useTranslations("forms.subscribe")
   const tSchema = useTranslations("schema")
   const trackEvent = useTrackEvent()
 

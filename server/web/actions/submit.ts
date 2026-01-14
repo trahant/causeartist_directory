@@ -24,17 +24,17 @@ export const submitTool = userActionClient
     return createSubmitToolSchema(t)
   })
   .action(async ({ parsedInput: { newsletterOptIn, ...data }, ctx: { user } }) => {
-    const t = await getTranslations("forms.submit.errors")
+    const t = await getTranslations("forms.submit")
     const domain = getDomain(data.websiteUrl)
 
     // Rate limiting check
-    if (await isRateLimited("submission")) {
-      throw new Error(t("rate_limited"))
+    if (user.role !== "admin" && (await isRateLimited("submission"))) {
+      throw new Error(t("errors.rate_limited"))
     }
 
     // Check if the website URL is accessible
     if (!(await checkUrlAvailability(data.websiteUrl))) {
-      throw new Error(t("url_not_accessible"))
+      throw new Error(t("errors.url_not_accessible"))
     }
 
     if (newsletterOptIn) {
@@ -84,7 +84,7 @@ export const submitTool = userActionClient
     )
 
     if (error) {
-      throw isDev ? error : new Error(t("failed_submission"))
+      throw isDev ? error : new Error(t("errors.failed_submission"))
     }
 
     // Notify the submitter of the tool submitted

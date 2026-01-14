@@ -1,5 +1,6 @@
 "use server"
 
+import { tryCatch } from "@primoui/utils"
 import { getTranslations } from "next-intl/server"
 import { isRateLimited } from "~/lib/rate-limiter"
 import { actionClient } from "~/lib/safe-actions"
@@ -17,13 +18,20 @@ export const subscribeToNewsletter = actionClient
     return createNewsletterSchema(t)
   })
   .action(async ({ parsedInput: { email } }) => {
+    const t = await getTranslations("forms.subscribe")
+
     // Rate limiting check
     if (await isRateLimited("newsletter")) {
-      throw new Error("Too many attempts. Please try again later.")
+      throw new Error(t("errors.rate_limited"))
     }
 
     // Create a resend contact
-    await createResendContact({ email })
+    const { error } = await tryCatch(createResendContact({ email }))
 
-    return "You've been subscribed to the newsletter."
+    if (error) {
+      console.error("Failed to create resend contact:", error)
+      throw new Error(t("errors.failed"))
+    }
+
+    return t("success_message")
   })

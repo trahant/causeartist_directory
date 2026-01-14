@@ -42,11 +42,16 @@
       "generic": "Something went wrong while saving the advertisement. Please try again."
     }
   },
-  "cta": {
+  "subscribe": {
     "email_placeholder": "Enter your email",
     "proof": "Join {count}+ other members",
     "button_md": "Subscribe",
-    "button_lg": "Join our community"
+    "button_lg": "Join our community",
+    "success_message": "You've been subscribed to the newsletter.",
+    "errors": {
+      "rate_limited": "Too many attempts. Please try again later.",
+      "failed": "We couldn't create a resend contact. Please try again."
+    }
   },
   "feedback": {
     "question": "What can we do to improve {siteName}?",
