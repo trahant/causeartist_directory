@@ -2,7 +2,7 @@
 
 import { Tooltip as TooltipPrimitive } from "radix-ui"
 import type { ComponentProps, ReactNode } from "react"
-import { cx } from "~/lib/utils"
+import { cva, cx, type VariantProps } from "~/lib/utils"
 
 const TooltipProvider = TooltipPrimitive.Provider
 const TooltipRoot = TooltipPrimitive.Root
@@ -10,19 +10,31 @@ const TooltipTrigger = TooltipPrimitive.Trigger
 const TooltipPortal = TooltipPrimitive.Portal
 const TooltipArrow = TooltipPrimitive.Arrow
 
-const TooltipContent = ({
-  className,
-  sideOffset = 4,
-  ...props
-}: ComponentProps<typeof TooltipPrimitive.Content>) => {
+const tooltipContentVariants = cva({
+  base: "z-50 max-w-[20em] inline-flex items-center gap-2 bg-foreground text-background text-center text-pretty rounded-md shadow-md will-change-[transform,opacity]",
+
+  variants: {
+    size: {
+      sm: "px-3 py-1.5 text-xs",
+      md: "px-4 py-2.5 text-[13px]",
+      lg: "px-5 py-3.5 text-sm",
+    },
+  },
+
+  defaultVariants: {
+    size: "sm",
+  },
+})
+
+type TooltipContentProps = ComponentProps<typeof TooltipPrimitive.Content> &
+  VariantProps<typeof tooltipContentVariants>
+
+const TooltipContent = ({ className, sideOffset = 4, size, ...props }: TooltipContentProps) => {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
-        className={cx(
-          "z-50 max-w-60 inline-flex items-center gap-2 px-3 py-1.5 bg-foreground text-xs text-background text-center text-pretty rounded-md will-change-[transform,opacity]",
-          className,
-        )}
+        className={cx(tooltipContentVariants({ size, className }))}
         {...props}
       />
     </TooltipPrimitive.Portal>

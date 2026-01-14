@@ -8,5 +8,5 @@ type NoteProps = ComponentProps<"p"> & {
 export const Note = ({ className, as, ...props }: NoteProps) => {
   const Comp = as || "p"
 
-  return <Comp className={cx("text-sm text-muted-foreground", className)} {...props} />
+  return <Comp className={cx("text-sm/normal text-muted-foreground", className)} {...props} />
 }

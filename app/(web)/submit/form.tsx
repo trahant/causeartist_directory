@@ -71,6 +71,8 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
     },
   })
 
+  const { serverError } = action.result
+
   return (
     <Form {...form}>
       <form
@@ -135,15 +137,13 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
           )}
         />
 
+        {serverError && <Hint className="col-span-full">{serverError}</Hint>}
+
         <div className="col-span-full">
           <Button variant="primary" isPending={action.isPending} className="flex min-w-32">
             {t("submit_button")}
           </Button>
         </div>
-
-        {action.result.serverError && (
-          <Hint className="col-span-full">{action.result.serverError}</Hint>
-        )}
       </form>
     </Form>
   )

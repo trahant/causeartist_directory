@@ -5,7 +5,7 @@ import { Stack } from "~/components/common/stack"
 import { cva, cx, type VariantProps } from "~/lib/utils"
 
 const cardVariants = cva({
-  base: "group relative flex flex-col items-start gap-4 w-full border bg-card p-5 rounded-lg transform-gpu",
+  base: "group relative flex flex-col items-start gap-4 w-full border bg-card p-5 rounded-lg",
 
   variants: {
     hover: {
@@ -13,7 +13,7 @@ const cardVariants = cva({
     },
 
     isRevealed: {
-      true: "animate-reveal",
+      true: "animate-reveal transform-gpu",
     },
 
     isHighlighted: {
@@ -84,7 +84,7 @@ const CardBadges = ({ className, size = "sm", ...props }: ComponentProps<typeof 
   return (
     <Stack
       size={size}
-      className={cx("absolute top-0 inset-x-5 z-10 -translate-y-1/2", className)}
+      className={cx("absolute top-0 inset-x-5 z-15 place-self-start -translate-y-1/2", className)}
       {...props}
     />
   )
