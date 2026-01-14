@@ -2,15 +2,21 @@ import { cacheLife, cacheTag } from "next/cache"
 import type { ComponentProps } from "react"
 import { MetricChart } from "~/components/admin/metrics/metric-chart"
 import type { Card } from "~/components/common/card"
-import { getTotalVisitors } from "~/lib/analytics"
+import { getPlausibleVisitors } from "~/lib/analytics"
+import { calculateMetricStats, fillMissingDates, getMetricDateRange } from "~/lib/metrics"
 
 const getVisitors = async () => {
   "use cache"
 
   cacheTag("analytics")
-  cacheLife("minutes")
+  cacheLife("hours")
 
-  return await getTotalVisitors()
+  const { today, startDate, dateRange } = getMetricDateRange()
+  const visitors = await getPlausibleVisitors(dateRange)
+  const results = fillMissingDates(visitors, startDate, today)
+  const { total, average } = calculateMetricStats(results)
+
+  return { results, totalVisitors: total, averageVisitors: average }
 }
 
 const VisitorMetric = async ({ ...props }: ComponentProps<typeof Card>) => {

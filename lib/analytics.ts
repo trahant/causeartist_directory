@@ -1,65 +1,53 @@
 import { tryCatch } from "@primoui/utils"
-import { eachDayOfInterval, format, startOfDay, subDays } from "date-fns"
 import { siteConfig } from "~/config/site"
 import { getPlausibleApi } from "~/services/plausible"
-
-type AnalyticsPageResponse = {
-  results: { metrics: [number, number]; dimensions: [] }[]
-}
 
 /**
  * Get the page analytics for a given page and period
  * @param page - The page to get the analytics for
  * @param period - The period to get the analytics for
- * @returns The page analytics
+ * @returns The number of pageviews for the given page and period
  */
-export const getPageAnalytics = async (page: string, period = "30d") => {
-  const query = {
-    site_id: siteConfig.domain,
-    metrics: ["visitors", "pageviews"],
-    date_range: period,
-    filters: [["is", "event:page", [page]]],
-  }
-
+export const getPlausiblePageviews = async (page: string, period: string | string[] = "30d") => {
   const { data, error } = await tryCatch(
-    getPlausibleApi().post(query).json<AnalyticsPageResponse>(),
+    getPlausibleApi()
+      .post({
+        site_id: siteConfig.domain,
+        metrics: ["pageviews"],
+        date_range: period,
+        filters: [["is", "event:page", [page]]],
+      })
+      .json<{ results: { metrics: [number]; dimensions: [] }[] }>(),
   )
 
   if (error) {
     console.error("Analytics error:", error)
-    return { visitors: 0, pageviews: 0 }
+    return 0
   }
 
-  return {
-    visitors: data.results[0].metrics[0],
-    pageviews: data.results[0].metrics[1],
-  }
-}
-
-type VisitorsTotalResponse = {
-  results: { metrics: [number]; dimensions: [string] }[]
+  return data.results[0].metrics[0]
 }
 
 /**
  * Get the total visitors for a given period
  * @param period - The period to get the visitors for
- * @returns The total visitors
+ * @returns The number of total visitors for the given period grouped by day
  */
-export const getTotalVisitors = async (period = "30d") => {
-  const query = {
-    site_id: siteConfig.domain,
-    metrics: ["visitors"],
-    date_range: period,
-    dimensions: ["time:day"],
-  }
-
+export const getPlausibleVisitors = async (period: string | string[] = "30d") => {
   const { data, error } = await tryCatch(
-    getPlausibleApi().post(query).json<VisitorsTotalResponse>(),
+    getPlausibleApi()
+      .post({
+        site_id: siteConfig.domain,
+        metrics: ["visitors"],
+        date_range: period,
+        dimensions: ["time:day"],
+      })
+      .json<{ results: { metrics: [number]; dimensions: [string] }[] }>(),
   )
 
   if (error) {
     console.error("Analytics error:", error)
-    return { results: [], totalVisitors: 0, averageVisitors: 0 }
+    return {}
   }
 
   // Group visitors by date
@@ -68,17 +56,5 @@ export const getTotalVisitors = async (period = "30d") => {
     return acc
   }, {})
 
-  // Fill in missing dates with 0
-  const results = eachDayOfInterval({
-    start: startOfDay(subDays(new Date(), 30)),
-    end: new Date(),
-  }).map(day => ({
-    date: format(day, "yyyy-MM-dd"),
-    value: visitorsByDate[format(day, "yyyy-MM-dd")] || 0,
-  }))
-
-  const totalVisitors = results.reduce((acc, curr) => acc + curr.value, 0)
-  const averageVisitors = totalVisitors / results.length
-
-  return { results, totalVisitors, averageVisitors }
+  return visitorsByDate
 }
