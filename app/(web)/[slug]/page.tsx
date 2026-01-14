@@ -25,6 +25,7 @@ import { Section } from "~/components/web/ui/section"
 import { Sticky } from "~/components/web/ui/sticky"
 import { Tag } from "~/components/web/ui/tag"
 import { VerifiedBadge } from "~/components/web/verified-badge"
+import type { OpenGraphParams } from "~/lib/opengraph"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { isToolPublished } from "~/lib/tools"
@@ -65,7 +66,7 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const { tool, url, metadata } = await getData(props)
 
-  const ogImage = {
+  const ogImage: OpenGraphParams = {
     title: tool.name,
     description: String(tool.description),
     faviconUrl: String(tool.faviconUrl),
