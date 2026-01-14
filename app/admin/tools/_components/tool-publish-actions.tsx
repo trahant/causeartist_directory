@@ -153,7 +153,7 @@ export const ToolPublishActions = ({
       },
       {
         type: "submit",
-        children: "Update",
+        children: "Save Draft",
         variant: "primary",
       },
     ],

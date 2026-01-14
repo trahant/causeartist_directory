@@ -37,15 +37,6 @@ export default async function ({ searchParams }: PageProps<"/advertise">) {
   const { metadata, structuredData } = await getData()
   const t = await getTranslations()
 
-  const testimonial = {
-    quote: t(`${namespace}.testimonial.quote`),
-    author: {
-      name: t(`${namespace}.testimonial.author.name`),
-      note: t(`${namespace}.testimonial.author.note`),
-      image: "/authors/piotrkulpinski.webp",
-    },
-  }
-
   return (
     <Wrapper gap="xl">
       <div className="flex flex-col items-center gap-10">
@@ -61,7 +52,7 @@ export default async function ({ searchParams }: PageProps<"/advertise">) {
 
       <Stats />
 
-      <Testimonial quote={testimonial.quote} author={testimonial.author} />
+      <Testimonial />
 
       <hr />
 

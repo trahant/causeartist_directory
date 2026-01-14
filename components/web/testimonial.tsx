@@ -1,6 +1,8 @@
+import { getTranslations } from "next-intl/server"
 import type { ComponentProps } from "react"
 import { Markdown } from "~/components/web/markdown"
-import { Author, type AuthorProps } from "~/components/web/ui/author"
+import { Author } from "~/components/web/ui/author"
+import { siteConfig } from "~/config/site"
 import { cva, cx, type VariantProps } from "~/lib/utils"
 
 const testimonialVariants = cva({
@@ -19,24 +21,20 @@ const testimonialVariants = cva({
   },
 })
 
-type TestimonialProps = ComponentProps<"blockquote"> &
-  VariantProps<typeof testimonialVariants> & {
-    quote: string
-    author: AuthorProps
-  }
+type TestimonialProps = ComponentProps<"blockquote"> & VariantProps<typeof testimonialVariants>
 
-export const Testimonial = ({
-  quote,
-  author,
-  className,
-  alignment,
-  ...props
-}: TestimonialProps) => {
+export const Testimonial = async ({ className, alignment, ...props }: TestimonialProps) => {
+  const t = await getTranslations("components.testimonial")
+
   return (
     <blockquote className={cx(testimonialVariants({ alignment, className }))} {...props}>
-      <Markdown className="text-lg/relaxed" code={quote} />
+      <Markdown className="text-lg/relaxed" code={t("quote", { siteName: siteConfig.name })} />
 
-      <Author {...author} />
+      <Author
+        name={t("author.name")}
+        note={t("author.note")}
+        image="/authors/piotrkulpinski.webp"
+      />
     </blockquote>
   )
 }

@@ -62,6 +62,13 @@
     "tools": "Listed Tools",
     "subscribers": "Newsletter Subscribers"
   },
+  "testimonial": {
+    "quote": "After advertising on {siteName}, we saw a 38% increase in qualified leads and 2.4x ROI within the first month. The targeted audience was exactly what our business needed. Highly recommended!",
+    "author": {
+      "name": "Piotr Kulpinski",
+      "note": "Founder of Dirstarter"
+    }
+  },
   "data_table": {
     "empty_state": "No results.",
     "column_header": {

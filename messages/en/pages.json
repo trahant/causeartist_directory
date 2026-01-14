@@ -12,13 +12,6 @@
       "description": "Tell us more about your company and we will get back to you as soon as possible.",
       "button": "Contact us"
     },
-    "testimonial": {
-      "quote": "After advertising on this platform, we saw a 38% increase in qualified leads and 2.4x ROI within the first month. The targeted audience was exactly what our business needed. Highly recommended!",
-      "author": {
-        "name": "Piotr Kulpinski",
-        "note": "Founder of Dirstarter"
-      }
-    },
     "success": {
       "title": "Thank you for your payment!",
       "description": "Please complete your advertisement setup by providing your company details."
