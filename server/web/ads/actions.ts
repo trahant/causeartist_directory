@@ -41,6 +41,7 @@ export const findAdWithFallback = actionClient
     let ads: AdOne[] = []
 
     const defaultAd = {
+      id: siteConfig.slug,
       type: AdType.All,
       websiteUrl: `${siteConfig.url}/advertise`,
       name: t("default_ad.name"),

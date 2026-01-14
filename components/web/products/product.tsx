@@ -1,15 +1,16 @@
 "use client"
 
 import { useLocalStorage } from "@mantine/hooks"
-import { ArrowUpRightIcon } from "lucide-react"
+import { ArrowUpRightIcon, TicketPercentIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import type { InferSafeActionFnInput } from "next-safe-action"
 import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps, ReactNode } from "react"
 import { toast } from "sonner"
 import type Stripe from "stripe"
+import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
-import { Card, CardBg } from "~/components/common/card"
+import { Card, CardBadges, CardBg } from "~/components/common/card"
 import { H4 } from "~/components/common/heading"
 import { Skeleton } from "~/components/common/skeleton"
 import { Stack } from "~/components/common/stack"
@@ -22,7 +23,7 @@ import { getProductFeatures, type ProductInterval } from "~/lib/products"
 import { cx } from "~/lib/utils"
 import { createStripeCheckout } from "~/server/web/products/actions"
 
-const productClassName = "items-stretch gap-8 basis-72 grow max-w-80 bg-transparent overflow-clip"
+const productClassName = "items-stretch gap-8 basis-72 grow max-w-80 bg-transparent"
 
 type ProductData = {
   product: Stripe.Product
@@ -83,10 +84,22 @@ const Product = ({
   return (
     <Card
       hover={false}
-      className={cx(productClassName, isFeatured && "lg:-my-3 lg:py-8", className)}
+      className={cx(productClassName, isFeatured && "not-only:lg:-my-3 lg:py-8", className)}
       {...props}
     >
       {isFeatured && <CardBg />}
+
+      {coupon && (fullPrice || 0) > price && (
+        <CardBadges size="sm">
+          <Badge
+            variant="success"
+            prefix={<TicketPercentIcon />}
+            className="border-background shadow-sm"
+          >
+            Limited offer
+          </Badge>
+        </CardBadges>
+      )}
 
       <Stack size="lg" direction="column">
         <Stack className="w-full justify-between">

@@ -23,7 +23,7 @@ const featureCheckVariants = cva({
 
   variants: {
     type: {
-      positive: "bg-green-500/50",
+      positive: "bg-primary/75 text-primary-foreground",
       neutral: "bg-foreground/10",
       negative: "bg-foreground/10",
     },
