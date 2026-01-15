@@ -58,7 +58,7 @@ export const upsertTool = adminActionClient
 export const duplicateTool = adminActionClient
   .inputSchema(idSchema)
   .action(async ({ parsedInput: { id }, ctx: { db, revalidate } }) => {
-    const originalTool = await db.tool.findUnique({
+    const tool = await db.tool.findUnique({
       where: { id },
       include: {
         categories: { select: { id: true } },
@@ -66,25 +66,25 @@ export const duplicateTool = adminActionClient
       },
     })
 
-    if (!originalTool) {
+    if (!tool) {
       throw new Error("Tool not found")
     }
 
-    const newName = `${originalTool.name} (Copy)`
+    const newName = `${tool.name} (Copy)`
 
-    const duplicatedTool = await db.tool.create({
+    const newTool = await db.tool.create({
       data: {
         name: newName,
         slug: "", // Slug will be auto-generated
-        websiteUrl: originalTool.websiteUrl,
-        affiliateUrl: originalTool.affiliateUrl,
-        tagline: originalTool.tagline,
-        description: originalTool.description,
-        content: originalTool.content,
-        faviconUrl: originalTool.faviconUrl,
-        screenshotUrl: originalTool.screenshotUrl,
-        categories: { connect: originalTool.categories },
-        tags: { connect: originalTool.tags },
+        websiteUrl: tool.websiteUrl,
+        affiliateUrl: tool.affiliateUrl,
+        tagline: tool.tagline,
+        description: tool.description,
+        content: tool.content,
+        faviconUrl: tool.faviconUrl,
+        screenshotUrl: tool.screenshotUrl,
+        categories: { connect: tool.categories },
+        tags: { connect: tool.tags },
       },
     })
 
@@ -93,7 +93,7 @@ export const duplicateTool = adminActionClient
       tags: ["tools"],
     })
 
-    return duplicatedTool
+    return newTool
   })
 
 export const deleteTools = adminActionClient

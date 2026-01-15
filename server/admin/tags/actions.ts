@@ -37,22 +37,22 @@ export const upsertTag = adminActionClient
 export const duplicateTag = adminActionClient
   .inputSchema(idSchema)
   .action(async ({ parsedInput: { id }, ctx: { db, revalidate } }) => {
-    const originalTag = await db.tag.findUnique({
+    const tag = await db.tag.findUnique({
       where: { id },
       include: { tools: { select: { id: true } } },
     })
 
-    if (!originalTag) {
+    if (!tag) {
       throw new Error("Tag not found")
     }
 
-    const newName = `${originalTag.name} (Copy)`
+    const newName = `${tag.name} (Copy)`
 
-    const duplicatedTag = await db.tag.create({
+    const newTag = await db.tag.create({
       data: {
         name: newName,
         slug: "", // Slug will be auto-generated
-        tools: { connect: originalTag.tools },
+        tools: { connect: tag.tools },
       },
     })
 
@@ -61,7 +61,7 @@ export const duplicateTag = adminActionClient
       tags: ["tags"],
     })
 
-    return duplicatedTag
+    return newTag
   })
 
 export const deleteTags = adminActionClient

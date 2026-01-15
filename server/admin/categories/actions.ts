@@ -37,24 +37,24 @@ export const upsertCategory = adminActionClient
 export const duplicateCategory = adminActionClient
   .inputSchema(idSchema)
   .action(async ({ parsedInput: { id }, ctx: { db, revalidate } }) => {
-    const originalCategory = await db.category.findUnique({
+    const category = await db.category.findUnique({
       where: { id },
       include: { tools: { select: { id: true } } },
     })
 
-    if (!originalCategory) {
+    if (!category) {
       throw new Error("Category not found")
     }
 
-    const newName = `${originalCategory.name} (Copy)`
+    const newName = `${category.name} (Copy)`
 
-    const duplicatedCategory = await db.category.create({
+    const newCategory = await db.category.create({
       data: {
         name: newName,
         slug: "", // Slug will be auto-generated
-        label: originalCategory.label,
-        description: originalCategory.description,
-        tools: { connect: originalCategory.tools },
+        label: category.label,
+        description: category.description,
+        tools: { connect: category.tools },
       },
     })
 
@@ -63,7 +63,7 @@ export const duplicateCategory = adminActionClient
       tags: ["categories"],
     })
 
-    return duplicatedCategory
+    return newCategory
   })
 
 export const deleteCategories = adminActionClient
