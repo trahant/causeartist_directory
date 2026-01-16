@@ -45,6 +45,8 @@ const ToolQuery = async ({
 
   return (
     <ToolListing pagination={{ total, perPage, page, ...pagination }} {...props}>
+      <StructuredData data={structuredData} />
+
       <ToolList tools={tools} {...list}>
         {ad &&
           Array.from({ length: adsConfig.adsPerPage }, (_, index) => {
@@ -53,8 +55,6 @@ const ToolQuery = async ({
             return <AdCard key={`ad-${index}`} type={ad} isRevealed style={{ order }} />
           })}
       </ToolList>
-
-      <StructuredData data={structuredData} />
     </ToolListing>
   )
 }
