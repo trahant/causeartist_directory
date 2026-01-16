@@ -9,7 +9,7 @@
   --header-top: 0rem;
   --header-bottom: 0.75rem;
   --header-inner-offset: calc(var(--header-top) + var(--header-height));
-  --header-outer-offset: calc(var(--header-top) + var(--header-height) + var(--header-bottom));
+  --header-outer-offset: calc(var(--header-inner-offset) + var(--header-bottom));
   --sidebar-max-height: calc(100vh - var(--header-outer-offset) - var(--header-bottom));
 
   --color-background: hsl(0 0% 100%);

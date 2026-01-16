@@ -17,6 +17,7 @@ type ToolQueryProps = Omit<ToolListingProps, "list" | "pagination"> & {
   list?: Partial<Omit<ToolListProps, "tools">>
   pagination?: Partial<Omit<PaginationProps, "total" | "pageSize">>
   ad?: AdType
+  name?: string
 }
 
 const ToolQuery = async ({
@@ -26,22 +27,21 @@ const ToolQuery = async ({
   list,
   pagination,
   ad,
+  name,
   ...props
 }: ToolQueryProps) => {
   const parsedParams = toolFilterParamsCache.parse(await searchParams)
   const params = { ...parsedParams, ...overrideParams }
   const { tools, total, page, perPage } = await searchTools(params, where)
 
+  const items = tools.map(tool => ({
+    name: tool.name,
+    url: `/${tool.slug}`,
+    description: tool.description,
+  }))
+
   // Generate structured data for the tool list
-  const structuredData = createGraph([
-    generateItemList(
-      tools.map(tool => ({
-        name: tool.name,
-        url: `/${tool.slug}`,
-        description: tool.description,
-      })),
-    ),
-  ])
+  const structuredData = createGraph([generateItemList(items, name)])
 
   return (
     <ToolListing pagination={{ total, perPage, page, ...pagination }} {...props}>
@@ -49,7 +49,7 @@ const ToolQuery = async ({
         {ad &&
           Array.from({ length: adsConfig.adsPerPage }, (_, index) => {
             const order = Math.ceil((perPage / adsConfig.adsPerPage) * index + 1)
-            if (order >= tools.length) return null
+            if (order > tools.length) return null
             return <AdCard key={`ad-${index}`} type={ad} isRevealed style={{ order }} />
           })}
       </ToolList>

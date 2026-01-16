@@ -1,3 +1,4 @@
+import { capitalCase } from "change-case"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getTranslations } from "next-intl/server"
@@ -28,13 +29,14 @@ const getData = cache(async ({ params }: Props) => {
 
   const t = await getTranslations()
   const url = `/tags/${tag.slug}`
-  const title = t(`${namespace}.title`, { name: tag.name })
-  const description = t(`${namespace}.description`, { name: tag.name, siteName: siteConfig.name })
+  const name = capitalCase(tag.name)
+  const title = t(`${namespace}.title`, { name })
+  const description = t(`${namespace}.description`, { name, siteName: siteConfig.name })
 
   const data = getPageData(url, title, description, {
     breadcrumbs: [
       { url: "/tags", title: t("navigation.tags") },
-      { url, title: tag.name },
+      { url, title: name },
     ],
     structuredData: [generateCollectionPage(url, title, description)],
   })
