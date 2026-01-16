@@ -158,7 +158,7 @@
   }
 
   hr {
-    @apply border-foreground/10!;
+    @apply border-foreground/10;
   }
 
   strong {

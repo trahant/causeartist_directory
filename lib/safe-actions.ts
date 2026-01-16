@@ -1,7 +1,5 @@
-import { noCase } from "change-case"
 import { revalidatePath, updateTag } from "next/cache"
 import { createSafeActionClient } from "next-safe-action"
-import { Prisma } from "~/.generated/prisma/client"
 import { getServerSession } from "~/lib/auth"
 import { db } from "~/services/db"
 
@@ -29,19 +27,6 @@ const revalidate = ({ paths = [], tags = [] }: RevalidateOptions) => {
 // -----------------------------------------------------------------------------
 export const actionClient = createSafeActionClient({
   handleServerError: e => {
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (e.code) {
-        // Unique constraint violation
-        case "P2002": {
-          const errorMeta = e.meta as { modelName: string; target: string[] }
-          const model = noCase(errorMeta.modelName)
-          const field = noCase(errorMeta.target[0])
-
-          return `A ${model} with this ${field} already exists in the database.`
-        }
-      }
-    }
-
     if (e instanceof Error) {
       return e.message
     }

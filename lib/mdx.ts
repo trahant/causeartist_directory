@@ -52,6 +52,10 @@ export const extractHeadingsFromMDX = (markdown: string): Heading[] => {
     if (!match) break
 
     const level = match[1].length
+
+    // Only include h1-h3 in table of contents
+    if (level > 3) continue
+
     const rawText = match[2].trim()
 
     // Strip markdown formatting from heading text
