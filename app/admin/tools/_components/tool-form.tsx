@@ -12,7 +12,7 @@ import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
 import { ToolPublishActions } from "~/app/admin/tools/_components/tool-publish-actions"
 import { AIGenerateContent } from "~/components/admin/ai/generate-content"
-import { RelationSelector } from "~/components/admin/relation-selector"
+import { AIRelationSuggestions } from "~/components/admin/ai/relation-suggestions"
 import { Button } from "~/components/common/button"
 import {
   Form,
@@ -460,10 +460,10 @@ export function ToolForm({
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Categories</FormLabel>
-              <RelationSelector
+              <AIRelationSuggestions
                 relations={categories}
-                selectedIds={field.value ?? []}
-                setSelectedIds={field.onChange}
+                ids={field.value ?? []}
+                setIds={field.onChange}
                 prompt={
                   isGenerationComplete && name && description
                     ? `From the list of available categories below, suggest relevant categories for this link:
@@ -484,10 +484,10 @@ export function ToolForm({
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Tags</FormLabel>
-              <RelationSelector
+              <AIRelationSuggestions
                 relations={tags}
-                selectedIds={field.value ?? []}
-                setSelectedIds={field.onChange}
+                ids={field.value ?? []}
+                setIds={field.onChange}
                 maxSuggestions={10}
                 prompt={
                   isGenerationComplete && name && description

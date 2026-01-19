@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { type ComponentProps, use } from "react"
 import { toast } from "sonner"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
-import { RelationSelector } from "~/components/admin/relation-selector"
 import { Button } from "~/components/common/button"
 import {
   Form,
@@ -20,6 +19,7 @@ import {
 import { H3 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
 import { Link } from "~/components/common/link"
+import { RelationSelector } from "~/components/common/relation-selector"
 import { Stack } from "~/components/common/stack"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { cx } from "~/lib/utils"
@@ -119,11 +119,7 @@ export function TagForm({ children, className, title, tag, toolsPromise, ...prop
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Tools</FormLabel>
-              <RelationSelector
-                relations={tools}
-                selectedIds={field.value ?? []}
-                setSelectedIds={field.onChange}
-              />
+              <RelationSelector relations={tools} ids={field.value ?? []} setIds={field.onChange} />
             </FormItem>
           )}
         />

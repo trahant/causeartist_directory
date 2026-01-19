@@ -8,7 +8,6 @@ import { type ComponentProps, use } from "react"
 import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
 import { AIGenerateDescription } from "~/components/admin/ai/generate-description"
-import { RelationSelector } from "~/components/admin/relation-selector"
 import { Button } from "~/components/common/button"
 import {
   Form,
@@ -21,6 +20,7 @@ import {
 import { H3 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
 import { Link } from "~/components/common/link"
+import { RelationSelector } from "~/components/common/relation-selector"
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
 import { useComputedField } from "~/hooks/use-computed-field"
@@ -178,11 +178,7 @@ export function CategoryForm({
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Tools</FormLabel>
-              <RelationSelector
-                relations={tools}
-                selectedIds={field.value ?? []}
-                setSelectedIds={field.onChange}
-              />
+              <RelationSelector relations={tools} ids={field.value ?? []} setIds={field.onChange} />
             </FormItem>
           )}
         />
