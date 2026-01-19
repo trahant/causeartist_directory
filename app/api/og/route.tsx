@@ -12,7 +12,7 @@ export const contentType = "image/png"
 export const alt = "OpenGraph Image"
 export const size = { width: 1200, height: 630 }
 
-export const GET = async (req: NextRequest) => {
+export async function GET(req: NextRequest) {
   const t = await getTranslations()
   const { title, description, faviconUrl } = createLoader(openGraphSearchParams)(req)
 

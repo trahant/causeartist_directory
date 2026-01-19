@@ -28,7 +28,7 @@ const findTools = cache(async () => {
   })
 })
 
-export const GET = async () => {
+export async function GET() {
   const t = await getTranslations()
   const tools = await findTools()
 

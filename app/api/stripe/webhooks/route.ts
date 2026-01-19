@@ -6,12 +6,7 @@ import { notifyAdminOfPremiumTool, notifySubmitterOfPremiumTool } from "~/lib/no
 import { db } from "~/services/db"
 import { stripe } from "~/services/stripe"
 
-/**
- * Handle the Stripe webhook
- * @param req - The request
- * @returns The response
- */
-export const POST = async (req: Request) => {
+export async function POST(req: Request) {
   const body = await req.text()
   const signature = req.headers.get("stripe-signature") as string
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET

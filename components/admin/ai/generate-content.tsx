@@ -25,7 +25,7 @@ export const AIGenerateContent = <T extends z.ZodSchema>({
   const successMessage = "Content generated successfully. Please save the page to update."
 
   const { object, submit, stop, isLoading } = useObject({
-    api: "/api/ai/generate-content",
+    api: "/admin/api/ai/generate-content",
     schema,
 
     onFinish: ({ error }) => {

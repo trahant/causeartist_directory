@@ -117,7 +117,7 @@ const searchParamsLoader = createLoader({
   height: parseAsInteger.withDefault(50),
 })
 
-export const GET = async ({ url }: NextRequest, { params }: RouteContext<"/[slug]/badge.svg">) => {
+export async function GET({ url }: NextRequest, { params }: RouteContext<"/[slug]/badge.svg">) {
   const { slug } = await params
   const { theme, width, height } = searchParamsLoader(url)
 

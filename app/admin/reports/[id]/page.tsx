@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation"
 import { ReportForm } from "~/app/admin/reports/_components/report-form"
-import { withAdminPage } from "~/components/admin/auth-hoc"
 import { Wrapper } from "~/components/common/wrapper"
 import { findReportById } from "~/server/admin/reports/queries"
 
-export default withAdminPage(async ({ params }: PageProps<"/admin/reports/[id]">) => {
+export default async function ({ params }: PageProps<"/admin/reports/[id]">) {
   const { id } = await params
   const report = await findReportById(id)
 
@@ -17,4 +16,4 @@ export default withAdminPage(async ({ params }: PageProps<"/admin/reports/[id]">
       <ReportForm title="Update report" report={report} />
     </Wrapper>
   )
-})
+}

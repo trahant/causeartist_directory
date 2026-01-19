@@ -1,12 +1,11 @@
 import { endOfMonth, endOfWeek, format, parse, startOfWeek } from "date-fns"
 import { createLoader, parseAsString } from "nuqs/server"
 import { Calendar } from "~/app/admin/schedule/calendar"
-import { withAdminPage } from "~/components/admin/auth-hoc"
 import { H3 } from "~/components/common/heading"
 import { Wrapper } from "~/components/common/wrapper"
 import { findScheduledTools } from "~/server/admin/tools/queries"
 
-export default withAdminPage(async ({ searchParams }: PageProps<"/admin/schedule">) => {
+export default async function ({ searchParams }: PageProps<"/admin/schedule">) {
   const defaultMonth = format(new Date(), "yyyy-MM")
   const searchParamsLoader = createLoader({ month: parseAsString.withDefault(defaultMonth) })
   const { month } = searchParamsLoader(await searchParams)
@@ -32,4 +31,4 @@ export default withAdminPage(async ({ searchParams }: PageProps<"/admin/schedule
       />
     </Wrapper>
   )
-})
+}

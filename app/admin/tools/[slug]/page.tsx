@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation"
 import { ToolForm } from "~/app/admin/tools/_components/tool-form"
-import { withAdminPage } from "~/components/admin/auth-hoc"
 import { Wrapper } from "~/components/common/wrapper"
 import { findCategoryList } from "~/server/admin/categories/queries"
 import { findTagList } from "~/server/admin/tags/queries"
 import { findToolBySlug } from "~/server/admin/tools/queries"
 
-export default withAdminPage(async ({ params }: PageProps<"/admin/tools/[slug]">) => {
+export default async function ({ params }: PageProps<"/admin/tools/[slug]">) {
   const { slug } = await params
   const tool = await findToolBySlug(slug)
 
@@ -24,4 +23,4 @@ export default withAdminPage(async ({ params }: PageProps<"/admin/tools/[slug]">
       />
     </Wrapper>
   )
-})
+}

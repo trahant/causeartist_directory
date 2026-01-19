@@ -1,11 +1,10 @@
 import { Suspense } from "react"
 import { TagTable } from "~/app/admin/tags/_components/tag-table"
-import { withAdminPage } from "~/components/admin/auth-hoc"
 import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { findTags } from "~/server/admin/tags/queries"
 import { tagTableParamsCache } from "~/server/admin/tags/schema"
 
-export default withAdminPage(async ({ searchParams }: PageProps<"/admin/tags">) => {
+export default async function ({ searchParams }: PageProps<"/admin/tags">) {
   const search = tagTableParamsCache.parse(await searchParams)
   const tagsPromise = findTags(search)
 
@@ -14,4 +13,4 @@ export default withAdminPage(async ({ searchParams }: PageProps<"/admin/tags">) 
       <TagTable tagsPromise={tagsPromise} />
     </Suspense>
   )
-})
+}

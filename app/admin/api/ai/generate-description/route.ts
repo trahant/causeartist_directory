@@ -1,11 +1,10 @@
 import { z } from "zod"
 import { streamDescription } from "~/lib/ai"
-import { withAdminAuth } from "~/lib/auth-hoc"
 import { isAIEnabled } from "~/services/ai"
 
 export const maxDuration = 60
 
-export const POST = withAdminAuth(async req => {
+export async function POST(req: Request) {
   if (!isAIEnabled) {
     return Response.json({ error: "AI features are not configured" }, { status: 501 })
   }
@@ -17,4 +16,4 @@ export const POST = withAdminAuth(async req => {
   const result = streamDescription(prompt, temperature)
 
   return result.toTextStreamResponse()
-})
+}

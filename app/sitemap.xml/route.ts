@@ -16,7 +16,7 @@ const buildSitemapIndex = (sitemaps: string[]) => {
   return xml
 }
 
-export const GET = () => {
+export function GET() {
   const { url } = siteConfig
   const sitemapIndexXML = buildSitemapIndex(sitemaps.map(id => `${url}/sitemap/${id}.xml`))
 

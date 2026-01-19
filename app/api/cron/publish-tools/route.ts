@@ -7,8 +7,7 @@ import { db } from "~/services/db"
 
 export const maxDuration = 60
 
-export const GET = async (req: Request) => {
-  // Verify the authorization token
+export async function GET(req: Request) {
   if (req.headers.get("authorization") !== `Bearer ${env.CRON_SECRET}`) {
     return new Response("Unauthorized", { status: 401 })
   }

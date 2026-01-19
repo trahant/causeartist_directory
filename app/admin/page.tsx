@@ -3,14 +3,13 @@ import { RevenueMetric } from "~/app/admin/_components/revenue-metric"
 import { SubscriberMetric } from "~/app/admin/_components/subscriber-metric"
 import { UserMetric } from "~/app/admin/_components/user-metric"
 import { VisitorMetric } from "~/app/admin/_components/visitor-metric"
-import { withAdminPage } from "~/components/admin/auth-hoc"
 import { MetricChartSkeleton } from "~/components/admin/metrics/metric-chart"
 import { MetricValue, MetricValueSkeleton } from "~/components/admin/metrics/metric-value"
 import { H3 } from "~/components/common/heading"
 import { Wrapper } from "~/components/common/wrapper"
 import { db } from "~/services/db"
 
-export default withAdminPage(() => {
+export default function () {
   const counters = [
     { label: "Tools", href: "/admin/tools", query: db.tool.count() },
     { label: "Categories", href: "/admin/categories", query: db.category.count() },
@@ -50,4 +49,4 @@ export default withAdminPage(() => {
       </div>
     </Wrapper>
   )
-})
+}

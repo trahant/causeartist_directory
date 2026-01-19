@@ -41,7 +41,7 @@ export async function generateStaticParams() {
   return sitemaps.map(id => ({ id }))
 }
 
-export const GET = async (_: Request, { params }: RouteContext<"/sitemap/[id]">) => {
+export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">) {
   const { id } = await params
   const siteUrl = siteConfig.url
 

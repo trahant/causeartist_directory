@@ -26,7 +26,7 @@ export const AIGenerateDescription = <T extends z.ZodSchema>({
   const successMessage = "Content generated successfully. Please save the page to update."
 
   const { object, submit, stop, isLoading } = useObject({
-    api: "/api/ai/generate-description",
+    api: "/admin/api/ai/generate-description",
     schema,
 
     onFinish: ({ error }) => {
