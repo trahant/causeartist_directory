@@ -60,7 +60,7 @@ const AdCard = async ({ className, type, explicitAd, fallback, ...props }: AdCar
             </CardDescription>
 
             <Button className="pointer-events-none md:w-full" suffix={<ArrowUpRightIcon />} asChild>
-              <span>{ad.buttonLabel ?? t("common.visit", { name: ad.name })}</span>
+              <span>{ad.buttonLabel || t("common.visit", { name: ad.name })}</span>
             </Button>
 
             <CardIcon>

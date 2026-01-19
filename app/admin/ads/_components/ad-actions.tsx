@@ -1,6 +1,7 @@
 "use client"
 
-import { CopyIcon, EllipsisIcon, ExternalLinkIcon, TrashIcon } from "lucide-react"
+import { isValidUrl } from "@primoui/utils"
+import { CopyIcon, EllipsisIcon, GlobeIcon, TrashIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps } from "react"
@@ -17,6 +18,7 @@ import {
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
+import { ExternalLink } from "~/components/web/external-link"
 import { cx } from "~/lib/utils"
 import { duplicateAd } from "~/server/admin/ads/actions"
 
@@ -76,19 +78,21 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem asChild>
-            <Link href={ad.websiteUrl} target="_blank">
-              <ExternalLinkIcon />
-              View Website
-            </Link>
-          </DropdownMenuItem>
-
           <DropdownMenuSeparator />
 
           <DropdownMenuItem onSelect={handleDuplicate}>
             <CopyIcon />
             Duplicate
           </DropdownMenuItem>
+
+          {isValidUrl(ad.websiteUrl) && (
+            <DropdownMenuItem asChild>
+              <ExternalLink href={ad.websiteUrl} doTrack>
+                <GlobeIcon />
+                Visit website
+              </ExternalLink>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -2,15 +2,16 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
-import { CircleCheckIcon, CircleDotIcon, PlusIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
 import type { ComponentProps } from "react"
 import { use } from "react"
-import { type Ad, AdType } from "~/.generated/prisma/browser"
+import { AdType, type Ad } from "~/.generated/prisma/browser"
 import { AdActions } from "~/app/admin/ads/_components/ad-actions"
 import { AdTableToolbarActions } from "~/app/admin/ads/_components/ad-table-toolbar-actions"
 import { DateRangePicker } from "~/components/admin/date-range-picker"
 import { RowCheckbox } from "~/components/admin/row-checkbox"
+
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { Link } from "~/components/common/link"
@@ -40,15 +41,9 @@ const getAdStatus = (ad: Ad): AdStatus => {
 }
 
 const statusBadges: Record<AdStatus, ComponentProps<typeof Badge>> = {
-  Active: {
-    variant: "success",
-  },
-  Scheduled: {
-    variant: "info",
-  },
-  Expired: {
-    variant: "soft",
-  },
+  Active: { variant: "success" },
+  Scheduled: { variant: "info" },
+  Expired: { variant: "soft" },
 }
 
 const columns: ColumnDef<Ad>[] = [
@@ -117,6 +112,11 @@ const columns: ColumnDef<Ad>[] = [
     cell: ({ row }) => <Note>{formatDate(row.getValue<Date>("endsAt"))}</Note>,
   },
   {
+    accessorKey: "createdAt",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    cell: ({ row }) => <Note>{formatDate(row.getValue<Date>("createdAt"))}</Note>,
+  },
+  {
     id: "actions",
     cell: ({ row }) => <AdActions ad={row.original} className="float-right" />,
   },
@@ -136,38 +136,10 @@ export function AdTable({ adsPromise }: AdTableProps) {
     {
       id: "type",
       label: "Type",
-      options: [
-        {
-          label: "Banner",
-          value: AdType.Banner,
-          icon: <CircleDotIcon className="text-purple-500" />,
-        },
-        {
-          label: "Tools",
-          value: AdType.Tools,
-          icon: <CircleDotIcon className="text-blue-500" />,
-        },
-        {
-          label: "Tool Page",
-          value: AdType.ToolPage,
-          icon: <CircleDotIcon className="text-cyan-500" />,
-        },
-        {
-          label: "Blog Post",
-          value: AdType.BlogPost,
-          icon: <CircleDotIcon className="text-orange-500" />,
-        },
-        {
-          label: "Bottom",
-          value: AdType.Bottom,
-          icon: <CircleDotIcon className="text-pink-500" />,
-        },
-        {
-          label: "All",
-          value: AdType.All,
-          icon: <CircleCheckIcon className="text-green-500" />,
-        },
-      ],
+      options: Object.values(AdType).map(type => ({
+        label: type,
+        value: type,
+      })),
     },
   ]
 
@@ -181,6 +153,7 @@ export function AdTable({ adsPromise }: AdTableProps) {
     initialState: {
       pagination: { pageIndex: 0, pageSize: perPage },
       sorting: sort,
+      columnVisibility: { createdAt: false },
       columnPinning: { right: ["actions"] },
     },
     getRowId: originalRow => originalRow.id,

@@ -2,13 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
-import { formatDate } from "date-fns"
+import { getRandomString, slugify } from "@primoui/utils"
+import { addMonths, formatDate } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { type Ad, AdType } from "~/.generated/prisma/browser"
+import { AdType } from "~/.generated/prisma/browser"
 import { AdActions } from "~/app/admin/ads/_components/ad-actions"
 import { Button } from "~/components/common/button"
 import { Calendar } from "~/components/common/calendar"
@@ -36,10 +37,11 @@ import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
 import { cx } from "~/lib/utils"
 import { upsertAd } from "~/server/admin/ads/actions"
+import type { findAdById } from "~/server/admin/ads/queries"
 import { adSchema } from "~/server/admin/ads/schema"
 
 type AdFormProps = ComponentProps<"form"> & {
-  ad?: Ad
+  ad?: NonNullable<Awaited<ReturnType<typeof findAdById>>>
 }
 
 export function AdForm({ children, className, title, ad, ...props }: AdFormProps) {
@@ -61,7 +63,7 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
         buttonLabel: ad?.buttonLabel ?? "",
         type: ad?.type ?? AdType.All,
         startsAt: ad?.startsAt ?? new Date(),
-        endsAt: ad?.endsAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        endsAt: ad?.endsAt ?? addMonths(new Date(), 1),
       },
     },
 
@@ -77,32 +79,32 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
     },
   })
 
-  const websiteUrl = form.watch("websiteUrl")
-  const startsAt = form.watch("startsAt") as Date
-  const endsAt = form.watch("endsAt") as Date
+  const [name, websiteUrl, startsAt, endsAt] = form.watch([
+    "name",
+    "websiteUrl",
+    "startsAt",
+    "endsAt",
+  ])
 
-  const path = useMemo(() => `ads/${ad?.id || "new"}`, [ad?.id])
-
-  const startsAtDate = startsAt instanceof Date ? startsAt : new Date(startsAt)
-  const endsAtDate = endsAt instanceof Date ? endsAt : new Date(endsAt)
+  const path = useMemo(() => `ads/${name ? slugify(name) : getRandomString(12)}`, [name])
 
   const formatDateDisplay = (date: Date) => formatDate(date, "yyyy-MM-dd")
   const formatTimeDisplay = (date: Date) => formatDate(date, "HH:mm")
 
-  const [startsAtDateStr, setStartsAtDateStr] = useState(formatDateDisplay(startsAtDate))
-  const [startsAtTimeStr, setStartsAtTimeStr] = useState(formatTimeDisplay(startsAtDate))
-  const [endsAtDateStr, setEndsAtDateStr] = useState(formatDateDisplay(endsAtDate))
-  const [endsAtTimeStr, setEndsAtTimeStr] = useState(formatTimeDisplay(endsAtDate))
+  const [startsAtDate, setStartsAtDate] = useState(formatDateDisplay(startsAt))
+  const [startsAtTime, setStartsAtTime] = useState(formatTimeDisplay(startsAt))
+  const [endsAtDate, setEndsAtDate] = useState(formatDateDisplay(endsAt))
+  const [endsAtTime, setEndsAtTime] = useState(formatTimeDisplay(endsAt))
 
-  const updateStartsAt = (dateStr: string, timeStr: string) => {
-    const newDate = new Date(`${dateStr}T${timeStr}`)
+  const updateStartsAt = (date: string, time: string) => {
+    const newDate = new Date(`${date}T${time}`)
     if (!Number.isNaN(newDate.getTime())) {
       form.setValue("startsAt", newDate)
     }
   }
 
-  const updateEndsAt = (dateStr: string, timeStr: string) => {
-    const newDate = new Date(`${dateStr}T${timeStr}`)
+  const updateEndsAt = (date: string, time: string) => {
+    const newDate = new Date(`${date}T${time}`)
     if (!Number.isNaN(newDate.getTime())) {
       form.setValue("endsAt", newDate)
     }
@@ -277,15 +279,15 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
                   suffix={<CalendarIcon />}
                   className="w-full tabular-nums justify-between"
                 >
-                  {startsAtDateStr}
+                  {startsAtDate}
                 </Button>
 
                 <Input
                   type="time"
-                  value={startsAtTimeStr}
+                  value={startsAtTime}
                   onChange={e => {
-                    setStartsAtTimeStr(e.target.value)
-                    updateStartsAt(startsAtDateStr, e.target.value)
+                    setStartsAtTime(e.target.value)
+                    updateStartsAt(startsAtDate, e.target.value)
                   }}
                   className="w-full tabular-nums"
                 />
@@ -298,12 +300,13 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
 
                     <Calendar
                       mode="single"
-                      selected={startsAtDate}
+                      selected={startsAt}
+                      defaultMonth={startsAt}
                       onSelect={date => {
                         if (date) {
-                          const newDateStr = formatDateDisplay(date)
-                          setStartsAtDateStr(newDateStr)
-                          updateStartsAt(newDateStr, startsAtTimeStr)
+                          const newDate = formatDateDisplay(date)
+                          setStartsAtDate(newDate)
+                          updateStartsAt(newDate, startsAtTime)
                         }
                         setIsStartsAtOpen(false)
                       }}
@@ -330,15 +333,15 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
                   suffix={<CalendarIcon />}
                   className="w-full tabular-nums justify-between"
                 >
-                  {endsAtDateStr}
+                  {endsAtDate}
                 </Button>
 
                 <Input
                   type="time"
-                  value={endsAtTimeStr}
+                  value={endsAtTime}
                   onChange={e => {
-                    setEndsAtTimeStr(e.target.value)
-                    updateEndsAt(endsAtDateStr, e.target.value)
+                    setEndsAtTime(e.target.value)
+                    updateEndsAt(endsAtDate, e.target.value)
                   }}
                   className="w-full tabular-nums"
                 />
@@ -351,13 +354,14 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
 
                     <Calendar
                       mode="single"
-                      selected={endsAtDate}
-                      disabled={{ before: startsAtDate }}
+                      selected={endsAt}
+                      defaultMonth={endsAt}
+                      disabled={{ before: startsAt }}
                       onSelect={date => {
                         if (date) {
-                          const newDateStr = formatDateDisplay(date)
-                          setEndsAtDateStr(newDateStr)
-                          updateEndsAt(newDateStr, endsAtTimeStr)
+                          const newDate = formatDateDisplay(date)
+                          setEndsAtDate(newDate)
+                          updateEndsAt(newDate, endsAtTime)
                         }
                         setIsEndsAtOpen(false)
                       }}
