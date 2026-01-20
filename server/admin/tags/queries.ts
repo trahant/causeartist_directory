@@ -56,15 +56,6 @@ export const findTagList = async ({ ...args }: Prisma.TagFindManyArgs = {}) => {
   })
 }
 
-export const findTagBySlug = async (slug: string) => {
-  return db.tag.findUnique({
-    where: { slug },
-    include: {
-      tools: { select: { id: true } },
-    },
-  })
-}
-
 export const findTagById = async (id: string) => {
   return db.tag.findUnique({
     where: { id },

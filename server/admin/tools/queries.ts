@@ -1,6 +1,6 @@
 import { isTruthy } from "@primoui/utils"
 import { endOfDay, startOfDay } from "date-fns"
-import { type Prisma, ToolStatus } from "~/.generated/prisma/client"
+import { ToolStatus, type Prisma } from "~/.generated/prisma/client"
 import type { ToolTableSchema } from "~/server/admin/tools/schema"
 import { db } from "~/services/db"
 
@@ -64,16 +64,6 @@ export const findToolList = async ({ ...args }: Prisma.ToolFindManyArgs = {}) =>
     ...args,
     select: { id: true, name: true },
     orderBy: { name: "asc" },
-  })
-}
-
-export const findToolBySlug = async (slug: string) => {
-  return db.tool.findUnique({
-    where: { slug },
-    include: {
-      categories: { select: { id: true } },
-      tags: { select: { id: true } },
-    },
   })
 }
 

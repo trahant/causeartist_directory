@@ -59,15 +59,6 @@ export const findCategoryList = async ({ ...args }: Prisma.CategoryFindManyArgs 
   })
 }
 
-export const findCategoryBySlug = async (slug: string) => {
-  return db.category.findUnique({
-    where: { slug },
-    include: {
-      tools: { select: { id: true } },
-    },
-  })
-}
-
 export const findCategoryById = async (id: string) => {
   return db.category.findUnique({
     where: { id },

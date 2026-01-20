@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { slugify } from "@primoui/utils"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use } from "react"
+import { use, type ComponentProps } from "react"
 import { toast } from "sonner"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
 import { Button } from "~/components/common/button"
@@ -24,12 +24,12 @@ import { Stack } from "~/components/common/stack"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { cx } from "~/lib/utils"
 import { upsertTag } from "~/server/admin/tags/actions"
-import type { findTagBySlug } from "~/server/admin/tags/queries"
+import type { findTagById } from "~/server/admin/tags/queries"
 import { tagSchema } from "~/server/admin/tags/schema"
 import type { findToolList } from "~/server/admin/tools/queries"
 
 type TagFormProps = ComponentProps<"form"> & {
-  tag?: Awaited<ReturnType<typeof findTagBySlug>>
+  tag?: Awaited<ReturnType<typeof findTagById>>
   toolsPromise: ReturnType<typeof findToolList>
 }
 

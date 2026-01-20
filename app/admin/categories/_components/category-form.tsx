@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { slugify } from "@primoui/utils"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use } from "react"
+import { use, type ComponentProps } from "react"
 import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
 import { AIGenerateDescription } from "~/components/admin/ai/generate-description"
@@ -26,13 +26,13 @@ import { TextArea } from "~/components/common/textarea"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { cx } from "~/lib/utils"
 import { upsertCategory } from "~/server/admin/categories/actions"
-import type { findCategoryBySlug } from "~/server/admin/categories/queries"
+import type { findCategoryById } from "~/server/admin/categories/queries"
 import { categorySchema } from "~/server/admin/categories/schema"
 import { descriptionSchema } from "~/server/admin/shared/schema"
 import type { findToolList } from "~/server/admin/tools/queries"
 
 type CategoryFormProps = ComponentProps<"form"> & {
-  category?: Awaited<ReturnType<typeof findCategoryBySlug>>
+  category?: Awaited<ReturnType<typeof findCategoryById>>
   toolsPromise: ReturnType<typeof findToolList>
 }
 

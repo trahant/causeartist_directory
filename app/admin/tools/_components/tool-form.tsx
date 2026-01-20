@@ -6,9 +6,9 @@ import { formatDateTime, getRandomString, slugify } from "@primoui/utils"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use, useMemo, useRef, useState } from "react"
+import { use, useMemo, useRef, useState, type ComponentProps } from "react"
 import { toast } from "sonner"
-import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
+import { ToolStatus, type Tool } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
 import { ToolPublishActions } from "~/app/admin/tools/_components/tool-publish-actions"
 import { AIGenerateContent } from "~/components/admin/ai/generate-content"
@@ -34,13 +34,13 @@ import { Tooltip } from "~/components/common/tooltip"
 import { Markdown } from "~/components/web/markdown"
 import { siteConfig } from "~/config/site"
 import { useComputedField } from "~/hooks/use-computed-field"
-import { isToolPublished } from "~/lib/tools"
+import { isToolApproved } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import type { findCategoryList } from "~/server/admin/categories/queries"
 import { contentSchema } from "~/server/admin/shared/schema"
 import type { findTagList } from "~/server/admin/tags/queries"
 import { upsertTool } from "~/server/admin/tools/actions"
-import type { findToolBySlug } from "~/server/admin/tools/queries"
+import type { findToolById } from "~/server/admin/tools/queries"
 import { toolSchema } from "~/server/admin/tools/schema"
 
 const ToolStatusChange = ({ tool }: { tool: Tool }) => {
@@ -61,7 +61,7 @@ const ToolStatusChange = ({ tool }: { tool: Tool }) => {
 }
 
 type ToolFormProps = ComponentProps<"form"> & {
-  tool?: NonNullable<Awaited<ReturnType<typeof findToolBySlug>>>
+  tool?: NonNullable<Awaited<ReturnType<typeof findToolById>>>
   categoriesPromise: ReturnType<typeof findCategoryList>
   tagsPromise: ReturnType<typeof findTagList>
 }
@@ -199,15 +199,15 @@ export function ToolForm({
 
         {tool && (
           <Note className="w-full">
-            {isToolPublished(tool) ? "View:" : "Preview:"}{" "}
             <Link href={`/${tool.slug}`} target="_blank" className="text-primary underline">
               {siteConfig.url}/{tool.slug}
             </Link>
-            {tool.status === ToolStatus.Scheduled && tool.publishedAt && (
+
+            {isToolApproved(tool) && tool.publishedAt && (
               <>
                 <br />
-                Scheduled to be published on{" "}
-                <strong className="text-foreground">{formatDateTime(tool.publishedAt)}</strong>
+                {tool.status === ToolStatus.Scheduled ? `Scheduled to be published` : `Published`}{" "}
+                on <strong className="text-foreground">{formatDateTime(tool.publishedAt)}</strong>
               </>
             )}
           </Note>

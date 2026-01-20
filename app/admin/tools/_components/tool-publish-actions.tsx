@@ -2,7 +2,7 @@
 
 import { formatDate } from "date-fns"
 import { BadgeCheckIcon, CalendarIcon } from "lucide-react"
-import { type ComponentProps, type ReactNode, useState } from "react"
+import { useState, type ComponentProps, type ReactNode } from "react"
 import { useFormContext } from "react-hook-form"
 import { ToolStatus } from "~/.generated/prisma/browser"
 import { Button, type ButtonProps } from "~/components/common/button"
@@ -17,11 +17,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/common/pop
 import { RadioGroup, RadioGroupItem } from "~/components/common/radio-group"
 import { Stack } from "~/components/common/stack"
 import { cx } from "~/lib/utils"
-import type { findToolBySlug } from "~/server/admin/tools/queries"
+import type { findToolById } from "~/server/admin/tools/queries"
 import type { ToolSchema } from "~/server/admin/tools/schema"
 
 type ToolPublishActionsProps = ComponentProps<typeof Stack> & {
-  tool?: NonNullable<Awaited<ReturnType<typeof findToolBySlug>>>
+  tool?: NonNullable<Awaited<ReturnType<typeof findToolById>>>
   isPending: boolean
   isStatusPending: boolean
   onStatusSubmit: (status: ToolStatus, publishedAt: Date | null) => void
