@@ -89,10 +89,10 @@ const columns: ColumnDef<Tool>[] = [
     size: 160,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
     cell: ({ row }) => {
-      const { name, slug, faviconUrl, ownerId } = row.original
+      const { id, name, faviconUrl, ownerId } = row.original
 
       return (
-        <DataTableLink href={`/admin/tools/${slug}`} image={faviconUrl} title={name}>
+        <DataTableLink href={`/admin/tools/${id}`} image={faviconUrl} title={name}>
           {ownerId && <VerifiedBadge size="sm" />}
         </DataTableLink>
       )

@@ -31,7 +31,7 @@ type SearchResultsProps<T> = {
   renderItemDisplay: (item: T) => ReactNode
 }
 
-const SearchResults = <T extends { slug: string; name: string }>({
+const SearchResults = <T extends { id: string; slug: string; name: string }>({
   name,
   items,
   onItemSelect,
@@ -229,7 +229,7 @@ export const Search = () => {
           name={t("navigation.tools")}
           items={results?.tools}
           onItemSelect={navigateTo}
-          getHref={({ slug }) => `${isAdminPath ? "/admin/tools" : ""}/${slug}`}
+          getHref={({ id, slug }) => (isAdminPath ? `/admin/tools/${id}` : `/${slug}`)}
           renderItemDisplay={({ name, faviconUrl, websiteUrl }) => (
             <>
               {faviconUrl && <img src={faviconUrl} alt="" width={16} height={16} />}
@@ -243,7 +243,9 @@ export const Search = () => {
           name={t("navigation.categories")}
           items={results?.categories}
           onItemSelect={navigateTo}
-          getHref={({ slug }) => `${isAdminPath ? "/admin" : ""}/categories/${slug}`}
+          getHref={({ id, slug }) =>
+            isAdminPath ? `/admin/categories/${id}` : `/categories/${slug}`
+          }
           renderItemDisplay={({ name }) => name}
         />
 
@@ -251,7 +253,7 @@ export const Search = () => {
           name={t("navigation.tags")}
           items={results?.tags}
           onItemSelect={navigateTo}
-          getHref={({ slug }) => `${isAdminPath ? "/admin" : ""}/tags/${slug}`}
+          getHref={({ id, slug }) => (isAdminPath ? `/admin/tags/${id}` : `/tags/${slug}`)}
           renderItemDisplay={({ name }) => name}
         />
       </CommandList>

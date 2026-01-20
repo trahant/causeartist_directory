@@ -121,7 +121,7 @@ export function ToolForm({
         }
 
         // Redirect to the new tool
-        router.push(`/admin/tools/${data.slug}`)
+        router.push(`/admin/tools/${data.id}`)
       },
 
       onError: ({ error }) => {

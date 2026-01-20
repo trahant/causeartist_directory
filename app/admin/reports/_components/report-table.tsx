@@ -94,10 +94,10 @@ const columns: ColumnDef<Report>[] = [
     accessorKey: "tool",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Tool" />,
     cell: ({ row }) => {
-      const tool = row.getValue<Pick<Tool, "slug" | "name">>("tool")
+      const tool = row.getValue<Pick<Tool, "id" | "slug" | "name">>("tool")
 
       return (
-        <DataTableLink href={`/admin/tools/${tool?.slug}`} title={tool?.name} isOverlay={false} />
+        <DataTableLink href={`/admin/tools/${tool?.id}`} title={tool?.name} isOverlay={false} />
       )
     },
   },

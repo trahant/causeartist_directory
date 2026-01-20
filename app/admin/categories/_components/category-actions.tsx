@@ -29,12 +29,12 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
   const router = useRouter()
 
   const indexPath = "/admin/categories"
-  const singlePath = `${indexPath}/${category.slug}`
+  const singlePath = `${indexPath}/${category.id}`
   const isSinglePage = pathname === singlePath
 
   const { executeAsync } = useAction(duplicateCategory, {
     onSuccess: ({ data }) => {
-      isSinglePage && router.push(`${indexPath}/${data.slug}`)
+      isSinglePage && router.push(`${indexPath}/${data.id}`)
     },
   })
 

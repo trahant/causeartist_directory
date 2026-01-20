@@ -54,7 +54,7 @@ export const findScheduledTools = async ({ where, ...args }: Prisma.ToolFindMany
   return db.tool.findMany({
     ...args,
     where: { status: { in: [ToolStatus.Published, ToolStatus.Scheduled] }, ...where },
-    select: { slug: true, name: true, status: true, publishedAt: true },
+    select: { id: true, slug: true, name: true, status: true, publishedAt: true },
     orderBy: { publishedAt: "asc" },
   })
 }
@@ -70,6 +70,16 @@ export const findToolList = async ({ ...args }: Prisma.ToolFindManyArgs = {}) =>
 export const findToolBySlug = async (slug: string) => {
   return db.tool.findUnique({
     where: { slug },
+    include: {
+      categories: { select: { id: true } },
+      tags: { select: { id: true } },
+    },
+  })
+}
+
+export const findToolById = async (id: string) => {
+  return db.tool.findUnique({
+    where: { id },
     include: {
       categories: { select: { id: true } },
       tags: { select: { id: true } },

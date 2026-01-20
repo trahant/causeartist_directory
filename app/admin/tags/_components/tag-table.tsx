@@ -63,7 +63,7 @@ const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
     size: 160,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
     cell: ({ row }) => (
-      <DataTableLink href={`/admin/tags/${row.original.slug}`} title={row.original.name} />
+      <DataTableLink href={`/admin/tags/${row.original.id}`} title={row.original.name} />
     ),
   },
   {

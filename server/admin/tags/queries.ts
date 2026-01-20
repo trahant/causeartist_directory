@@ -64,3 +64,12 @@ export const findTagBySlug = async (slug: string) => {
     },
   })
 }
+
+export const findTagById = async (id: string) => {
+  return db.tag.findUnique({
+    where: { id },
+    include: {
+      tools: { select: { id: true } },
+    },
+  })
+}

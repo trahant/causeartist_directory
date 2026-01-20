@@ -51,7 +51,7 @@ export function TagForm({ children, className, title, tag, toolsPromise, ...prop
     actionProps: {
       onSuccess: ({ data }) => {
         toast.success(`Tag successfully ${tag ? "updated" : "created"}`)
-        router.push(`/admin/tags/${data?.slug}`)
+        router.push(`/admin/tags/${data?.id}`)
       },
 
       onError: ({ error }) => {

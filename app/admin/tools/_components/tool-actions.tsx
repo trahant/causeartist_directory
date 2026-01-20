@@ -31,12 +31,12 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
   const router = useRouter()
 
   const indexPath = "/admin/tools"
-  const singlePath = `${indexPath}/${tool.slug}`
+  const singlePath = `${indexPath}/${tool.id}`
   const isSinglePage = pathname === singlePath
 
   const { executeAsync } = useAction(duplicateTool, {
     onSuccess: ({ data }) => {
-      isSinglePage && router.push(`${indexPath}/${data.slug}`)
+      isSinglePage && router.push(`${indexPath}/${data.id}`)
     },
   })
 

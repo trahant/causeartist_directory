@@ -63,7 +63,7 @@ const columns: ColumnDef<Category & { _count?: { tools: number } }>[] = [
     size: 160,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
     cell: ({ row }) => (
-      <DataTableLink href={`/admin/categories/${row.original.slug}`} title={row.original.name} />
+      <DataTableLink href={`/admin/categories/${row.original.id}`} title={row.original.name} />
     ),
   },
   {

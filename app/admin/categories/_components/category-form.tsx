@@ -63,7 +63,7 @@ export function CategoryForm({
     actionProps: {
       onSuccess: ({ data }) => {
         toast.success(`Category successfully ${category ? "updated" : "created"}`)
-        router.push(`/admin/categories/${data?.slug}`)
+        router.push(`/admin/categories/${data?.id}`)
       },
 
       onError: ({ error }) => {

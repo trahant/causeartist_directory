@@ -20,7 +20,7 @@ export const EmailAdminSubmissionPremium = ({ tool, ...props }: EmailProps) => {
         of {tool.name}. You should review and approve it as soon as possible.
       </Text>
 
-      <EmailButton href={`${siteConfig.url}/admin/tools/${tool.slug}`}>
+      <EmailButton href={`${siteConfig.url}/admin/tools/${tool.id}`}>
         Review {tool.name}
       </EmailButton>
     </EmailWrapper>
@@ -30,6 +30,7 @@ export const EmailAdminSubmissionPremium = ({ tool, ...props }: EmailProps) => {
 EmailAdminSubmissionPremium.PreviewProps = {
   to: "alex@example.com",
   tool: {
+    id: "example-id",
     name: "Example Tool",
     slug: "example-tool",
     websiteUrl: "https://example.com",

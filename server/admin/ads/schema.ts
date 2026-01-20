@@ -6,7 +6,7 @@ import {
   parseAsStringEnum,
 } from "nuqs/server"
 import * as z from "zod"
-import { AdType, type Ad } from "~/.generated/prisma/browser"
+import { type Ad, AdType } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
 export const adTableParamsSchema = {
