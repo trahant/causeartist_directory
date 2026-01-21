@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { getRandomString, slugify } from "@primoui/utils"
 import { addMonths, formatDate } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, ClockIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, useMemo, useState } from "react"
@@ -108,6 +108,20 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
     if (!Number.isNaN(newDate.getTime())) {
       form.setValue("endsAt", newDate)
     }
+  }
+
+  const setStartsAtNow = () => {
+    const now = new Date()
+    setStartsAtDate(formatDateDisplay(now))
+    setStartsAtTime(formatTimeDisplay(now))
+    form.setValue("startsAt", now)
+  }
+
+  const setEndsAtNow = () => {
+    const now = new Date()
+    setEndsAtDate(formatDateDisplay(now))
+    setEndsAtTime(formatTimeDisplay(now))
+    form.setValue("endsAt", now)
   }
 
   return (
@@ -269,8 +283,22 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
           control={form.control}
           name="startsAt"
           render={() => (
-            <FormItem>
-              <FormLabel isRequired>Starts At</FormLabel>
+            <FormItem className="items-stretch">
+              <Stack className="justify-between">
+                <FormLabel isRequired>Starts At</FormLabel>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  prefix={<ClockIcon />}
+                  onClick={setStartsAtNow}
+                  className="-my-1"
+                >
+                  Set as now
+                </Button>
+              </Stack>
+
               <Stack size="sm" wrap={false} className="items-stretch w-full">
                 <Button
                   type="button"
@@ -323,8 +351,22 @@ export function AdForm({ children, className, title, ad, ...props }: AdFormProps
           control={form.control}
           name="endsAt"
           render={() => (
-            <FormItem>
-              <FormLabel isRequired>Ends At</FormLabel>
+            <FormItem className="items-stretch">
+              <Stack className="justify-between">
+                <FormLabel isRequired>Ends At</FormLabel>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  prefix={<ClockIcon />}
+                  onClick={setEndsAtNow}
+                  className="-my-1"
+                >
+                  Set as now
+                </Button>
+              </Stack>
+
               <Stack size="sm" wrap={false} className="items-stretch w-full">
                 <Button
                   type="button"

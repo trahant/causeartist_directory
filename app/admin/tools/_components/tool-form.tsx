@@ -6,9 +6,9 @@ import { formatDateTime, getRandomString, slugify } from "@primoui/utils"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { use, useMemo, useRef, useState, type ComponentProps } from "react"
+import { type ComponentProps, use, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
-import { ToolStatus, type Tool } from "~/.generated/prisma/browser"
+import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
 import { ToolPublishActions } from "~/app/admin/tools/_components/tool-publish-actions"
 import { AIGenerateContent } from "~/components/admin/ai/generate-content"
@@ -206,7 +206,7 @@ export function ToolForm({
             {isToolApproved(tool) && tool.publishedAt && (
               <>
                 <br />
-                {tool.status === ToolStatus.Scheduled ? `Scheduled to be published` : `Published`}{" "}
+                {tool.status === ToolStatus.Scheduled ? "Scheduled to be published" : "Published"}{" "}
                 on <strong className="text-foreground">{formatDateTime(tool.publishedAt)}</strong>
               </>
             )}
