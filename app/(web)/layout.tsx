@@ -13,7 +13,10 @@ import { env } from "~/env"
 
 export default function ({ children }: PropsWithChildren) {
   return (
-    <PlausibleProvider domain={siteConfig.domain} customDomain={env.NEXT_PUBLIC_PLAUSIBLE_URL}>
+    <PlausibleProvider
+      domain={env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+      customDomain={env.NEXT_PUBLIC_PLAUSIBLE_URL}
+    >
       <div className="flex flex-col min-h-dvh overflow-clip pt-(--header-inner-offset)">
         <Header />
 

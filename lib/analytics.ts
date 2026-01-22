@@ -1,5 +1,5 @@
 import { tryCatch } from "@primoui/utils"
-import { siteConfig } from "~/config/site"
+import { env } from "~/env";
 import { getPlausibleApi } from "~/services/plausible"
 
 /**
@@ -12,7 +12,7 @@ export const getPlausiblePageviews = async (page: string, period: string | strin
   const { data, error } = await tryCatch(
     getPlausibleApi()
       .post({
-        site_id: siteConfig.domain,
+        site_id: env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
         metrics: ["pageviews"],
         date_range: period,
         filters: [["is", "event:page", [page]]],
@@ -37,7 +37,7 @@ export const getPlausibleVisitors = async (period: string | string[] = "30d") =>
   const { data, error } = await tryCatch(
     getPlausibleApi()
       .post({
-        site_id: siteConfig.domain,
+        site_id: env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
         metrics: ["visitors"],
         date_range: period,
         dimensions: ["time:day"],
