@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import { notFound } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 import { cache } from "react"
@@ -27,12 +26,11 @@ const getData = cache(async ({ params }: Props) => {
     notFound()
   }
 
-  const prefix = tool.isFeatured ? "featured" : "success"
   const t = await getTranslations()
   const name = tool.name
   const url = `/submit/${tool.slug}/success`
-  const title = t(`${namespace}.${prefix}.title`, { name })
-  const description = t(`${namespace}.${prefix}.description`, { name, siteName: siteConfig.name })
+  const title = t(`${namespace}.success.title`, { name })
+  const description = t(`${namespace}.success.description`, { name, siteName: siteConfig.name })
 
   const data = getPageData(url, title, description, {
     breadcrumbs: [{ url, title }],
@@ -50,20 +48,9 @@ export default async function (props: Props) {
   const { metadata } = await getData(props)
 
   return (
-    <>
-      <Intro alignment="center">
-        <IntroTitle>{metadata.title}</IntroTitle>
-        <IntroDescription>{metadata.description}</IntroDescription>
-      </Intro>
-
-      <Image
-        src={"/3d-heart.webp"}
-        alt=""
-        width={256}
-        height={228}
-        loading="eager"
-        className="max-w-64 w-2/3 h-auto mx-auto"
-      />
-    </>
+    <Intro alignment="center">
+      <IntroTitle>{metadata.title}</IntroTitle>
+      <IntroDescription>{metadata.description}</IntroDescription>
+    </Intro>
   )
 }

@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache"
 import { after } from "next/server"
 import type Stripe from "stripe"
+import { ToolTier } from "~/.generated/prisma/client"
 import { env } from "~/env"
 import { notifyAdminOfPremiumTool, notifySubmitterOfPremiumTool } from "~/lib/notifications"
 import { db } from "~/services/db"
@@ -26,47 +27,50 @@ export async function POST(req: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
-        const { mode, subscription, metadata } = event.data.object
+        const session = event.data.object
+        const slug = session.metadata?.tool
+        const email = session.customer_email ?? session.customer_details?.email
 
-        switch (mode) {
-          case "payment": {
-            // Handle tool expedited payment
-            if (metadata?.tool) {
-              const tool = await db.tool.findUniqueOrThrow({
-                where: { slug: metadata.tool },
+        if (slug) {
+          // Retrieve the session with line items expanded to get product metadata
+          const checkoutSession = await stripe.checkout.sessions.retrieve(session.id, {
+            expand: ["line_items.data.price.product"],
+          })
+
+          // Get the tier from the product metadata
+          const lineItem = checkoutSession.line_items?.data[0]?.price?.product as
+            | Stripe.Product
+            | undefined
+          const tier = lineItem?.metadata?.tier as ToolTier
+
+          if (tier && tier !== ToolTier.Free) {
+            const tool = await db.tool.update({
+              where: { slug },
+              data: { tier },
+            })
+
+            // If the tool doesn't have an owner, try to match by customer email
+            if (!tool.ownerId && email) {
+              const user = await db.user.findUnique({
+                where: { email },
               })
 
-              // Notify the submitter of the premium tool
-              after(async () => await notifySubmitterOfPremiumTool(tool))
-
-              // Notify the admin of the premium tool
-              after(async () => await notifyAdminOfPremiumTool(tool))
+              if (user) {
+                await db.tool.update({
+                  where: { slug },
+                  data: { ownerId: user.id },
+                })
+              }
             }
 
-            break
-          }
+            // Revalidate the cache
+            revalidateTag("tools", "infinite")
 
-          case "subscription": {
-            const { metadata } = await stripe.subscriptions.retrieve(subscription as string)
+            // Notify the submitter of the premium tool
+            after(async () => await notifySubmitterOfPremiumTool(tool))
 
-            // Handle tool featured listing
-            if (metadata?.tool) {
-              const tool = await db.tool.update({
-                where: { slug: metadata.tool },
-                data: { isFeatured: true },
-              })
-
-              // Revalidate the cache
-              revalidateTag("tools", "infinite")
-
-              // Notify the submitter of the premium tool
-              after(async () => await notifySubmitterOfPremiumTool(tool))
-
-              // Notify the admin of the premium tool
-              after(async () => await notifyAdminOfPremiumTool(tool))
-            }
-
-            break
+            // Notify the admin of the premium tool
+            after(async () => await notifyAdminOfPremiumTool(tool))
           }
         }
 
@@ -79,11 +83,11 @@ export async function POST(req: Request) {
       case "customer.subscription.deleted": {
         const { metadata } = event.data.object
 
-        // Handle tool featured listing
+        // Handle tool premium listing cancellation - downgrade to Standard (not Free)
         if (metadata?.tool) {
           await db.tool.update({
             where: { slug: metadata?.tool },
-            data: { isFeatured: false },
+            data: { tier: ToolTier.Standard },
           })
 
           // Revalidate the cache

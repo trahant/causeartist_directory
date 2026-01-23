@@ -13,6 +13,7 @@ import { Backdrop } from "~/components/web/ui/backdrop"
 import { Favicon } from "~/components/web/ui/favicon"
 import { Sticky } from "~/components/web/ui/sticky"
 import { VerifiedBadge } from "~/components/web/verified-badge"
+import { isToolPremiumTier } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -82,10 +83,10 @@ const ToolEntry = async ({ children, className, tool, ...props }: ToolEntryProps
       )}
 
       <Stack className="w-full not-prose">
-        {tool.isFeatured && <ToolButton tool={tool} />}
+        {isToolPremiumTier(tool) && <ToolButton tool={tool} />}
 
         <Button
-          variant={tool.isFeatured ? "secondary" : "primary"}
+          variant={isToolPremiumTier(tool) ? "secondary" : "primary"}
           suffix={<ArrowRightIcon />}
           className="self-start"
           asChild

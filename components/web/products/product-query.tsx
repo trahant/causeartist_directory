@@ -1,27 +1,42 @@
+import { isTruthy } from "@primoui/utils"
 import { createLoader, parseAsString, type SearchParams } from "nuqs/server"
 import type { ComponentProps } from "react"
-import type Stripe from "stripe"
-import type { Product } from "~/components/web/products/product"
+import { Product } from "~/components/web/products/product"
 import { ProductList } from "~/components/web/products/product-list"
-import { getProductsForListing } from "~/lib/products"
+import { getProductsForListing, type ProductProps, type ProductWithPrices } from "~/lib/products"
 
-type ProductQueryProps = Omit<ComponentProps<typeof ProductList>, "products" | "urls"> & {
+type ProductQueryProps = ComponentProps<typeof ProductList> & {
   searchParams: Promise<SearchParams>
   checkoutData: ComponentProps<typeof Product>["checkoutData"]
-  productFilter?: (product: Stripe.Product) => boolean
-  productMapper?: (product: Stripe.Product) => Stripe.Product
+  getProductProps?: (item: ProductWithPrices) => ProductProps
 }
 
 export const ProductQuery = async ({
   searchParams,
   checkoutData,
-  productFilter,
-  productMapper,
+  getProductProps,
   ...props
 }: ProductQueryProps) => {
   const loadSearchParams = createLoader({ discountCode: parseAsString.withDefault("") })
   const { discountCode } = await loadSearchParams(searchParams)
-  const products = await getProductsForListing(discountCode, productFilter, productMapper)
+  const products = await getProductsForListing(discountCode)
 
-  return <ProductList products={products} checkoutData={checkoutData} {...props} />
+  const items = products
+    .map(item => ({ ...item, customProps: getProductProps?.(item) }))
+    .filter(({ customProps }) => isTruthy(customProps))
+
+  return (
+    <ProductList {...props}>
+      {items.map(({ product, prices, coupon, customProps }, index) => (
+        <Product
+          key={product.id}
+          data={{ product: { ...product, ...customProps?.product }, prices, coupon }}
+          checkoutData={checkoutData}
+          isHighlighted={index === items.length - 1}
+          isDisabled={customProps?.isDisabled}
+          buttonLabel={customProps?.buttonLabel}
+        />
+      ))}
+    </ProductList>
+  )
 }

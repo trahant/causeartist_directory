@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { siteConfig } from "~/config/site"
+import { getServerSession } from "~/lib/auth"
 import { actionClient } from "~/lib/safe-actions"
 import { checkoutSchema } from "~/server/web/products/schema"
 import { stripe } from "~/services/stripe"
@@ -9,6 +10,9 @@ import { stripe } from "~/services/stripe"
 export const createStripeCheckout = actionClient
   .inputSchema(checkoutSchema)
   .action(async ({ parsedInput: { lineItems, successUrl, cancelUrl, mode, metadata, coupon } }) => {
+    const session = await getServerSession()
+    const customerEmail = session?.user.email
+
     const checkout = await stripe.checkout.sessions.create({
       mode,
       metadata,
@@ -22,6 +26,7 @@ export const createStripeCheckout = actionClient
       discounts: coupon ? [{ coupon }] : undefined,
       success_url: `${siteConfig.url}${successUrl}?sessionId={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl ? `${siteConfig.url}${cancelUrl}?cancelled=true` : undefined,
+      customer_email: customerEmail,
     })
 
     if (!checkout.url) {

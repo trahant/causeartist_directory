@@ -31,9 +31,10 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
     ]
   }
 
+  // Query Premium tools first, then others by createdAt (Standard and Free equal)
   const [tools, total] = await db.$transaction([
     db.tool.findMany({
-      orderBy: sortBy ? { [sortBy]: sortOrder } : [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy: sortBy ? { [sortBy]: sortOrder } : [{ tier: "desc" }, { createdAt: "desc" }],
       where: { ...whereQuery, ...where },
       select: toolManyPayload,
       take,
@@ -95,7 +96,7 @@ export const findTools = async ({ where, orderBy, ...args }: Prisma.ToolFindMany
   return db.tool.findMany({
     ...args,
     where: { status: ToolStatus.Published, ...where },
-    orderBy: orderBy ?? [{ isFeatured: "desc" }, { createdAt: "desc" }],
+    orderBy: orderBy ?? [{ tier: "desc" }, { createdAt: "desc" }],
     select: toolManyPayload,
   })
 }

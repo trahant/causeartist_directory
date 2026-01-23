@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
-import type { ComponentProps, ReactNode } from "react"
+import { useId, type ComponentProps, type ReactNode } from "react"
 import { Ping } from "~/components/common/ping"
 import type { ProductInterval } from "~/lib/products"
 import { cx } from "~/lib/utils"
@@ -25,6 +25,8 @@ export const ProductIntervalSwitch = ({
   onChange,
   ...props
 }: ProductIntervalSwitchProps) => {
+  const id = useId()
+
   return (
     <div className={cx("relative flex rounded-md bg-foreground/10 p-0.5", className)} {...props}>
       {intervals.map(interval => (
@@ -55,7 +57,7 @@ export const ProductIntervalSwitch = ({
           {interval.value === value && (
             <motion.div
               className="absolute inset-0 bg-background rounded-sm -z-10"
-              layoutId="indicator"
+              layoutId={`${id}-indicator`}
               transition={{ type: "tween", duration: 0.125, ease: "easeOut" }}
             />
           )}

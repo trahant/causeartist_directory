@@ -2,13 +2,13 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 import { cache, Suspense } from "react"
+import { ToolTier } from "~/.generated/prisma/browser"
 import { ProductListSkeleton } from "~/components/web/products/product-list"
 import { ProductQuery } from "~/components/web/products/product-query"
 import { Stats } from "~/components/web/stats"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { siteConfig } from "~/config/site"
 import { getPageData, getPageMetadata } from "~/lib/pages"
-import { isToolPublished } from "~/lib/tools"
 import { toolOnePayload } from "~/server/web/tools/payloads"
 import { db } from "~/services/db"
 
@@ -22,7 +22,7 @@ const getData = cache(async ({ params }: Props) => {
   const { slug } = await params
 
   const tool = await db.tool.findFirst({
-    where: { slug, isFeatured: false },
+    where: { slug },
     select: toolOnePayload,
   })
 
@@ -30,12 +30,11 @@ const getData = cache(async ({ params }: Props) => {
     notFound()
   }
 
-  const prefix = isToolPublished(tool) ? "feature" : "expedite"
   const t = await getTranslations()
   const name = tool.name
   const url = `/submit/${tool.slug}`
-  const title = t(`${namespace}.${prefix}.title`, { name })
-  const description = t(`${namespace}.${prefix}.description`, { name, siteName: siteConfig.name })
+  const title = t(`${namespace}.upgrade.title`, { name })
+  const description = t(`${namespace}.upgrade.description`, { name, siteName: siteConfig.name })
 
   const data = getPageData(url, title, description, {
     breadcrumbs: [{ url, title }],
@@ -52,7 +51,12 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
 export default async function (props: Props) {
   const { tool, url, metadata } = await getData(props)
   const t = await getTranslations()
-  const isPublished = isToolPublished(tool)
+
+  const tierRank: Record<ToolTier, number> = {
+    [ToolTier.Free]: 0,
+    [ToolTier.Standard]: 1,
+    [ToolTier.Premium]: 2,
+  }
 
   return (
     <>
@@ -69,22 +73,20 @@ export default async function (props: Props) {
             cancelUrl: `${url}`,
             metadata: { tool: tool.slug },
           }}
-          productFilter={({ name }) => {
-            return name.includes("Listing") && (!isPublished || !name.includes("Expedited"))
-          }}
-          productMapper={({ name, ...product }) => {
-            return { ...product, name: name.replace("Listing", "").trim() }
-          }}
-          buttonLabel={({ name, metadata }) => {
-            if (name.includes("Free")) {
-              return t(`${namespace}.current_package`)
-            }
+          getProductProps={({ product }) => {
+            const tier = product.metadata.tier as ToolTier | undefined
 
-            if (isPublished) {
-              return t(`${namespace}.upgrade_listing`)
-            }
+            // Only show listing products with a valid tier
+            if (!tier) return null
 
-            return metadata.label ?? t(`${namespace}.choose_plan`, { name })
+            const name = product.name.replace(" Listing", "")
+            const isDisabled = tierRank[tier] <= tierRank[tool.tier]
+            const buttonLabel =
+              tier === tool.tier
+                ? t(`${namespace}.current_tier`, { name })
+                : (product.metadata.label ?? t(`${namespace}.choose_tier`, { name }))
+
+            return { product: { name }, isDisabled, buttonLabel }
           }}
         />
       </Suspense>

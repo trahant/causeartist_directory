@@ -168,7 +168,8 @@
   a,
   button,
   label[for],
-  [href] [class*="group-hover"] {
+  [href] [class*="group-hover"],
+  [type]:not([disabled]) [class*="group-hover"] {
     @apply ease-out;
     @apply duration-100;
     @apply not-disabled:cursor-pointer;
@@ -185,29 +186,30 @@
     @apply size-[1em]!;
   }
 
-  [href] svg[class*="arrow-"] {
+  [href] svg[class*="arrow-"],
+  [type]:not([disabled]) svg[class*="arrow-"] {
     @apply will-change-transform;
     @apply duration-150;
   }
 
   [href]:hover svg[class*="arrow-right"],
-  [type]:hover svg[class*="arrow-right"] {
+  [type]:not([disabled]):hover svg[class*="arrow-right"] {
     @apply translate-x-[0.1em];
   }
 
   [href]:hover svg[class*="arrow-left"],
-  [type]:hover svg[class*="arrow-left"] {
+  [type]:not([disabled]):hover svg[class*="arrow-left"] {
     @apply -translate-x-[0.1em];
   }
 
   [href]:hover svg[class*="arrow-up-right"],
-  [type]:hover svg[class*="arrow-up-right"] {
+  [type]:not([disabled]):hover svg[class*="arrow-up-right"] {
     @apply translate-x-[0.1em];
     @apply -translate-y-[0.1em];
   }
 
   [href]:hover svg[class*="arrow-up-left"],
-  [type]:hover svg[class*="arrow-up-left"] {
+  [type]:not([disabled]):hover svg[class*="arrow-up-left"] {
     @apply -translate-x-[0.1em];
     @apply -translate-y-[0.1em];
   }

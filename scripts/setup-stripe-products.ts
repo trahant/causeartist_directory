@@ -6,7 +6,7 @@ const products: (Stripe.ProductCreateParams & { price_data?: Stripe.PriceCreateP
     name: "Free Listing",
     description: "Free listing with a wait time and a direct link to your website.",
     active: true,
-    metadata: {},
+    metadata: { tier: "Free" },
     marketing_features: [
       { name: "• Few weeks processing time" },
       { name: "✗ No content updates" },
@@ -20,14 +20,14 @@ const products: (Stripe.ProductCreateParams & { price_data?: Stripe.PriceCreateP
     },
   },
   {
-    name: "Expedited Listing",
+    name: "Standard Listing",
     description: "Skip the queue and get your site published on the site within 24 hours.",
     active: true,
-    metadata: { label: "Expedite Listing" },
+    metadata: { tier: "Standard" },
     marketing_features: [
       { name: "✓ 24h processing time" },
       { name: "✓ Unlimited content updates" },
-      { name: "✗ Do-follow backlink" },
+      { name: "✓ Do-follow backlink" },
       { name: "✗ No featured spot" },
       { name: "✗ No prominent placement" },
     ],
@@ -37,10 +37,10 @@ const products: (Stripe.ProductCreateParams & { price_data?: Stripe.PriceCreateP
     },
   },
   {
-    name: "Featured Listing",
-    description: "Featured listing with a homepage spot and a prominent placement.",
+    name: "Premium Listing",
+    description: "Premium listing with a homepage spot and a prominent placement.",
     active: true,
-    metadata: { label: "Feature Listing" },
+    metadata: { tier: "Premium" },
     marketing_features: [
       { name: "✓ 12h processing time" },
       { name: "✓ Unlimited content updates" },

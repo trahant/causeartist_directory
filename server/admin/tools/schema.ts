@@ -6,7 +6,7 @@ import {
   parseAsStringEnum,
 } from "nuqs/server"
 import * as z from "zod"
-import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
+import { type Tool, ToolTier, ToolStatus } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
 export const toolTableParamsSchema = {
@@ -34,7 +34,7 @@ export const toolSchema = z.object({
   content: z.string().optional(),
   faviconUrl: z.string().optional(),
   screenshotUrl: z.string().optional(),
-  isFeatured: z.boolean().default(false),
+  tier: z.enum(ToolTier).default("Free"),
   submitterName: z.string().optional(),
   submitterEmail: z.string().optional(),
   submitterNote: z.string().optional(),

@@ -9,7 +9,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, use, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
-import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
+import { type Tool, ToolTier, ToolStatus } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
 import { ToolPublishActions } from "~/app/admin/tools/_components/tool-publish-actions"
 import { AIGenerateContent } from "~/components/admin/ai/generate-content"
@@ -29,7 +29,13 @@ import { Input, inputVariants } from "~/components/common/input"
 import { Link } from "~/components/common/link"
 import { Note } from "~/components/common/note"
 import { Stack } from "~/components/common/stack"
-import { Switch } from "~/components/common/switch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/common/select"
 import { TextArea } from "~/components/common/textarea"
 import { Tooltip } from "~/components/common/tooltip"
 import { Markdown } from "~/components/web/markdown"
@@ -98,7 +104,7 @@ export function ToolForm({
         affiliateUrl: tool?.affiliateUrl ?? "",
         faviconUrl: tool?.faviconUrl ?? "",
         screenshotUrl: tool?.screenshotUrl ?? "",
-        isFeatured: tool?.isFeatured ?? false,
+        tier: tool?.tier ?? ToolTier.Free,
         submitterName: tool?.submitterName ?? "",
         submitterEmail: tool?.submitterEmail ?? "",
         submitterNote: tool?.submitterNote ?? "",
@@ -508,13 +514,22 @@ export function ToolForm({
 
         <FormField
           control={form.control}
-          name="isFeatured"
+          name="tier"
           render={({ field }) => (
-            <FormItem direction="row">
+            <FormItem className="col-span-full">
+              <FormLabel>Tier</FormLabel>
               <FormControl>
-                <Switch onCheckedChange={field.onChange} checked={field.value} />
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ToolTier.Free}>Free</SelectItem>
+                    <SelectItem value={ToolTier.Standard}>Standard</SelectItem>
+                    <SelectItem value={ToolTier.Premium}>Premium</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
-              <FormLabel>Feature this tool</FormLabel>
               <FormMessage />
             </FormItem>
           )}

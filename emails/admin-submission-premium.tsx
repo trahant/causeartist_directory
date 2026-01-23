@@ -1,10 +1,11 @@
 import "dotenv/config"
 
 import { Text } from "@react-email/components"
-import type { Tool } from "~/.generated/prisma/client"
+import { type Tool } from "~/.generated/prisma/client"
 import { siteConfig } from "~/config/site"
 import { EmailButton } from "~/emails/components/button"
 import { EmailWrapper, type EmailWrapperProps } from "~/emails/components/wrapper"
+import { isToolPremiumTier } from "~/lib/tools"
 
 type EmailProps = EmailWrapperProps & {
   tool: Tool
@@ -16,8 +17,8 @@ export const EmailAdminSubmissionPremium = ({ tool, ...props }: EmailProps) => {
       <Text>Hi!</Text>
 
       <Text>
-        {tool.submitterName} has opted to {tool.isFeatured ? "feature" : "expedite"} the submission
-        of {tool.name}. You should review and approve it as soon as possible.
+        {tool.submitterName} has opted to {isToolPremiumTier(tool) ? "feature" : "upgrade"} the
+        submission of {tool.name}. You should review and approve it as soon as possible.
       </Text>
 
       <EmailButton href={`${siteConfig.url}/admin/tools/${tool.id}`}>

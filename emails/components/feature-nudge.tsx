@@ -1,7 +1,8 @@
 import { Hr, Link, Text } from "@react-email/components"
-import type { Tool } from "~/.generated/prisma/client"
+import { type Tool } from "~/.generated/prisma/client"
 import { siteConfig } from "~/config/site"
 import { EmailButton } from "~/emails/components/button"
+import { isToolPremiumTier } from "~/lib/tools"
 
 type EmailFeatureNudgeProps = {
   tool: Tool
@@ -19,7 +20,7 @@ export const EmailFeatureNudge = ({ tool, showButton }: EmailFeatureNudgeProps) 
     "✏️ Unlimited content updates",
   ]
 
-  if (tool.isFeatured) {
+  if (isToolPremiumTier(tool)) {
     return null
   }
 

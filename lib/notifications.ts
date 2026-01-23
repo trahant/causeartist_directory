@@ -84,7 +84,7 @@ export const notifySubmitterOfPremiumTool = async (tool: Tool) => {
   }
 
   const to = tool.submitterEmail
-  const subject = `🙌 Thank you for ${tool.isFeatured ? "featuring" : "expediting"} ${tool.name}!`
+  const subject = `🙌 Thank you for upgrading ${tool.name}!`
 
   return await sendEmail({
     to,
@@ -101,7 +101,7 @@ export const notifySubmitterOfPremiumTool = async (tool: Tool) => {
  */
 export const notifyAdminOfPremiumTool = async (tool: Tool) => {
   const to = siteConfig.email
-  const subject = `New tool ${tool.isFeatured ? "featured" : "expedited"}: ${tool.name}`
+  const subject = `New ${tool.tier.toLowerCase()} tool: ${tool.name}`
 
   return await sendEmail({
     to,

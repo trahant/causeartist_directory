@@ -16,7 +16,7 @@ import { ToolReportDialog } from "~/components/web/dialogs/tool-report-dialog"
 import { ToolButton } from "~/components/web/tools/tool-button"
 import { reportsConfig } from "~/config/reports"
 import { useSession } from "~/lib/auth-client"
-import { isToolApproved, isToolPublished } from "~/lib/tools"
+import { isToolPremiumTier, isToolApproved, isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -69,7 +69,7 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
         )}
       </AnimatePresence>
 
-      {!tool.isFeatured && tool.ownerId && tool.ownerId === session?.user.id && (
+      {!isToolPremiumTier(tool) && tool.ownerId && tool.ownerId === session?.user.id && (
         <Tooltip tooltip={t("promote_tooltip")}>
           <Button
             size="md"

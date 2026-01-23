@@ -3,13 +3,12 @@
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
 import {
-  CalendarPlusIcon,
+  ArrowUpRightIcon,
   CircleCheckIcon,
   CircleDashedIcon,
   CircleDotDashedIcon,
   CircleDotIcon,
   PlusIcon,
-  SparklesIcon,
 } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import { useQueryStates } from "nuqs"
@@ -24,8 +23,9 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
+import { LogoSymbol } from "~/components/web/ui/logo-symbol"
 import { useDataTable } from "~/hooks/use-data-table"
-import { isToolPublished } from "~/lib/tools"
+import { isToolPremiumTier } from "~/lib/tools"
 import type { findTools } from "~/server/admin/tools/queries"
 import { toolTableParamsSchema } from "~/server/admin/tools/schema"
 import type { DataTableFilterField } from "~/types"
@@ -96,10 +96,7 @@ export const DashboardTable = ({ tools, pageCount }: Awaited<ReturnType<typeof f
       {
         id: "actions",
         cell: ({ row }) => {
-          const { slug, isFeatured } = row.original
-          const isPublished = isToolPublished(row.original)
-
-          if (isPublished && isFeatured) {
+          if (isToolPremiumTier(row.original)) {
             return null
           }
 
@@ -107,19 +104,12 @@ export const DashboardTable = ({ tools, pageCount }: Awaited<ReturnType<typeof f
             <Button
               size="sm"
               variant="secondary"
-              prefix={
-                !isPublished ? (
-                  <CalendarPlusIcon className="text-green-600 dark:text-green-400" />
-                ) : (
-                  <SparklesIcon className="text-blue-600 dark:text-blue-400" />
-                )
-              }
+              prefix={<LogoSymbol className="text-primary" />}
+              suffix={<ArrowUpRightIcon />}
               className="float-right -my-1"
               asChild
             >
-              <Link href={`/submit/${slug}`}>
-                {!isPublished ? t("actions.publish") : t("actions.feature")}
-              </Link>
+              <Link href={`/submit/${row.original.slug}`}>{t("upgrade_button")}</Link>
             </Button>
           )
         },

@@ -26,6 +26,12 @@ enum ToolStatus {
   Published
 }
 
+enum ToolTier {
+  Free
+  Standard
+  Premium
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -125,7 +131,7 @@ model Tool {
   content        String?
   faviconUrl     String?
   screenshotUrl  String?
-  isFeatured     Boolean    @default(false)
+  tier           ToolTier    @default(Free)
   submitterName  String?
   submitterEmail String?
   submitterNote  String?

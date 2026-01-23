@@ -1,5 +1,5 @@
 import { addDays } from "date-fns"
-import { ToolStatus } from "~/.generated/prisma/client"
+import { ToolTier, ToolStatus } from "~/.generated/prisma/client"
 import { db } from "~/services/db"
 
 const ADMIN_EMAIL = "admin@dirstarter.com"
@@ -143,7 +143,7 @@ async function main() {
       tagline: "The full-stack React framework for the web",
       description:
         "Next.js gives you the best developer experience with all the features you need for production: hybrid static & server rendering, TypeScript support, smart bundling, route pre-fetching, and more.",
-      isFeatured: true,
+      tier: ToolTier.Premium,
       status: ToolStatus.Published,
       publishedAt: now,
       screenshotUrl: "https://assets.vercel.com/image/upload/front/nextjs/twitter-card.png",
@@ -157,7 +157,7 @@ async function main() {
       tagline: "Accelerate how you build, share and run modern applications",
       description:
         "Docker is an open platform for developing, shipping, and running applications in containers.",
-      isFeatured: true,
+      tier: ToolTier.Premium,
       status: ToolStatus.Published,
       publishedAt: now,
       screenshotUrl: "https://www.docker.com/app/uploads/2023/06/meta-image-homepage-1110x580.png",
@@ -171,7 +171,7 @@ async function main() {
       tagline: "Design, prototype, and collaborate all in the browser",
       description:
         "Figma is a vector graphics editor and prototyping tool, primarily web-based with additional offline features through desktop applications.",
-      isFeatured: true,
+      tier: ToolTier.Premium,
       status: ToolStatus.Published,
       publishedAt: now,
       screenshotUrl:
@@ -252,7 +252,7 @@ async function main() {
       tagline: "A conversational AI system that listens, learns, and challenges",
       description:
         "ChatGPT is a large language model developed by OpenAI that can generate human-like text based on the context and prompt it's given.",
-      isFeatured: true,
+      tier: ToolTier.Premium,
       status: ToolStatus.Published,
       publishedAt: now,
       screenshotUrl: "https://cdn.oaistatic.com/assets/chatgpt-share-og-u7j5uyao.webp",
@@ -306,7 +306,7 @@ async function main() {
       tagline: "Build and ship software on a single, collaborative platform",
       description:
         "GitHub is a code hosting platform for version control and collaboration, letting you and others work together on projects.",
-      isFeatured: true,
+      tier: ToolTier.Premium,
       status: ToolStatus.Published,
       publishedAt: now,
       screenshotUrl:

@@ -2,6 +2,7 @@
 
 import { useLocalStorage } from "@mantine/hooks"
 import { ArrowUpRightIcon, TicketPercentIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import type { InferSafeActionFnInput } from "next-safe-action"
 import { useAction } from "next-safe-action/hooks"
@@ -39,7 +40,8 @@ type ProductCheckoutData = Omit<
 type ProductProps = ComponentProps<typeof Card> & {
   data: ProductData
   checkoutData: ProductCheckoutData
-  isFeatured?: boolean
+  isHighlighted?: boolean
+  isDisabled?: boolean
   buttonLabel?: ReactNode
 }
 
@@ -47,11 +49,13 @@ const Product = ({
   className,
   data,
   checkoutData,
-  isFeatured,
+  isHighlighted,
+  isDisabled,
   buttonLabel,
   ...props
 }: ProductProps) => {
   const { product, prices, coupon } = data
+  const router = useRouter()
   const features = getProductFeatures(product)
   const t = useTranslations("components.product")
 
@@ -68,14 +72,16 @@ const Product = ({
   })
 
   const onSubmit = () => {
-    if (currentPrice?.id) {
-      execute({
+    if (currentPrice?.id && currentPrice.unit_amount) {
+      return execute({
         lineItems: [{ price: currentPrice.id }],
         mode: isSubscription ? "subscription" : "payment",
         coupon: coupon?.id,
         ...checkoutData,
       })
     }
+
+    return router.push(checkoutData.successUrl)
   }
 
   const priceCalculations = useProductPrices(prices, coupon, interval)
@@ -84,10 +90,15 @@ const Product = ({
   return (
     <Card
       hover={false}
-      className={cx(productClassName, isFeatured && "not-only:lg:-my-3 lg:py-8", className)}
+      className={cx(
+        productClassName,
+        isHighlighted && "not-only:lg:-my-3 lg:py-8",
+        isDisabled && "opacity-50 cursor-not-allowed",
+        className,
+      )}
       {...props}
     >
-      {isFeatured && <CardBg />}
+      {isHighlighted && <CardBg />}
 
       {coupon && (fullPrice || 0) > price && (
         <CardBadges size="sm">
@@ -136,11 +147,12 @@ const Product = ({
       <ProductFeatures features={features} />
 
       <Button
+        type="button"
         onClick={onSubmit}
-        variant={isFeatured ? "primary" : "secondary"}
-        disabled={isPending || !currentPrice?.unit_amount}
+        variant={isHighlighted ? "primary" : "secondary"}
         isPending={isPending}
-        suffix={!currentPrice?.unit_amount ? <span /> : <ArrowUpRightIcon />}
+        disabled={isPending || isDisabled}
+        suffix={<ArrowUpRightIcon />}
       >
         {buttonLabel}
       </Button>

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server"
 import type { ComponentProps } from "react"
+import { ToolTier } from "~/.generated/prisma/client"
 import { Link } from "~/components/common/link"
 import { Listing } from "~/components/web/listing"
 import { ToolList, ToolListSkeleton } from "~/components/web/tools/tool-list"
@@ -8,7 +9,7 @@ import { findTools } from "~/server/web/tools/queries"
 type FeaturedToolsProps = Omit<ComponentProps<typeof Listing>, "title">
 
 const FeaturedTools = async ({ ...props }: FeaturedToolsProps) => {
-  const tools = await findTools({ where: { isFeatured: true }, take: 6 })
+  const tools = await findTools({ where: { tier: ToolTier.Premium }, take: 6 })
 
   if (!tools.length) {
     return null
