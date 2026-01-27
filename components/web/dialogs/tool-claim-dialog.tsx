@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { getDomain } from "@primoui/utils"
-import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import type { z } from "zod"
@@ -104,7 +104,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
       setVerificationEmail("")
       setCooldownRemaining(0)
     }
-  }, [isOpen, sendOtpAction.form, verifyOtpAction.form])
+  }, [isOpen])
 
   // Cooldown timer effect
   useEffect(() => {

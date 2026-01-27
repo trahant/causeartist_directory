@@ -185,16 +185,7 @@ export const FeedbackWidget = () => {
         onDismiss: () => setDismissed(true),
       })
     }
-  }, [
-    dismissed,
-    shouldShow,
-    pageViews,
-    toastId,
-    setDismissed,
-    minTimeSpent,
-    minPageView,
-    minScroll,
-  ])
+  }, [dismissed, shouldShow, pageViews, toastId, minTimeSpent, minPageView, minScroll])
 
   // Setup scroll listener and engagement checker
   useEffect(() => {

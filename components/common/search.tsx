@@ -3,11 +3,11 @@
 import { type HotkeyItem, useDebouncedState, useHotkeys } from "@mantine/hooks"
 import { getDomain } from "@primoui/utils"
 import { LoaderIcon, MoonIcon, SunIcon } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import type { InferSafeActionFnResult } from "next-safe-action"
 import { useAction } from "next-safe-action/hooks"
 import { useTheme } from "next-themes"
+import { usePathname, useRouter } from "next/navigation"
 import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react"
 import {
   CommandDialog,

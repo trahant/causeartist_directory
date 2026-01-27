@@ -65,15 +65,7 @@ export const AIRelationSuggestions = <T extends Relation>({
       const relationNames = relations.map(({ name }) => name).join(", ")
       complete(buildSuggestionPrompt(debouncedPrompt, maxSuggestions, relationNames))
     }
-  }, [
-    isAIEnabled,
-    debouncedPrompt,
-    ids.length,
-    suggestions.length,
-    relations,
-    complete,
-    maxSuggestions,
-  ])
+  }, [isAIEnabled, debouncedPrompt, ids.length, suggestions.length])
 
   const handleSetIds = useCallback(
     (newIds: string[]) => {

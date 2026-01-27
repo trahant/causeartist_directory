@@ -115,7 +115,7 @@ export const DashboardTable = ({ tools, pageCount }: Awaited<ReturnType<typeof f
         },
       },
     ]
-  }, [t, format])
+  }, [])
 
   // Search filters
   const filterFields: DataTableFilterField<Tool>[] = [

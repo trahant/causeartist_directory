@@ -68,7 +68,7 @@ export const useAds = (spots: AdSpot[]) => {
 
     const basePrice = Math.min(...spots.map(s => s.price))
     return calculateAdsPrice(selectedItems, basePrice)
-  }, [selections, spots, findAdSpot])
+  }, [selections, spots])
 
   return {
     price,

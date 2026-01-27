@@ -21,8 +21,8 @@ import {
   parseAsInteger,
   parseAsString,
   type SingleParser,
-  type UseQueryStateOptions,
   useQueryState,
+  type UseQueryStateOptions,
   useQueryStates,
 } from "nuqs"
 import * as React from "react"
