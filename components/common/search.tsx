@@ -18,7 +18,6 @@ import {
   CommandList,
   CommandShortcut,
 } from "~/components/common/command"
-import { Kbd } from "~/components/common/kbd"
 import { useSearch } from "~/contexts/search-context"
 import { useSession } from "~/lib/auth-client"
 import { searchItems } from "~/server/web/actions/search"
@@ -110,17 +109,17 @@ export const Search = () => {
       items: [
         {
           label: t("navigation.new_tool"),
-          shortcut: { meta: true, children: "1" },
+          shortcut: { keys: ["meta", "1"] },
           onSelect: () => navigateTo("/admin/tools/new"),
         },
         {
           label: t("navigation.new_category"),
-          shortcut: { meta: true, children: "2" },
+          shortcut: { keys: ["meta", "2"] },
           onSelect: () => navigateTo("/admin/categories/new"),
         },
         {
           label: t("navigation.new_tag"),
-          shortcut: { meta: true, children: "3" },
+          shortcut: { keys: ["meta", "3"] },
           onSelect: () => navigateTo("/admin/tags/new"),
         },
       ],
@@ -148,7 +147,7 @@ export const Search = () => {
           value: "theme",
           label: t("navigation.switch_theme", { theme: t(`common.themes.${nextTheme}`) }),
           icon: nextTheme === "dark" ? <MoonIcon /> : <SunIcon />,
-          shortcut: { meta: true, shift: true, children: "L" },
+          shortcut: { keys: ["meta", "shift", "L"] },
           onSelect: () => setTheme(nextTheme),
         },
       ],
@@ -160,13 +159,14 @@ export const Search = () => {
     .entries()) {
     if (!shortcut) continue
 
-    const mods = []
-    if (shortcut.shift) mods.push("shift")
-    if (shortcut.meta) mods.push("mod")
-    if (shortcut.alt) mods.push("alt")
-    if (shortcut.ctrl) mods.push("ctrl")
+    const hotkeyParts = shortcut.keys.map(key => {
+      const lowerKey = key.toLowerCase()
+      if (lowerKey === "meta") return "mod"
+      if (["shift", "alt", "ctrl"].includes(lowerKey)) return lowerKey
+      return key
+    })
 
-    hotkeys.push([[...mods, shortcut.children].join("+"), onSelect])
+    hotkeys.push([hotkeyParts.join("+"), onSelect])
   }
 
   useHotkeys(hotkeys, [], true)
@@ -204,7 +204,6 @@ export const Search = () => {
         onValueChange={setQuery}
         className="pr-10"
         prefix={isPending && <LoaderIcon className="animate-spin" />}
-        suffix={<Kbd meta>K</Kbd>}
       />
 
       {hasQuery && !isPending && <CommandEmpty>{t("components.search.no_results")}</CommandEmpty>}

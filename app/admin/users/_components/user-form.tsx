@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { UserActions } from "~/app/admin/users/_components/user-actions"
 import { Avatar, AvatarImage } from "~/components/common/avatar"
 import { Button } from "~/components/common/button"
+import { Kbd } from "~/components/common/kbd"
 import {
   Form,
   FormControl,
@@ -122,7 +123,11 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
             <Link href="/admin/users">Cancel</Link>
           </Button>
 
-          <Button size="md" isPending={action.isPending}>
+          <Button
+            size="md"
+            isPending={action.isPending}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
+          >
             Update user
           </Button>
         </div>

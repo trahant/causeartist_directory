@@ -7,6 +7,7 @@ import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ReportActions } from "~/app/admin/reports/_components/report-actions"
 import { Button } from "~/components/common/button"
+import { Kbd } from "~/components/common/kbd"
 import {
   Form,
   FormControl,
@@ -137,7 +138,11 @@ export function ReportForm({ className, title, report, ...props }: ReportFormPro
             <Link href="/admin/reports">Cancel</Link>
           </Button>
 
-          <Button size="md" isPending={action.isPending}>
+          <Button
+            size="md"
+            isPending={action.isPending}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
+          >
             Update report
           </Button>
         </div>

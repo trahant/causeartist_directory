@@ -93,7 +93,7 @@ const columns: ColumnDef<Tool>[] = [
 
       return (
         <DataTableLink href={`/admin/tools/${id}`} image={faviconUrl} title={name}>
-          {ownerId && <VerifiedBadge size="sm" />}
+          {ownerId && <VerifiedBadge className="pointer-events-none" size="sm" />}
         </DataTableLink>
       )
     },

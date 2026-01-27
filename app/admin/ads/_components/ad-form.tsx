@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { AdType } from "~/.generated/prisma/browser"
 import { AdActions } from "~/app/admin/ads/_components/ad-actions"
 import { Button } from "~/components/common/button"
+import { Kbd } from "~/components/common/kbd"
 import { Calendar } from "~/components/common/calendar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/common/dialog"
 import {
@@ -424,7 +425,11 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
             <Link href="/admin/ads">Cancel</Link>
           </Button>
 
-          <Button size="md" isPending={action.isPending}>
+          <Button
+            size="md"
+            isPending={action.isPending}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
+          >
             {ad ? "Update ad" : "Create ad"}
           </Button>
         </div>

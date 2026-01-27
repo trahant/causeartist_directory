@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/c
 import { FormControl, FormField, FormItem, FormLabel } from "~/components/common/form"
 import { H5, H6 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
+import { Kbd } from "~/components/common/kbd"
 import { Note } from "~/components/common/note"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/common/popover"
 import { RadioGroup, RadioGroupItem } from "~/components/common/radio-group"
@@ -379,6 +380,7 @@ export const ToolPublishActions = ({
             size="md"
             isPending={isPending}
             className="lg:min-w-24"
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
             {...action}
           />
         )

@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
 import { AIGenerateDescription } from "~/components/admin/ai/generate-description"
 import { Button } from "~/components/common/button"
+import { Kbd } from "~/components/common/kbd"
 import {
   Form,
   FormControl,
@@ -190,7 +191,11 @@ export function CategoryForm({
             <Link href="/admin/categories">Cancel</Link>
           </Button>
 
-          <Button size="md" isPending={action.isPending}>
+          <Button
+            size="md"
+            isPending={action.isPending}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
+          >
             {category ? "Update category" : "Create category"}
           </Button>
         </div>

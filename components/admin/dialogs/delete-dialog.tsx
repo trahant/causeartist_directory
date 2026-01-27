@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/common/dialog"
+import { Kbd } from "~/components/common/kbd"
 import type { idsSchema } from "~/server/admin/shared/schema"
 
 type DeleteDialogProps<ServerError, CVE, Data> = ComponentProps<typeof Dialog> & {
@@ -55,7 +56,7 @@ export const DeleteDialog = <ServerError, CVE, Data>({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button size="md" variant="secondary">
+            <Button size="md" variant="secondary" suffix={<Kbd keys={["esc"]} />}>
               Cancel
             </Button>
           </DialogClose>
@@ -66,6 +67,7 @@ export const DeleteDialog = <ServerError, CVE, Data>({
             variant="destructive"
             className="min-w-28"
             onClick={() => execute({ ids })}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
             isPending={isPending}
           >
             Delete {pluralizedLabel}

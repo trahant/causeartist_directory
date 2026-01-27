@@ -1,8 +1,8 @@
 "use client"
 
 import { useClipboard, useHotkeys } from "@mantine/hooks"
-import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { usePathname } from "next/navigation"
 import { Slot } from "radix-ui"
 import type { ComponentProps, ReactNode } from "react"
 import { toast } from "sonner"
@@ -110,7 +110,7 @@ export const Nav = ({ className, title, ...props }: NavProps) => {
         {...props}
       >
         <button type="button" className={navItemVariants()} onClick={handleCopyLink}>
-          {t("copy_link")} <Kbd className="ml-0.5">{clipboard.copied ? "✔︎" : "C"}</Kbd>
+          {t("copy_link")} <Kbd className="ml-0.5" keys={[clipboard.copied ? "✔︎" : "C"]} />
         </button>
 
         <div className="w-px h-4 mx-1.5 bg-ring" />

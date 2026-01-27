@@ -116,7 +116,7 @@ export const Sidebar = () => {
           href: "#",
           onClick: search.open,
           prefix: <DockIcon />,
-          suffix: <Kbd meta>K</Kbd>,
+          suffix: <Kbd keys={["meta", "K"]} />,
         },
         {
           title: "Logout",

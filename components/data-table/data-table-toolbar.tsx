@@ -61,9 +61,10 @@ export function DataTableToolbar<TData>({
                   onChange={e => table.getColumn(column.id)?.setFilterValue(e.target.value)}
                 />
 
-                <Kbd className="absolute right-2 top-1/2 -translate-y-1/2 m-0 pointer-events-none">
-                  /
-                </Kbd>
+                <Kbd
+                  className="absolute right-2 top-1/2 -translate-y-1/2 m-0 pointer-events-none"
+                  keys={["/"]}
+                />
               </div>
             ),
         )}

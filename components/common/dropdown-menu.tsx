@@ -166,7 +166,7 @@ const DropdownMenuSeparator = ({
   )
 }
 
-const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<"kbd">) => {
+const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<typeof Kbd>) => {
   return <Kbd className={cx("ml-auto", className)} {...props} />
 }
 

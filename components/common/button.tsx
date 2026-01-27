@@ -14,13 +14,15 @@ const buttonVariants = cva({
 
   variants: {
     variant: {
-      fancy: "bg-primary text-primary-foreground hover:opacity-90",
-      primary: "text-background bg-foreground hover:opacity-90",
+      fancy: "scheme-dark bg-primary text-primary-foreground hover:opacity-90",
+      primary: "scheme-dark text-background bg-foreground hover:opacity-90",
       secondary:
-        "border-border! bg-background text-secondary-foreground hover:bg-card hover:border-ring!",
-      soft: "bg-muted text-secondary-foreground hover:bg-border/50 hover:text-foreground hover:outline-none",
-      ghost: "text-secondary-foreground hover:bg-muted hover:text-foreground hover:outline-none",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        "scheme-light border-border! bg-background text-secondary-foreground hover:bg-card hover:border-ring!",
+      soft: "scheme-light bg-muted text-secondary-foreground hover:bg-border/50 hover:text-foreground hover:outline-none",
+      ghost:
+        "scheme-light text-secondary-foreground hover:bg-muted hover:text-foreground hover:outline-none",
+      destructive:
+        "scheme-light bg-destructive text-destructive-foreground hover:bg-destructive/90",
     },
     size: {
       sm: "px-2 py-1 gap-[0.66ch]",
@@ -28,7 +30,7 @@ const buttonVariants = cva({
       lg: "px-4 py-2.5 gap-[1ch] rounded-lg sm:text-sm/tight",
     },
     isPending: {
-      true: "[&>*:not(.animate-spin)]:text-transparent select-none",
+      true: "[&>*:not(.animate-spin)]:opacity-0 select-none",
     },
   },
 
@@ -39,7 +41,13 @@ const buttonVariants = cva({
 })
 
 const buttonAffixVariants = cva({
-  base: "shrink-0 first:-ml-[0.21425em] last:-mr-[0.21425em] [svg]:my-[0.077em] [svg]:size-[1.1em] [svg]:opacity-75",
+  base: "shrink-0 [svg]:my-[0.077em] [svg]:size-[1.1em] [svg]:opacity-75",
+  variants: {
+    position: {
+      left: "-ml-[0.21425em]",
+      right: "-mr-[0.21425em]",
+    },
+  },
 })
 
 export type ButtonProps = Omit<ComponentProps<"button">, "size" | "prefix"> &
@@ -96,7 +104,7 @@ const Button = ({
       <Slottable child={children} asChild={asChild}>
         {child => (
           <>
-            <Slot.Root className={buttonAffixVariants()}>{prefix}</Slot.Root>
+            <Slot.Root className={buttonAffixVariants({ position: "left" })}>{prefix}</Slot.Root>
 
             {Children.count(child) > 0 && (
               <Slot.Root className="flex-1 truncate only:text-center has-[div]:contents">
@@ -104,7 +112,7 @@ const Button = ({
               </Slot.Root>
             )}
 
-            <Slot.Root className={buttonAffixVariants()}>{suffix}</Slot.Root>
+            <Slot.Root className={buttonAffixVariants({ position: "right" })}>{suffix}</Slot.Root>
 
             {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin" />}
           </>

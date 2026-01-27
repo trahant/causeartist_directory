@@ -19,6 +19,7 @@ import {
 } from "~/components/common/form"
 import { H3 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
+import { Kbd } from "~/components/common/kbd"
 import { Link } from "~/components/common/link"
 import { RelationSelector } from "~/components/common/relation-selector"
 import { Stack } from "~/components/common/stack"
@@ -132,7 +133,11 @@ export function TagForm({ className, title, tag, toolsPromise, ...props }: TagFo
             <Link href="/admin/tags">Cancel</Link>
           </Button>
 
-          <Button size="md" isPending={action.isPending}>
+          <Button
+            size="md"
+            isPending={action.isPending}
+            suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
+          >
             {tag ? "Update tag" : "Create tag"}
           </Button>
         </div>
