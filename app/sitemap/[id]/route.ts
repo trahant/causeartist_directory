@@ -22,7 +22,7 @@ const buildSitemapXML = (entries: SitemapEntry[]) => {
     xml += "<url>"
     xml += `<loc>${entry.url}</loc>`
     if (entry.lastModified) {
-      xml += `<lastmod>${entry.lastModified.toISOString()}</lastmod>`
+      xml += `<lastmod>${entry.lastModified.toISOString().split("T")[0]}</lastmod>`
     }
     if (entry.changeFrequency) {
       xml += `<changefreq>${entry.changeFrequency}</changefreq>`
