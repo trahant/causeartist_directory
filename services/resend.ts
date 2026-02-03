@@ -3,9 +3,8 @@ import { env } from "~/env"
 
 export const resend = new Resend(env.RESEND_API_KEY)
 
-export const createResendContact = async (payload: Omit<CreateContactOptions, "audienceId">) => {
-  const audienceId = env.RESEND_AUDIENCE_ID
-  const { error, data } = await resend.contacts.create({ audienceId, ...payload })
+export const createResendContact = async (payload: CreateContactOptions) => {
+  const { error, data } = await resend.contacts.create(payload)
 
   if (error) {
     throw new Error("Failed to create resend contact. Please try again later.")

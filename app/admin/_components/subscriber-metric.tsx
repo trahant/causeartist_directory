@@ -3,7 +3,6 @@ import { cacheLife, cacheTag } from "next/cache"
 import type { ComponentProps } from "react"
 import { MetricChart } from "~/components/admin/metrics/metric-chart"
 import type { Card } from "~/components/common/card"
-import { env } from "~/env"
 import { calculateMetricStats, fillMissingDates, getMetricDateRange } from "~/lib/metrics"
 import { resend } from "~/services/resend"
 
@@ -13,9 +12,7 @@ const getSubscribers = async () => {
   cacheTag("subscribers")
   cacheLife("hours")
 
-  const { data, error } = await resend.contacts.list({
-    audienceId: env.RESEND_AUDIENCE_ID,
-  })
+  const { data, error } = await resend.contacts.list()
 
   if (error) {
     console.error("Subscribers error:", error)

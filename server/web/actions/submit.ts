@@ -1,8 +1,8 @@
 "use server"
 
 import { checkUrlAvailability, getDomain, tryCatch } from "@primoui/utils"
-import { after } from "next/server"
 import { getTranslations } from "next-intl/server"
+import { after } from "next/server"
 import { ToolStatus } from "~/.generated/prisma/client"
 import { siteConfig } from "~/config/site"
 import { isDev } from "~/env"
