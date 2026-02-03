@@ -8,6 +8,7 @@ import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, use, useMemo, useRef, useState } from "react"
+import { Controller, FormProvider as Form } from "react-hook-form"
 import { toast } from "sonner"
 import { type Tool, ToolStatus, ToolTier } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
@@ -15,7 +16,6 @@ import { ToolPublishActions } from "~/app/admin/tools/_components/tool-publish-a
 import { AIGenerateContent } from "~/components/admin/ai/generate-content"
 import { AIRelationSuggestions } from "~/components/admin/ai/relation-suggestions"
 import { Button } from "~/components/common/button"
-import { Controller, FormProvider as Form } from "react-hook-form"
 import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { FormMedia } from "~/components/common/form-media"
 import { H3 } from "~/components/common/heading"
@@ -412,7 +412,6 @@ export function ToolForm({
                   width={32}
                   height={32}
                   className="size-8 border box-content rounded-md object-contain"
-                  unoptimized
                 />
               )}
             </FormMedia>
@@ -436,7 +435,6 @@ export function ToolForm({
                   alt="Screenshot"
                   height={72}
                   width={128}
-                  unoptimized
                   className="h-8 w-auto border box-content rounded-md aspect-video object-cover"
                 />
               )}

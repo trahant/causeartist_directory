@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  images: {
+    unoptimized: true,
+    remotePatterns: [{ hostname: process.env.S3_PUBLIC_URL ?? "" }],
+  },
+
   async rewrites() {
     return [
       {

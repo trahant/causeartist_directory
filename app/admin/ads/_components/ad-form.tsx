@@ -210,7 +210,6 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
                   width={32}
                   height={32}
                   className="size-8 border box-content rounded-md object-contain"
-                  unoptimized
                 />
               )}
             </FormMedia>
@@ -228,7 +227,6 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
                   alt="Banner"
                   height={72}
                   width={128}
-                  unoptimized
                   className="h-8 w-auto border box-content rounded-md aspect-video object-cover"
                 />
               )}

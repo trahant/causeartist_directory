@@ -39,7 +39,6 @@ export const Favicon = ({
       width={size}
       height={size}
       className={cx(faviconVariants({ contained, className }))}
-      unoptimized
       {...props}
     />
   )

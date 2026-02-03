@@ -1,5 +1,5 @@
-import Image from "next/image"
 import { useTranslations } from "next-intl"
+import Image from "next/image"
 import { Note } from "~/components/common/note"
 import { Stack } from "~/components/common/stack"
 import { LoginButton } from "~/components/web/auth/login-button"
@@ -19,7 +19,7 @@ export const Login = () => {
 
       <LoginButton
         provider="google"
-        suffix={<Image src={googleIcon} alt="Google" className="size-4" unoptimized />}
+        suffix={<Image src={googleIcon} alt="Google" className="size-4" />}
       />
     </Stack>
   )
