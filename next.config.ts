@@ -31,7 +31,19 @@ const nextConfig: NextConfig = {
 
   images: {
     unoptimized: true,
-    remotePatterns: [{ hostname: process.env.S3_PUBLIC_URL ?? "" }],
+    remotePatterns: [
+      (function () {
+        const { S3_PUBLIC_URL, S3_BUCKET, S3_REGION } = process.env
+        const url = new URL(S3_PUBLIC_URL ?? `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`)
+
+        return {
+          protocol: "https",
+          hostname: url.hostname,
+          port: "",
+          pathname: "/**",
+        }
+      })(),
+    ],
   },
 
   async rewrites() {
