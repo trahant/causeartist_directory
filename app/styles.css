@@ -50,8 +50,6 @@
   --font-system:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji";
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-sans);
 
   --text-5xl: 2.75rem;
 
@@ -181,12 +179,12 @@
   }
 
   svg.lucide:not([class*="stroke"]) {
-    @apply stroke-[1.75]!;
+    @apply stroke-[1.75];
   }
 
-  svg.lucide:not([class*="size-"]):not([class*="h-"]),
-  svg[aria-label*="Icon"]:not([class*="size-"]):not([class*="h-"]) {
-    @apply size-[1em]!;
+  svg.lucide:not([class*="size-"]),
+  svg[aria-label*="Icon"]:not([class*="size-"]) {
+    @apply size-[1em];
   }
 
   [href] svg[class*="arrow-"],

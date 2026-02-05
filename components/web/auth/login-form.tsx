@@ -1,8 +1,8 @@
 "use client"
 
 import { InboxIcon } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form } from "react-hook-form"
 import { toast } from "sonner"
@@ -27,8 +27,8 @@ export const LoginForm = ({ ...props }: ComponentProps<"form">) => {
   })
 
   return (
-    <Stack direction="column" className="items-stretch" asChild>
-      <Form {...form}>
+    <Form {...form}>
+      <Stack direction="column" className="items-stretch" asChild>
         <form onSubmit={form.handleSubmit(handleSignIn)} noValidate {...props}>
           <Controller
             control={form.control}
@@ -53,7 +53,7 @@ export const LoginForm = ({ ...props }: ComponentProps<"form">) => {
             {t("forms.sign_in.magic_link_button")}
           </Button>
         </form>
-      </Form>
-    </Stack>
+      </Stack>
+    </Form>
   )
 }

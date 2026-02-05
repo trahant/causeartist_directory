@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import type { ComponentProps } from "react"
 import { Button } from "~/components/common/button"
 import { ExternalLink } from "~/components/web/external-link"
-import { isToolStandardTier, isToolPremiumTier } from "~/lib/tools"
+import { isToolPremiumTier, isToolStandardTier } from "~/lib/tools"
 import type { ToolMany, ToolOne } from "~/server/web/tools/payloads"
 
 type ToolButtonProps = ComponentProps<typeof Button> & {

@@ -66,8 +66,8 @@ const FeedbackWidgetForm = ({ toastId, setDismissed }: FeedbackWidgetFormProps) 
   useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
 
   return (
-    <Stack direction="column" className="items-stretch w-full" asChild>
-      <Form {...form}>
+    <Form {...form}>
+      <Stack direction="column" className="items-stretch w-full" asChild>
         <form onSubmit={handleSubmitWithAction} noValidate>
           <p className="mb-1 text-xs">{t("question", { siteName: siteConfig.name })}</p>
 
@@ -124,8 +124,8 @@ const FeedbackWidgetForm = ({ toastId, setDismissed }: FeedbackWidgetFormProps) 
             </Button>
           </Stack>
         </form>
-      </Form>
-    </Stack>
+      </Stack>
+    </Form>
   )
 }
 
