@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { admin, useSession } from "~/lib/auth-client"
 import { cx } from "~/lib/utils"
 import { updateUserRole } from "~/server/admin/users/actions"
@@ -45,7 +45,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
   }
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -158,6 +158,6 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
           />
         </UserDeleteDialog>
       )}
-    </Stack>
+    </ButtonGroup>
   )
 }

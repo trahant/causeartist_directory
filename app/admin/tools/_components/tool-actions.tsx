@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { ExternalLink } from "~/components/web/external-link"
 import { cx } from "~/lib/utils"
 import { duplicateTool } from "~/server/admin/tools/actions"
@@ -61,7 +61,7 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
   }
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -114,6 +114,6 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
           {...props}
         />
       </ToolDeleteDialog>
-    </Stack>
+    </ButtonGroup>
   )
 }

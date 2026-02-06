@@ -43,7 +43,7 @@ export default async function ({ children }: LayoutProps<"/">) {
       <body className="min-h-dvh flex flex-col bg-background text-foreground font-sans">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>
           <NuqsAdapter>
-            <TooltipProvider delayDuration={250}>
+            <TooltipProvider delayDuration={250} skipDelayDuration={250}>
               <SearchProvider>
                 <ThemeProvider attribute="class" disableTransitionOnChange>
                   <MotionConfig reducedMotion="user">{children}</MotionConfig>

@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { ExternalLink } from "~/components/web/external-link"
 import { cx } from "~/lib/utils"
 import { duplicateAd } from "~/server/admin/ads/actions"
@@ -60,7 +60,7 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
   }
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -107,6 +107,6 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
           {...props}
         />
       </AdDeleteDialog>
-    </Stack>
+    </ButtonGroup>
   )
 }

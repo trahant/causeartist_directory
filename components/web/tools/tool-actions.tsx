@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl"
 import { parseAsStringEnum, useQueryState } from "nuqs"
 import { type ComponentProps, type SetStateAction, useEffect, useState } from "react"
 import { Button } from "~/components/common/button"
+import { ButtonGroup } from "~/components/common/button-group"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { Tooltip } from "~/components/common/tooltip"
@@ -100,31 +101,33 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
         </Tooltip>
       )}
 
-      <ToolBookmark toolId={tool.id} />
+      <ButtonGroup>
+        <ToolBookmark toolId={tool.id} />
 
-      {reportsConfig.enabled && (
-        <Tooltip tooltip={t("report_tooltip")}>
-          <Button
-            size="md"
-            variant="secondary"
-            prefix={<FlagIcon />}
-            onClick={() => setDialog(Dialog.report)}
-            aria-label={t("report_button")}
-          />
-        </Tooltip>
-      )}
+        {reportsConfig.enabled && (
+          <Tooltip tooltip={t("report_tooltip")}>
+            <Button
+              size="md"
+              variant="secondary"
+              prefix={<FlagIcon />}
+              onClick={() => setDialog(Dialog.report)}
+              aria-label={t("report_button")}
+            />
+          </Tooltip>
+        )}
 
-      {isToolApproved(tool) && (
-        <Tooltip tooltip={t("embed_tooltip")}>
-          <Button
-            size="md"
-            variant="secondary"
-            prefix={<CodeXmlIcon />}
-            onClick={() => setDialog(Dialog.embed)}
-            aria-label={t("embed_button")}
-          />
-        </Tooltip>
-      )}
+        {isToolApproved(tool) && (
+          <Tooltip tooltip={t("embed_tooltip")}>
+            <Button
+              size="md"
+              variant="secondary"
+              prefix={<CodeXmlIcon />}
+              onClick={() => setDialog(Dialog.embed)}
+              aria-label={t("embed_button")}
+            />
+          </Tooltip>
+        )}
+      </ButtonGroup>
 
       {children}
 

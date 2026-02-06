@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { cx } from "~/lib/utils"
 
 type ReportActionsProps = ComponentProps<typeof Button> & {
@@ -29,7 +29,7 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
   const isSinglePage = pathname === singlePath
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -63,6 +63,6 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
           {...props}
         />
       </ReportDeleteDialog>
-    </Stack>
+    </ButtonGroup>
   )
 }

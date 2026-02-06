@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/common/select"
+import { ButtonGroup } from "~/components/common/button-group"
 import { Stack } from "~/components/common/stack"
 
 type DataTablePaginationProps<TData> = {
@@ -67,7 +68,7 @@ export function DataTablePagination<TData>({
         })}
       </div>
 
-      <Stack size="sm" wrap={false}>
+      <ButtonGroup>
         <Button
           aria-label={t("go_to_first")}
           variant="secondary"
@@ -105,7 +106,7 @@ export function DataTablePagination<TData>({
           disabled={!table.getCanNextPage()}
           suffix={<ChevronsRightIcon />}
         />
-      </Stack>
+      </ButtonGroup>
     </div>
   )
 }

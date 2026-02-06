@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { cx } from "~/lib/utils"
 import { duplicateTag } from "~/server/admin/tags/actions"
 
@@ -58,7 +58,7 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
   }
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -102,6 +102,6 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
           {...props}
         />
       </TagDeleteDialog>
-    </Stack>
+    </ButtonGroup>
   )
 }

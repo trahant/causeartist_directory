@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
+import { ButtonGroup } from "~/components/common/button-group"
 import { cx } from "~/lib/utils"
 import { duplicateCategory } from "~/server/admin/categories/actions"
 
@@ -58,7 +58,7 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
   }
 
   return (
-    <Stack size="sm" wrap={false}>
+    <ButtonGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -105,6 +105,6 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
           {...props}
         />
       </CategoryDeleteDialog>
-    </Stack>
+    </ButtonGroup>
   )
 }
