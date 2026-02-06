@@ -98,6 +98,7 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button
+          aria-label="Delete"
           variant="secondary"
           size="sm"
           prefix={<TrashIcon />}

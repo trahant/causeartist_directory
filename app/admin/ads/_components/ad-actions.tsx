@@ -100,6 +100,7 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
 
       <AdDeleteDialog ads={[ad]} onExecute={() => isSinglePage && router.push(indexPath)}>
         <Button
+          aria-label="Delete"
           variant="secondary"
           size="sm"
           prefix={<TrashIcon />}

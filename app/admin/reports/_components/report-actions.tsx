@@ -56,6 +56,7 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button
+          aria-label="Delete"
           variant="secondary"
           size="sm"
           prefix={<TrashIcon />}

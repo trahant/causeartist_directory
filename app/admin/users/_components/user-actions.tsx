@@ -150,6 +150,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
       {user.role !== "admin" && (
         <UserDeleteDialog users={[user]} onExecute={() => isSinglePage && router.push(indexPath)}>
           <Button
+            aria-label="Delete"
             variant="secondary"
             size="sm"
             prefix={<TrashIcon />}

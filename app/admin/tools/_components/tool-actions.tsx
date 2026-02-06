@@ -107,6 +107,7 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
 
       <ToolDeleteDialog tools={[tool]} onExecute={() => isSinglePage && router.push(indexPath)}>
         <Button
+          aria-label="Delete"
           variant="secondary"
           size="sm"
           prefix={<TrashIcon />}

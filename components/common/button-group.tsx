@@ -6,6 +6,7 @@ type ButtonGroupProps = ComponentProps<"div">
 const ButtonGroup = ({ className, ...props }: ButtonGroupProps) => {
   return (
     <div
+      role="group"
       className={cx(
         "flex items-center [&>*]:rounded-none [&>*]:focus-within:z-10 [&>*:first-child]:rounded-l-md [&>*:last-child]:rounded-r-md [&>*:not(:first-child)]:-ml-px",
         className,
