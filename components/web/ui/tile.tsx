@@ -4,7 +4,7 @@ import { H5, type Heading } from "~/components/common/heading"
 import { cva, cx, type VariantProps } from "~/lib/utils"
 
 const tileVariants = cva({
-  base: "group flex justify-between items-center gap-4 min-w-0 -my-2 py-2",
+  base: "group/tile flex justify-between items-center gap-4 min-w-0 -my-2 py-2",
 })
 
 type TileProps = ComponentProps<"div"> &
@@ -28,11 +28,11 @@ const TileTitle = ({ className, ...props }: ComponentProps<typeof Heading>) => {
 }
 
 const TileDivider = ({ className, ...props }: ComponentProps<"hr">) => {
-  return <hr className={cx("min-w-2 flex-1 group-hover:border-ring", className)} {...props} />
+  return <hr className={cx("min-w-2 flex-1 group-hover/tile:border-ring", className)} {...props} />
 }
 
 const TileCaption = ({ className, ...props }: ComponentProps<"span">) => {
   return <span className={cx("shrink-0 text-xs text-secondary-foreground", className)} {...props} />
 }
 
-export { Tile, TileTitle, TileDivider, TileCaption }
+export { Tile, TileCaption, TileDivider, TileTitle }

@@ -29,7 +29,7 @@ const buttonVariants = cva({
       lg: "px-4 py-2.5 gap-[1ch] rounded-lg sm:text-sm/tight",
     },
     isPending: {
-      true: "relative [&>*]:opacity-0! select-none after:absolute after:size-[1.1em] after:rounded-full after:border-[1.5px] after:border-foreground after:border-t-transparent after:animate-spin",
+      true: "relative [&>*]:opacity-0! select-none after:absolute after:size-[1.1em] after:rounded-full after:border-[1.5px] after:border-[light-dark(var(--color-foreground),var(--color-background))] after:border-t-transparent after:animate-spin",
     },
   },
 
