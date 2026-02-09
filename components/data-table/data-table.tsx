@@ -3,6 +3,7 @@
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table"
 import { useTranslations } from "next-intl"
 import type { ComponentProps, CSSProperties, ReactNode } from "react"
+import { Skeleton } from "~/components/common/skeleton"
 import {
   Table,
   TableBody,
@@ -37,12 +38,28 @@ type DataTableProps<TData> = ComponentProps<typeof Table> & {
    * @example emptyState={<div>No data</div>}
    */
   emptyState?: ReactNode | null
+
+  /**
+   * Whether the table is currently fetching new data (e.g. after a filter change).
+   * When true, the table body is dimmed to indicate a pending refresh.
+   * @default false
+   */
+  isFetching?: boolean
+
+  /**
+   * Whether the table is loading data for the first time (no data yet).
+   * When true, skeleton rows are shown instead of real data.
+   * @default false
+   */
+  isLoading?: boolean
 }
 
 export function DataTable<TData>({
   table,
   floatingBar = null,
   emptyState,
+  isFetching = false,
+  isLoading = false,
   children,
   className,
   ...props
@@ -64,48 +81,86 @@ export function DataTable<TData>({
       {children}
 
       <Table
-        className={cx("rounded-md border", className)}
-        style={{ "--table-columns": gridColumns.join(" ") } as CSSProperties}
+        className={cx(
+          "rounded-md border transition-opacity",
+          isFetching && "opacity-50 pointer-events-none",
+          className,
+        )}
+        style={
+          {
+            "--table-columns": isLoading
+              ? `repeat(${visibleColumns.length}, minmax(0, 1fr))`
+              : gridColumns.join(" "),
+          } as CSSProperties
+        }
         {...props}
       >
-        {!!table.getRowModel().rows?.length && (
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id} style={getColumnPinningStyle(header)}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-        )}
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map(row => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                {row.getVisibleCells().map(cell => (
-                  <TableCell
-                    key={cell.id}
-                    style={getColumnPinningStyle({ column: cell.column, withBorder: true })}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+        {isLoading ? (
+          <>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                {visibleColumns.map(column => (
+                  <TableHead key={column.id}>
+                    <Skeleton className="h-6 w-full" />
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow className="h-24" aria-disabled>
-              <TableCell className="col-span-full text-center">{defaultEmptyState}</TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+            </TableHeader>
+
+            <TableBody>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <TableRow key={i} className="hover:bg-transparent">
+                  {visibleColumns.map(column => (
+                    <TableCell key={column.id}>
+                      <Skeleton className="h-6 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </>
+        ) : (
+          <>
+            {!!table.getRowModel().rows?.length && (
+              <TableHeader>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map(header => {
+                      return (
+                        <TableHead key={header.id} style={getColumnPinningStyle(header)}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+            )}
+
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map(row => (
+                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map(cell => (
+                      <TableCell
+                        key={cell.id}
+                        style={getColumnPinningStyle({ column: cell.column, withBorder: true })}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="h-24" aria-disabled>
+                  <TableCell className="col-span-full text-center">{defaultEmptyState}</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </>
+        )}
       </Table>
 
       <div className="flex flex-col gap-2.5">

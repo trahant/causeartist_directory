@@ -1,8 +1,8 @@
 "use client"
 
 import { formatDate } from "@primoui/utils"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "@tanstack/react-query"
 import { HashIcon, PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
 import type { Tag } from "~/.generated/prisma/browser"
@@ -18,7 +18,6 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
-import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
@@ -86,7 +85,13 @@ const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
 
 export function TagTable() {
   const [params] = useQueryStates(tagTableParamsSchema)
-  const { data, isLoading } = useQuery(orpc.tags.list.queryOptions({ input: params }))
+
+  const { data, isLoading, isFetching } = useQuery(
+    orpc.tags.list.queryOptions({
+      input: params,
+      placeholderData: keepPreviousData,
+    }),
+  )
 
   // Search filters
   const filterFields: DataTableFilterField<Tag>[] = [
@@ -102,7 +107,6 @@ export function TagTable() {
     columns,
     pageCount: data?.pageCount ?? 0,
     filterFields,
-    shallow: false,
     clearOnDefault: true,
     initialState: {
       pagination: { pageIndex: 0, pageSize: params.perPage },
@@ -112,15 +116,11 @@ export function TagTable() {
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   })
 
-  if (isLoading) {
-    return <DataTableSkeleton title="Tags" />
-  }
-
   return (
-    <DataTable table={table}>
+    <DataTable table={table} isLoading={isLoading} isFetching={isFetching && !isLoading}>
       <DataTableHeader
         title="Tags"
-        total={data?.tagsTotal ?? 0}
+        total={data?.tagsTotal}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/tags/new">

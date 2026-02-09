@@ -1,8 +1,8 @@
 "use client"
 
 import { formatDate } from "@primoui/utils"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "@tanstack/react-query"
 import {
   CircleCheckIcon,
   CircleDashedIcon,
@@ -25,7 +25,6 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
-import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { VerifiedBadge } from "~/components/web/verified-badge"
@@ -135,7 +134,13 @@ const columns: ColumnDef<Tool>[] = [
 
 export function ToolTable() {
   const [params] = useQueryStates(toolTableParamsSchema)
-  const { data, isLoading } = useQuery(orpc.tools.list.queryOptions({ input: params }))
+
+  const { data, isLoading, isFetching } = useQuery(
+    orpc.tools.list.queryOptions({
+      input: params,
+      placeholderData: keepPreviousData,
+    }),
+  )
 
   // Search filters
   const filterFields: DataTableFilterField<Tool>[] = [
@@ -177,7 +182,6 @@ export function ToolTable() {
     columns,
     pageCount: data?.pageCount ?? 0,
     filterFields,
-    shallow: false,
     clearOnDefault: true,
     initialState: {
       pagination: { pageIndex: 0, pageSize: params.perPage },
@@ -188,15 +192,11 @@ export function ToolTable() {
     getRowId: originalRow => originalRow.id,
   })
 
-  if (isLoading) {
-    return <DataTableSkeleton title="Tools" />
-  }
-
   return (
-    <DataTable table={table}>
+    <DataTable table={table} isLoading={isLoading} isFetching={isFetching && !isLoading}>
       <DataTableHeader
         title="Tools"
-        total={data?.total ?? 0}
+        total={data?.total}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/tools/new">

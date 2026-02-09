@@ -1,8 +1,8 @@
 "use client"
 
 import { formatDate } from "@primoui/utils"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "@tanstack/react-query"
 import { PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
 import type { ComponentProps } from "react"
@@ -19,7 +19,6 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
-import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
@@ -120,7 +119,13 @@ const columns: ColumnDef<Ad>[] = [
 
 export function AdTable() {
   const [params] = useQueryStates(adTableParamsSchema)
-  const { data, isLoading } = useQuery(orpc.ads.list.queryOptions({ input: params }))
+
+  const { data, isLoading, isFetching } = useQuery(
+    orpc.ads.list.queryOptions({
+      input: params,
+      placeholderData: keepPreviousData,
+    }),
+  )
 
   // Search filters
   const filterFields: DataTableFilterField<Ad>[] = [
@@ -144,7 +149,6 @@ export function AdTable() {
     columns,
     pageCount: data?.pageCount ?? 0,
     filterFields,
-    shallow: false,
     clearOnDefault: true,
     initialState: {
       pagination: { pageIndex: 0, pageSize: params.perPage },
@@ -155,15 +159,11 @@ export function AdTable() {
     getRowId: originalRow => originalRow.id,
   })
 
-  if (isLoading) {
-    return <DataTableSkeleton title="Ads" />
-  }
-
   return (
-    <DataTable table={table}>
+    <DataTable table={table} isLoading={isLoading} isFetching={isFetching && !isLoading}>
       <DataTableHeader
         title="Ads"
-        total={data?.adsTotal ?? 0}
+        total={data?.adsTotal}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/ads/new">

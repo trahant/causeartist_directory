@@ -1,8 +1,8 @@
 "use client"
 
 import { formatDate } from "@primoui/utils"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
-import { useQuery } from "@tanstack/react-query"
 import { useQueryStates } from "nuqs"
 import type { Report, Tool } from "~/.generated/prisma/browser"
 import { ReportActions } from "~/app/admin/reports/_components/report-actions"
@@ -17,7 +17,6 @@ import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { reportsConfig } from "~/config/reports"
-import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { useDataTable } from "~/hooks/use-data-table"
 import { orpc } from "~/lib/orpc-query"
 import type { ReportTableSchema } from "~/server/admin/reports/schema"
@@ -107,12 +106,16 @@ const columns: ColumnDef<Report>[] = [
 
 export function ReportTable() {
   const [params] = useQueryStates(reportTableParamsSchema)
-  const { data, isLoading } = useQuery(
-    orpc.reports.list.queryOptions({ input: params as ReportTableSchema }),
+
+  const { data, isLoading, isFetching } = useQuery(
+    orpc.reports.list.queryOptions({
+      input: params as ReportTableSchema,
+      placeholderData: keepPreviousData,
+    }),
   )
 
   const reports = data?.reports ?? []
-  const reportsTotal = data?.reportsTotal ?? 0
+  const reportsTotal = data?.reportsTotal
   const pageCount = data?.pageCount ?? 0
 
   // Search filters
@@ -137,7 +140,6 @@ export function ReportTable() {
     columns,
     pageCount,
     filterFields,
-    shallow: false,
     clearOnDefault: true,
     initialState: {
       pagination: { pageIndex: 0, pageSize: params.perPage },
@@ -147,12 +149,8 @@ export function ReportTable() {
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   })
 
-  if (isLoading) {
-    return <DataTableSkeleton title="Reports" />
-  }
-
   return (
-    <DataTable table={table}>
+    <DataTable table={table} isLoading={isLoading} isFetching={isFetching && !isLoading}>
       <DataTableHeader title="Reports" total={reportsTotal}>
         <DataTableToolbar table={table} filterFields={filterFields}>
           <ReportTableToolbarActions table={table} />

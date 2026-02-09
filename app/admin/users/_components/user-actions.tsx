@@ -114,6 +114,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
                   toast.promise(
                     async () => {
                       await admin.unbanUser({ userId: user.id })
+                      queryClient.invalidateQueries({ queryKey: orpc.users.key() })
                       router.refresh()
                     },
                     { loading: "Unbanning...", success: "User successfully unbanned" },
@@ -128,6 +129,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
                   toast.promise(
                     async () => {
                       await admin.banUser({ userId: user.id })
+                      queryClient.invalidateQueries({ queryKey: orpc.users.key() })
                       router.refresh()
                     },
                     { loading: "Banning...", success: "User successfully banned" },

@@ -1,5 +1,5 @@
 import { ORPCError, os } from "@orpc/server"
-import { revalidatePath, updateTag } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { getServerSession } from "~/lib/auth"
 import { db } from "~/services/db"
 
@@ -18,7 +18,7 @@ const revalidate = ({ paths = [], tags = [] }: RevalidateOptions) => {
   }
 
   for (const tag of tags) {
-    updateTag(tag)
+    revalidateTag(tag, "infinite")
   }
 }
 
