@@ -3,9 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { slugify } from "@primoui/utils"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use } from "react"
+import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
@@ -22,17 +22,14 @@ import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findTagById } from "~/server/admin/tags/queries"
 import { tagSchema } from "~/server/admin/tags/schema"
-import type { findToolList } from "~/server/admin/tools/queries"
-
 type TagFormProps = ComponentProps<"form"> & {
   tag?: Awaited<ReturnType<typeof findTagById>>
-  toolsPromise: ReturnType<typeof findToolList>
 }
 
-export function TagForm({ className, title, tag, toolsPromise, ...props }: TagFormProps) {
+export function TagForm({ className, title, tag, ...props }: TagFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const tools = use(toolsPromise)
+  const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
 
   const form = useForm({
     resolver: zodResolver(tagSchema),

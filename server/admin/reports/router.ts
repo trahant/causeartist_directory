@@ -1,25 +1,10 @@
-import * as z from "zod"
 import { adminProcedure } from "~/lib/orpc"
 import { findReports } from "~/server/admin/reports/queries"
-import type { ReportTableSchema } from "~/server/admin/reports/schema"
-import { reportSchema } from "~/server/admin/reports/schema"
+import { reportListSchema, reportSchema } from "~/server/admin/reports/schema"
 import { idsSchema } from "~/server/admin/shared/schema"
 
-const reportListSchema = z.object({
-  message: z.string().default(""),
-  type: z.array(z.string()).default([]),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "createdAt", desc: true }]),
-  page: z.number().default(1),
-  perPage: z.number().default(50),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
-})
-
 const list = adminProcedure.input(reportListSchema).handler(async ({ input }) => {
-  return findReports(input as ReportTableSchema)
+  return findReports(input)
 })
 
 const update = adminProcedure

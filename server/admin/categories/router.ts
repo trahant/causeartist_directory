@@ -1,24 +1,14 @@
-import * as z from "zod"
 import { adminProcedure } from "~/lib/orpc"
-import { findCategories } from "~/server/admin/categories/queries"
-import type { CategoryTableSchema } from "~/server/admin/categories/schema"
-import { categorySchema } from "~/server/admin/categories/schema"
+import { findCategories, findCategoryList } from "~/server/admin/categories/queries"
+import { categoryListSchema, categorySchema } from "~/server/admin/categories/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 
-const categoryListSchema = z.object({
-  name: z.string().default(""),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "name", desc: false }]),
-  page: z.number().default(1),
-  perPage: z.number().default(25),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
+const list = adminProcedure.input(categoryListSchema).handler(async ({ input }) => {
+  return findCategories(input)
 })
 
-const list = adminProcedure.input(categoryListSchema).handler(async ({ input }) => {
-  return findCategories(input as CategoryTableSchema)
+const lookup = adminProcedure.handler(async () => {
+  return findCategoryList()
 })
 
 const upsert = adminProcedure
@@ -99,6 +89,7 @@ const remove = adminProcedure
 
 export const categoryRouter = {
   list,
+  lookup,
   upsert,
   duplicate,
   remove,

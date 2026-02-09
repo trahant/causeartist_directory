@@ -24,7 +24,7 @@ import { DataTableViewOptions } from "~/components/data-table/data-table-view-op
 import { useDataTable } from "~/hooks/use-data-table"
 import { orpc } from "~/lib/orpc-query"
 import { isDefaultState } from "~/lib/parsers"
-import { adTableParamsSchema } from "~/server/admin/ads/schema"
+import { adListParams } from "~/server/admin/ads/schema"
 import type { DataTableFilterField } from "~/types"
 
 type AdStatus = "Active" | "Scheduled" | "Expired"
@@ -119,7 +119,7 @@ const columns: ColumnDef<Ad>[] = [
 ]
 
 export function AdTable() {
-  const [params, setParams] = useQueryStates(adTableParamsSchema)
+  const [params, setParams] = useQueryStates(adListParams)
 
   const { data, isLoading, isFetching } = useQuery(
     orpc.ads.list.queryOptions({
@@ -176,7 +176,7 @@ export function AdTable() {
         <DataTableToolbar
           table={table}
           filterFields={filterFields}
-          isFiltered={!isDefaultState(adTableParamsSchema, params, ["perPage", "page"])}
+          isFiltered={!isDefaultState(adListParams, params, ["perPage", "page"])}
           onReset={() => {
             table.resetColumnFilters()
             void setParams(null)

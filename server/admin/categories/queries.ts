@@ -1,11 +1,11 @@
 import { isTruthy } from "@primoui/utils"
 import { endOfDay, startOfDay } from "date-fns"
 import type { Prisma } from "~/.generated/prisma/client"
-import type { CategoryTableSchema } from "~/server/admin/categories/schema"
+import type { CategoryListParams } from "~/server/admin/categories/schema"
 import { db } from "~/services/db"
 
 export const findCategories = async (
-  search: CategoryTableSchema,
+  search: CategoryListParams,
   where?: Prisma.CategoryWhereInput,
 ) => {
   const { name, page, perPage, sort, from, to, operator } = search

@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { formatDateTime, getRandomString, slugify } from "@primoui/utils"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import React, { type ComponentProps, useMemo, useRef, useState } from "react"
+import { type ComponentProps, useMemo, useRef, useState } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { type Tool, ToolStatus, ToolTier } from "~/.generated/prisma/browser"
@@ -38,9 +38,7 @@ import { useComputedField } from "~/hooks/use-computed-field"
 import { orpc } from "~/lib/orpc-query"
 import { isToolApproved } from "~/lib/tools"
 import { cx } from "~/lib/utils"
-import type { findCategoryList } from "~/server/admin/categories/queries"
 import { contentSchema } from "~/server/admin/shared/schema"
-import type { findTagList } from "~/server/admin/tags/queries"
 import type { findToolById } from "~/server/admin/tools/queries"
 import { toolSchema } from "~/server/admin/tools/schema"
 
@@ -63,22 +61,13 @@ const ToolStatusChange = ({ tool }: { tool: Tool }) => {
 
 type ToolFormProps = ComponentProps<"form"> & {
   tool?: NonNullable<Awaited<ReturnType<typeof findToolById>>>
-  categoriesPromise: ReturnType<typeof findCategoryList>
-  tagsPromise: ReturnType<typeof findTagList>
 }
 
-export function ToolForm({
-  className,
-  title,
-  tool,
-  categoriesPromise,
-  tagsPromise,
-  ...props
-}: ToolFormProps) {
+export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const categories = React.use(categoriesPromise)
-  const tags = React.use(tagsPromise)
+  const { data: categories = [] } = useQuery(orpc.categories.lookup.queryOptions())
+  const { data: tags = [] } = useQuery(orpc.tags.lookup.queryOptions())
   const [isPreviewing, setIsPreviewing] = useState(false)
   const [isStatusPending, setIsStatusPending] = useState(false)
   const [isGenerationComplete, setIsGenerationComplete] = useState(true)

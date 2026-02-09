@@ -1,10 +1,10 @@
 import { isTruthy } from "@primoui/utils"
 import { endOfDay, startOfDay } from "date-fns"
 import type { Prisma } from "~/.generated/prisma/client"
-import type { TagTableSchema } from "~/server/admin/tags/schema"
+import type { TagListParams } from "~/server/admin/tags/schema"
 import { db } from "~/services/db"
 
-export const findTags = async (search: TagTableSchema, where?: Prisma.TagWhereInput) => {
+export const findTags = async (search: TagListParams, where?: Prisma.TagWhereInput) => {
   const { name, page, perPage, sort, from, to, operator } = search
 
   // Offset to paginate the results

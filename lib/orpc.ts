@@ -3,7 +3,7 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { getServerSession } from "~/lib/auth"
 import { db } from "~/services/db"
 
-type RevalidateOptions = {
+export type RevalidateOptions = {
   paths?: string[]
   tags?: string[]
 }
@@ -12,7 +12,7 @@ type RevalidateOptions = {
  * Queue revalidation for the given options
  * @param options - The options to queue revalidation for
  */
-const revalidate = ({ paths = [], tags = [] }: RevalidateOptions) => {
+export const revalidate = ({ paths = [], tags = [] }: RevalidateOptions) => {
   for (const path of paths) {
     revalidatePath(path)
   }
@@ -58,6 +58,3 @@ export const adminProcedure = authedProcedure.use(async ({ next, context }) => {
 
   return next()
 })
-
-export { revalidate }
-export type { RevalidateOptions }

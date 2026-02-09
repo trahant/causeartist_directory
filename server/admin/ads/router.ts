@@ -1,26 +1,10 @@
-import * as z from "zod"
-import { AdType } from "~/.generated/prisma/client"
 import { adminProcedure } from "~/lib/orpc"
 import { findAds } from "~/server/admin/ads/queries"
-import type { AdTableSchema } from "~/server/admin/ads/schema"
-import { adSchema } from "~/server/admin/ads/schema"
+import { adListSchema, adSchema } from "~/server/admin/ads/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 
-const adListSchema = z.object({
-  name: z.string().default(""),
-  type: z.array(z.enum(AdType)).default([]),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "createdAt", desc: true }]),
-  page: z.number().default(1),
-  perPage: z.number().default(25),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
-})
-
 const list = adminProcedure.input(adListSchema).handler(async ({ input }) => {
-  return findAds(input as AdTableSchema)
+  return findAds(input)
 })
 
 const upsert = adminProcedure

@@ -1,10 +1,10 @@
 import { isTruthy } from "@primoui/utils"
 import { endOfDay, startOfDay } from "date-fns"
 import type { Prisma } from "~/.generated/prisma/client"
-import type { AdTableSchema } from "~/server/admin/ads/schema"
+import type { AdListParams } from "~/server/admin/ads/schema"
 import { db } from "~/services/db"
 
-export const findAds = async (search: AdTableSchema, where?: Prisma.AdWhereInput) => {
+export const findAds = async (search: AdListParams, where?: Prisma.AdWhereInput) => {
   const { name, type, page, perPage, sort, from, to, operator } = search
 
   // Offset to paginate the results

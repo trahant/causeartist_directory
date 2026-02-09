@@ -23,7 +23,7 @@ import { DataTableViewOptions } from "~/components/data-table/data-table-view-op
 import { useDataTable } from "~/hooks/use-data-table"
 import { orpc } from "~/lib/orpc-query"
 import { isDefaultState } from "~/lib/parsers"
-import { tagTableParamsSchema } from "~/server/admin/tags/schema"
+import { tagListParams } from "~/server/admin/tags/schema"
 import type { DataTableFilterField } from "~/types"
 
 const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
@@ -85,7 +85,7 @@ const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
 ]
 
 export function TagTable() {
-  const [params, setParams] = useQueryStates(tagTableParamsSchema)
+  const [params, setParams] = useQueryStates(tagListParams)
 
   const { data, isLoading, isFetching } = useQuery(
     orpc.tags.list.queryOptions({
@@ -133,7 +133,7 @@ export function TagTable() {
         <DataTableToolbar
           table={table}
           filterFields={filterFields}
-          isFiltered={!isDefaultState(tagTableParamsSchema, params, ["perPage", "page"])}
+          isFiltered={!isDefaultState(tagListParams, params, ["perPage", "page"])}
           onReset={() => {
             table.resetColumnFilters()
             void setParams(null)

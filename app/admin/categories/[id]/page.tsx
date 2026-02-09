@@ -2,7 +2,6 @@ import { notFound } from "next/navigation"
 import { CategoryForm } from "~/app/admin/categories/_components/category-form"
 import { Wrapper } from "~/components/common/wrapper"
 import { findCategoryById } from "~/server/admin/categories/queries"
-import { findToolList } from "~/server/admin/tools/queries"
 
 export default async function ({ params }: PageProps<"/admin/categories/[id]">) {
   const { id } = await params
@@ -14,7 +13,7 @@ export default async function ({ params }: PageProps<"/admin/categories/[id]">) 
 
   return (
     <Wrapper size="md" gap="sm">
-      <CategoryForm title="Update category" category={category} toolsPromise={findToolList()} />
+      <CategoryForm title="Update category" category={category} />
     </Wrapper>
   )
 }

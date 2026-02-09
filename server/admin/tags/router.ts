@@ -1,24 +1,14 @@
-import * as z from "zod"
 import { adminProcedure } from "~/lib/orpc"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
-import { findTags } from "~/server/admin/tags/queries"
-import type { TagTableSchema } from "~/server/admin/tags/schema"
-import { tagSchema } from "~/server/admin/tags/schema"
-
-const tagListSchema = z.object({
-  name: z.string().default(""),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "name", desc: false }]),
-  page: z.number().default(1),
-  perPage: z.number().default(25),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
-})
+import { findTagList, findTags } from "~/server/admin/tags/queries"
+import { tagListSchema, tagSchema } from "~/server/admin/tags/schema"
 
 const list = adminProcedure.input(tagListSchema).handler(async ({ input }) => {
-  return findTags(input as TagTableSchema)
+  return findTags(input)
+})
+
+const lookup = adminProcedure.handler(async () => {
+  return findTagList()
 })
 
 const upsert = adminProcedure
@@ -97,6 +87,7 @@ const remove = adminProcedure
 
 export const tagRouter = {
   list,
+  lookup,
   upsert,
   duplicate,
   remove,

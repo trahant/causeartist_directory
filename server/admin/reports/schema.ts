@@ -1,5 +1,6 @@
 import {
   createSearchParamsCache,
+  createStandardSchemaV1,
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
@@ -9,7 +10,7 @@ import { z } from "zod"
 import type { Report } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const reportTableParamsSchema = {
+export const reportListParams = {
   message: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(50),
@@ -20,8 +21,9 @@ export const reportTableParamsSchema = {
   type: parseAsArrayOf(parseAsString).withDefault([]),
 }
 
-export const reportTableParamsCache = createSearchParamsCache(reportTableParamsSchema)
-export type ReportTableSchema = Awaited<ReturnType<typeof reportTableParamsCache.parse>>
+export const reportListSchema = createStandardSchemaV1(reportListParams)
+export const reportListCache = createSearchParamsCache(reportListParams)
+export type ReportListParams = Awaited<ReturnType<typeof reportListCache.parse>>
 
 export const reportSchema = z.object({
   id: z.string().optional(),

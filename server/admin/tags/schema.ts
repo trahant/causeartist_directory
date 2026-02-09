@@ -1,5 +1,6 @@
 import {
   createSearchParamsCache,
+  createStandardSchemaV1,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -8,7 +9,7 @@ import * as z from "zod"
 import type { Tag } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const tagTableParamsSchema = {
+export const tagListParams = {
   name: parseAsString.withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(25),
@@ -18,8 +19,9 @@ export const tagTableParamsSchema = {
   operator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 }
 
-export const tagTableParamsCache = createSearchParamsCache(tagTableParamsSchema)
-export type TagTableSchema = Awaited<ReturnType<typeof tagTableParamsCache.parse>>
+export const tagListSchema = createStandardSchemaV1(tagListParams)
+export const tagListCache = createSearchParamsCache(tagListParams)
+export type TagListParams = Awaited<ReturnType<typeof tagListCache.parse>>
 
 export const tagSchema = z.object({
   id: z.string().optional(),

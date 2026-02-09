@@ -3,9 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { slugify } from "@primoui/utils"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use } from "react"
+import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
@@ -25,23 +25,14 @@ import { cx } from "~/lib/utils"
 import type { findCategoryById } from "~/server/admin/categories/queries"
 import { categorySchema } from "~/server/admin/categories/schema"
 import { descriptionSchema } from "~/server/admin/shared/schema"
-import type { findToolList } from "~/server/admin/tools/queries"
-
 type CategoryFormProps = ComponentProps<"form"> & {
   category?: Awaited<ReturnType<typeof findCategoryById>>
-  toolsPromise: ReturnType<typeof findToolList>
 }
 
-export function CategoryForm({
-  className,
-  title,
-  category,
-  toolsPromise,
-  ...props
-}: CategoryFormProps) {
+export function CategoryForm({ className, title, category, ...props }: CategoryFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const tools = use(toolsPromise)
+  const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
 
   const form = useForm({
     resolver: zodResolver(categorySchema),

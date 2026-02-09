@@ -1,5 +1,6 @@
 import {
   createSearchParamsCache,
+  createStandardSchemaV1,
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
@@ -9,7 +10,7 @@ import * as z from "zod"
 import { type Ad, AdType } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const adTableParamsSchema = {
+export const adListParams = {
   name: parseAsString.withDefault(""),
   type: parseAsArrayOf(parseAsStringEnum(Object.values(AdType))).withDefault([]),
   page: parseAsInteger.withDefault(1),
@@ -20,8 +21,9 @@ export const adTableParamsSchema = {
   operator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 }
 
-export const adTableParamsCache = createSearchParamsCache(adTableParamsSchema)
-export type AdTableSchema = Awaited<ReturnType<typeof adTableParamsCache.parse>>
+export const adListSchema = createStandardSchemaV1(adListParams)
+export const adListCache = createSearchParamsCache(adListParams)
+export type AdListParams = Awaited<ReturnType<typeof adListCache.parse>>
 
 export const adSchema = z
   .object({

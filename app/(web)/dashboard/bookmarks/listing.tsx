@@ -2,10 +2,10 @@ import { redirect } from "next/navigation"
 import { BookmarkTable } from "~/app/(web)/dashboard/bookmarks/table"
 import { getServerSession } from "~/lib/auth"
 import { findTools } from "~/server/admin/tools/queries"
-import { toolTableParamsCache } from "~/server/admin/tools/schema"
+import { toolListCache } from "~/server/admin/tools/schema"
 
 export const BookmarkListing = async ({ searchParams }: PageProps<"/dashboard/bookmarks">) => {
-  const params = toolTableParamsCache.parse(await searchParams)
+  const params = toolListCache.parse(await searchParams)
   const session = await getServerSession()
 
   if (!session?.user) {

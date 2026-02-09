@@ -1,5 +1,6 @@
 import {
   createSearchParamsCache,
+  createStandardSchemaV1,
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
@@ -9,7 +10,7 @@ import * as z from "zod"
 import { type Tool, ToolStatus, ToolTier } from "~/.generated/prisma/browser"
 import { getSortingStateParser } from "~/lib/parsers"
 
-export const toolTableParamsSchema = {
+export const toolListParams = {
   name: parseAsString.withDefault(""),
   sort: getSortingStateParser<Tool>().withDefault([{ id: "createdAt", desc: true }]),
   page: parseAsInteger.withDefault(1),
@@ -20,8 +21,9 @@ export const toolTableParamsSchema = {
   status: parseAsArrayOf(parseAsStringEnum(Object.values(ToolStatus))).withDefault([]),
 }
 
-export const toolTableParamsCache = createSearchParamsCache(toolTableParamsSchema)
-export type ToolTableSchema = Awaited<ReturnType<typeof toolTableParamsCache.parse>>
+export const toolListSchema = createStandardSchemaV1(toolListParams)
+export const toolListCache = createSearchParamsCache(toolListParams)
+export type ToolListParams = Awaited<ReturnType<typeof toolListCache.parse>>
 
 export const toolSchema = z.object({
   id: z.string().optional(),

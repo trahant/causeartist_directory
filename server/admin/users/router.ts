@@ -1,26 +1,12 @@
 import { after } from "next/server"
-import * as z from "zod"
 import { removeS3Directories } from "~/lib/media"
 import { adminProcedure } from "~/lib/orpc"
 import { idsSchema } from "~/server/admin/shared/schema"
 import { findUsers } from "~/server/admin/users/queries"
-import type { UserTableSchema } from "~/server/admin/users/schema"
-import { userSchema } from "~/server/admin/users/schema"
-
-const userListSchema = z.object({
-  name: z.string().default(""),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "createdAt", desc: true }]),
-  page: z.number().default(1),
-  perPage: z.number().default(50),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
-})
+import { userListSchema, userSchema } from "~/server/admin/users/schema"
 
 const list = adminProcedure.input(userListSchema).handler(async ({ input }) => {
-  return findUsers(input as UserTableSchema)
+  return findUsers(input)
 })
 
 const update = adminProcedure

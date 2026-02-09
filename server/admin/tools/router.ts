@@ -1,30 +1,27 @@
 import { after } from "next/server"
-import * as z from "zod"
-import { ToolStatus } from "~/.generated/prisma/client"
+import { z } from "zod"
 import { removeS3Directories } from "~/lib/media"
 import { notifySubmitterOfToolPublished, notifySubmitterOfToolScheduled } from "~/lib/notifications"
 import { adminProcedure } from "~/lib/orpc"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
-import { findTools } from "~/server/admin/tools/queries"
-import type { ToolTableSchema } from "~/server/admin/tools/schema"
-import { toolSchema } from "~/server/admin/tools/schema"
-
-const toolListSchema = z.object({
-  name: z.string().default(""),
-  sort: z
-    .array(z.object({ id: z.string(), desc: z.boolean() }))
-    .default([{ id: "createdAt", desc: true }]),
-  page: z.number().default(1),
-  perPage: z.number().default(25),
-  from: z.string().default(""),
-  to: z.string().default(""),
-  operator: z.enum(["and", "or"]).default("and"),
-  status: z.array(z.enum(ToolStatus)).default([]),
-})
+import { findScheduledTools, findToolList, findTools } from "~/server/admin/tools/queries"
+import { toolListSchema, toolSchema } from "~/server/admin/tools/schema"
 
 const list = adminProcedure.input(toolListSchema).handler(async ({ input }) => {
-  return findTools(input as ToolTableSchema)
+  return findTools(input)
 })
+
+const lookup = adminProcedure.handler(async () => {
+  return findToolList()
+})
+
+const scheduled = adminProcedure
+  .input(z.object({ start: z.coerce.date(), end: z.coerce.date() }))
+  .handler(async ({ input: { start, end } }) => {
+    return findScheduledTools({
+      where: { publishedAt: { gte: start, lte: end } },
+    })
+  })
 
 const upsert = adminProcedure
   .input(toolSchema)
@@ -133,6 +130,8 @@ const remove = adminProcedure
 
 export const toolRouter = {
   list,
+  lookup,
+  scheduled,
   upsert,
   duplicate,
   remove,

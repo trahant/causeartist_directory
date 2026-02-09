@@ -20,8 +20,7 @@ import { reportsConfig } from "~/config/reports"
 import { useDataTable } from "~/hooks/use-data-table"
 import { orpc } from "~/lib/orpc-query"
 import { isDefaultState } from "~/lib/parsers"
-import type { ReportTableSchema } from "~/server/admin/reports/schema"
-import { reportTableParamsSchema } from "~/server/admin/reports/schema"
+import { reportListParams } from "~/server/admin/reports/schema"
 import type { DataTableFilterField } from "~/types"
 import { ReportTableToolbarActions } from "./report-table-toolbar-actions"
 
@@ -106,11 +105,11 @@ const columns: ColumnDef<Report>[] = [
 ]
 
 export function ReportTable() {
-  const [params, setParams] = useQueryStates(reportTableParamsSchema)
+  const [params, setParams] = useQueryStates(reportListParams)
 
   const { data, isLoading, isFetching } = useQuery(
     orpc.reports.list.queryOptions({
-      input: params as ReportTableSchema,
+      input: params,
       placeholderData: keepPreviousData,
     }),
   )
@@ -156,7 +155,7 @@ export function ReportTable() {
         <DataTableToolbar
           table={table}
           filterFields={filterFields}
-          isFiltered={!isDefaultState(reportTableParamsSchema, params, ["perPage", "page"])}
+          isFiltered={!isDefaultState(reportListParams, params, ["perPage", "page"])}
           onReset={() => {
             table.resetColumnFilters()
             void setParams(null)

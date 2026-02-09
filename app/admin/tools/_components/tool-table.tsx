@@ -31,7 +31,7 @@ import { VerifiedBadge } from "~/components/web/verified-badge"
 import { useDataTable } from "~/hooks/use-data-table"
 import { orpc } from "~/lib/orpc-query"
 import { isDefaultState } from "~/lib/parsers"
-import { toolTableParamsSchema } from "~/server/admin/tools/schema"
+import { toolListParams } from "~/server/admin/tools/schema"
 import type { DataTableFilterField } from "~/types"
 
 const statusBadges: Record<ToolStatus, ComponentProps<typeof Badge>> = {
@@ -134,7 +134,7 @@ const columns: ColumnDef<Tool>[] = [
 ]
 
 export function ToolTable() {
-  const [params, setParams] = useQueryStates(toolTableParamsSchema)
+  const [params, setParams] = useQueryStates(toolListParams)
 
   const { data, isLoading, isFetching } = useQuery(
     orpc.tools.list.queryOptions({
@@ -209,7 +209,7 @@ export function ToolTable() {
         <DataTableToolbar
           table={table}
           filterFields={filterFields}
-          isFiltered={!isDefaultState(toolTableParamsSchema, params, ["perPage", "page"])}
+          isFiltered={!isDefaultState(toolListParams, params, ["perPage", "page"])}
           onReset={() => {
             table.resetColumnFilters()
             void setParams(null)

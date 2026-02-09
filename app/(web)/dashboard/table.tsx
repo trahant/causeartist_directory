@@ -26,13 +26,13 @@ import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { useDataTable } from "~/hooks/use-data-table"
 import { isToolPremiumTier } from "~/lib/tools"
 import type { findTools } from "~/server/admin/tools/queries"
-import { toolTableParamsSchema } from "~/server/admin/tools/schema"
+import { toolListParams } from "~/server/admin/tools/schema"
 import type { DataTableFilterField } from "~/types"
 
 export const DashboardTable = ({ tools, pageCount }: Awaited<ReturnType<typeof findTools>>) => {
   const t = useTranslations("pages.dashboard.table")
   const format = useFormatter()
-  const [{ perPage, sort }] = useQueryStates(toolTableParamsSchema)
+  const [{ perPage, sort }] = useQueryStates(toolListParams)
 
   // Memoize the columns so they don't re-render on every render
   const columns = useMemo((): ColumnDef<Tool>[] => {

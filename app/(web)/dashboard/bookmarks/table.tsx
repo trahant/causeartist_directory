@@ -17,7 +17,7 @@ import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { useDataTable } from "~/hooks/use-data-table"
 import { findTools } from "~/server/admin/tools/queries"
-import { toolTableParamsSchema } from "~/server/admin/tools/schema"
+import { toolListParams } from "~/server/admin/tools/schema"
 import { removeBookmark } from "~/server/web/actions/bookmark"
 import type { DataTableFilterField } from "~/types"
 
@@ -52,7 +52,7 @@ const BookmarkRemoveButton = ({ toolId }: BookmarkRemoveButtonProps) => {
 
 export const BookmarkTable = ({ tools, pageCount }: Awaited<ReturnType<typeof findTools>>) => {
   const t = useTranslations("pages.dashboard.table")
-  const [{ perPage, sort }] = useQueryStates(toolTableParamsSchema)
+  const [{ perPage, sort }] = useQueryStates(toolListParams)
 
   const columns = useMemo((): ColumnDef<Tool>[] => {
     return [
