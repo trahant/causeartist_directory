@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "next build",
+    "build": "prisma migrate deploy && next build",
     "lint": "bunx oxlint . --fix",
     "format": "bunx oxfmt --write .",
     "email": "SKIP_ENV_VALIDATION=1 email dev",
@@ -16,7 +16,6 @@
     "db:push": "prisma db push --skip-generate",
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
-    "prebuild": "bun run db:migrate deploy",
     "postinstall": "bun run db:generate"
   },
   "dependencies": {
