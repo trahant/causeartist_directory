@@ -9,7 +9,6 @@ import { db } from "~/services/db"
 export const searchItems = actionClient
   .inputSchema(z.object({ query: z.string() }))
   .action(async ({ parsedInput: { query } }) => {
-    const start = performance.now()
     const session = await getServerSession()
 
     const [tools, categories, tags] = await Promise.all([
@@ -38,8 +37,6 @@ export const searchItems = actionClient
         take: 10,
       }),
     ])
-
-    console.log(`Search: ${Math.round(performance.now() - start)}ms`)
 
     return { tools, categories, tags }
   })

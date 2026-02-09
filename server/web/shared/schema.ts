@@ -57,13 +57,6 @@ export const createReportToolSchema = (t: TFunction) => {
   })
 }
 
-export const createFeedbackSchema = (t: TFunction) => {
-  return z.object({
-    email: z.email({ error: t("invalidEmail") }),
-    message: z.string().min(1, { error: t("required") }),
-  })
-}
-
 export const createClaimToolEmailSchema = (t: TFunction) => {
   return z.object({
     toolId: z.string(),

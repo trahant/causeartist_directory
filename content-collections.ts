@@ -4,7 +4,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
 import { z } from "zod"
-import { defaultLocale, locales } from "~/lib/i18n"
+import { defaultLocale, locales } from "~/lib/i18n-config"
 import { extractHeadingsFromMDX, extractToolsFromMDX } from "~/lib/mdx"
 
 const mdxOptions: Options = {

@@ -11,7 +11,6 @@ export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhe
   cacheLife("infinite")
 
   const { q, letter, sort, page, perPage } = search
-  const start = performance.now()
   const skip = (page - 1) * perPage
   const take = perPage
   const [sortBy, sortOrder] = sort.split(".")
@@ -52,8 +51,6 @@ export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhe
       where: { ...whereQuery, ...where },
     }),
   ])
-
-  console.log(`Tags search: ${Math.round(performance.now() - start)}ms`)
 
   return { tags, total, page, perPage }
 }

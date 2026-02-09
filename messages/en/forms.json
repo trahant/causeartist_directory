@@ -53,19 +53,6 @@
       "failed": "We couldn't create a resend contact. Please try again."
     }
   },
-  "feedback": {
-    "question": "What can we do to improve {siteName}?",
-    "email_placeholder": "Your email",
-    "feedback_placeholder": "Write your feedback here...",
-    "dismiss_button": "Dismiss",
-    "send_button": "Send feedback",
-    "success_message": "Thank you for your feedback!",
-    "errors": {
-      "rate_limited": "You're sending feedback too quickly. Please wait a moment and try again.",
-      "failed": "We couldn't send your feedback. Please try again later.",
-      "generic": "Something went wrong while sending your feedback. Please try again."
-    }
-  },
   "media": {
     "success": "Media updated successfully. Save the form to apply changes.",
     "error": "We couldn't process this media file. Please try again.",

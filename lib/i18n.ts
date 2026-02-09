@@ -1,33 +1,36 @@
-import { glob, readFile } from "node:fs/promises"
-import { basename, join } from "node:path"
 import { getRequestConfig } from "next-intl/server"
-
-export const locales = ["en"] as const
-export const defaultLocale = "en" as const
-
-export type Locale = (typeof locales)[number]
-
-// Dynamically load all JSON files from the locale directory
-const loadMessages = async (locale: Locale) => {
-  const messagesPath = join(process.cwd(), "messages", locale)
-  const files = glob(`${messagesPath}/*.json`)
-  const filesArray = await Array.fromAsync(files)
-
-  const messages = await Promise.all(
-    filesArray.map(async file => {
-      const namespace = basename(file, ".json")
-      const content = JSON.parse(await readFile(file, "utf-8"))
-      return [namespace, content]
-    }),
-  )
-
-  return Object.fromEntries(messages)
-}
+import { defaultLocale as locale } from "~/lib/i18n-config"
+import ads from "../messages/en/ads.json"
+import brand from "../messages/en/brand.json"
+import categories from "../messages/en/categories.json"
+import common from "../messages/en/common.json"
+import components from "../messages/en/components.json"
+import dialogs from "../messages/en/dialogs.json"
+import forms from "../messages/en/forms.json"
+import navigation from "../messages/en/navigation.json"
+import pages from "../messages/en/pages.json"
+import posts from "../messages/en/posts.json"
+import schema from "../messages/en/schema.json"
+import tags from "../messages/en/tags.json"
+import tools from "../messages/en/tools.json"
 
 export default getRequestConfig(async () => {
-  // TODO: get locale from headers or URL params
-  const locale = defaultLocale
-  const messages = await loadMessages(locale)
-
-  return { locale, messages }
+  return {
+    locale,
+    messages: {
+      ads,
+      brand,
+      categories,
+      common,
+      components,
+      dialogs,
+      forms,
+      navigation,
+      pages,
+      posts,
+      schema,
+      tags,
+      tools,
+    },
+  }
 })

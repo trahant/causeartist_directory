@@ -9,9 +9,6 @@
     "preview_ad": "Preview this ad",
     "day": "day"
   },
-  "bottom": {
-    "popular_categories": "Popular Categories:"
-  },
   "footer": {
     "cta_title": "Subscribe to our newsletter",
     "cta_description": "Join {count}+ other members and get updates straight to your inbox."

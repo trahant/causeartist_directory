@@ -1,4 +1,3 @@
-import { performance } from "node:perf_hooks"
 import { getRandomElement } from "@primoui/utils"
 import { cacheLife, cacheTag } from "next/cache"
 import { type Prisma, ToolStatus } from "~/.generated/prisma/client"
@@ -13,7 +12,6 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
   cacheLife("infinite")
 
   const { q, category, sort, page, perPage } = search
-  const start = performance.now()
   const skip = (page - 1) * perPage
   const take = perPage
   const [sortBy, sortOrder] = sort.split(".")
@@ -45,8 +43,6 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
       where: { ...whereQuery, ...where },
     }),
   ])
-
-  console.log(`Tools search: ${Math.round(performance.now() - start)}ms`)
 
   return { tools, total, page, perPage }
 }
