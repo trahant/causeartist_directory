@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { slugify } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, use } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
 import { AIGenerateDescription } from "~/components/admin/ai/generate-description"
@@ -20,8 +20,8 @@ import { RelationSelector } from "~/components/common/relation-selector"
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
 import { useComputedField } from "~/hooks/use-computed-field"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { upsertCategory } from "~/server/admin/categories/actions"
 import type { findCategoryById } from "~/server/admin/categories/queries"
 import { categorySchema } from "~/server/admin/categories/schema"
 import { descriptionSchema } from "~/server/admin/shared/schema"
@@ -40,34 +40,38 @@ export function CategoryForm({
   ...props
 }: CategoryFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const tools = use(toolsPromise)
-  const resolver = zodResolver(categorySchema)
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(upsertCategory, resolver, {
-    formProps: {
-      defaultValues: {
-        id: category?.id ?? "",
-        name: category?.name ?? "",
-        slug: category?.slug ?? "",
-        label: category?.label ?? "",
-        description: category?.description ?? "",
-        tools: category?.tools.map(t => t.id) ?? [],
-      },
-    },
-
-    actionProps: {
-      onSuccess: ({ data }) => {
-        toast.success(`Category successfully ${category ? "updated" : "created"}`)
-        router.push(`/admin/categories/${data?.id}`)
-      },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
-      },
+  const form = useForm({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      id: category?.id ?? "",
+      name: category?.name ?? "",
+      slug: category?.slug ?? "",
+      label: category?.label ?? "",
+      description: category?.description ?? "",
+      tools: category?.tools.map(t => t.id) ?? [],
     },
   })
 
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  const mutation = useMutation(
+    orpc.categories.upsert.mutationOptions({
+      onSuccess: data => {
+        toast.success(`Category successfully ${category ? "updated" : "created"}`)
+        queryClient.invalidateQueries({ queryKey: orpc.categories.key() })
+        router.push(`/admin/categories/${data.id}`)
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   const name = form.watch("name")
 
@@ -107,7 +111,7 @@ export function CategoryForm({
       </Stack>
 
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}
@@ -184,7 +188,7 @@ export function CategoryForm({
 
           <Button
             size="md"
-            isPending={action.isPending}
+            isPending={mutation.isPending}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
           >
             {category ? "Update category" : "Create category"}

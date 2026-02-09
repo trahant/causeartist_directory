@@ -1,8 +1,8 @@
 "use client"
 
 import { isValidUrl } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CopyIcon, EllipsisIcon, GlobeIcon, TrashIcon } from "lucide-react"
-import { useAction } from "next-safe-action/hooks"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
@@ -19,8 +19,8 @@ import {
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
 import { ExternalLink } from "~/components/web/external-link"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { duplicateAd } from "~/server/admin/ads/actions"
 
 type AdActionsProps = ComponentProps<typeof Button> & {
   ad: Ad
@@ -29,34 +29,30 @@ type AdActionsProps = ComponentProps<typeof Button> & {
 export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
   const pathname = usePathname()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const indexPath = "/admin/ads"
   const singlePath = `${indexPath}/${ad.id}`
   const isSinglePage = pathname === singlePath
 
-  const { executeAsync } = useAction(duplicateAd, {
-    onSuccess: ({ data }) => {
-      if (isSinglePage) {
-        router.push(`${indexPath}/${data?.id}`)
-      }
-    },
-  })
+  const duplicateMutation = useMutation(
+    orpc.ads.duplicate.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({ queryKey: orpc.ads.key() })
 
-  const handleDuplicate = () => {
-    toast.promise(
-      async () => {
-        const { serverError } = await executeAsync({ id: ad.id })
-
-        if (serverError) {
-          throw new Error(serverError)
+        if (isSinglePage) {
+          router.push(`${indexPath}/${data.id}`)
         }
       },
-      {
-        loading: "Duplicating ad...",
-        success: "Ad duplicated successfully",
-        error: err => `Failed to duplicate ad: ${err.message}`,
-      },
-    )
+    }),
+  )
+
+  const handleDuplicate = () => {
+    toast.promise(duplicateMutation.mutateAsync({ id: ad.id }), {
+      loading: "Duplicating ad...",
+      success: "Ad duplicated successfully",
+      error: err => `Failed to duplicate ad: ${err.message}`,
+    })
   }
 
   return (

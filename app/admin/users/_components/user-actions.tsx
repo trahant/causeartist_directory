@@ -1,8 +1,9 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { EllipsisIcon, TrashIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
-import { type ComponentProps, useTransition } from "react"
+import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { User } from "~/.generated/prisma/browser"
 import { UserDeleteDialog } from "~/app/admin/users/_components/user-delete-dialog"
@@ -22,8 +23,8 @@ import {
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
 import { admin, useSession } from "~/lib/auth-client"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { updateUserRole } from "~/server/admin/users/actions"
 
 type UserActionsProps = ComponentProps<typeof Button> & {
   user: User
@@ -33,12 +34,21 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
-  const [isUpdatePending, startUpdateTransition] = useTransition()
+  const queryClient = useQueryClient()
   const roles = ["admin", "user"] as const
 
   const indexPath = "/admin/users"
   const singlePath = `${indexPath}/${user.id}`
   const isSinglePage = pathname === singlePath
+
+  const updateRoleMutation = useMutation(
+    orpc.users.updateRole.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+        router.refresh()
+      },
+    }),
+  )
 
   if (user.id === session?.user.id) {
     return null
@@ -72,19 +82,13 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
               <DropdownMenuRadioGroup
                 value={user.role}
                 onValueChange={value => {
-                  startUpdateTransition(() => {
-                    toast.promise(
-                      async () => {
-                        await updateUserRole({
-                          id: user.id,
-                          role: value as (typeof roles)[number],
-                        })
-
-                        router.refresh()
-                      },
-                      { loading: "Updating...", success: "Role successfully updated" },
-                    )
-                  })
+                  toast.promise(
+                    updateRoleMutation.mutateAsync({
+                      id: user.id,
+                      role: value as (typeof roles)[number],
+                    }),
+                    { loading: "Updating...", success: "Role successfully updated" },
+                  )
                 }}
               >
                 {roles.map(role => (
@@ -92,7 +96,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
                     key={role}
                     value={role}
                     className="capitalize"
-                    disabled={isUpdatePending}
+                    disabled={updateRoleMutation.isPending}
                   >
                     {role}
                   </DropdownMenuRadioItem>

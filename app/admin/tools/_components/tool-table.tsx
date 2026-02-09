@@ -2,6 +2,7 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import {
   CircleCheckIcon,
   CircleDashedIcon,
@@ -11,7 +12,6 @@ import {
 } from "lucide-react"
 import { useQueryStates } from "nuqs"
 import type { ComponentProps } from "react"
-import { use } from "react"
 import { type Tool, ToolStatus } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
 import { ToolTableToolbarActions } from "~/app/admin/tools/_components/tool-table-toolbar-actions"
@@ -25,17 +25,14 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { VerifiedBadge } from "~/components/web/verified-badge"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findTools } from "~/server/admin/tools/queries"
+import { orpc } from "~/lib/orpc-query"
 import { toolTableParamsSchema } from "~/server/admin/tools/schema"
 import type { DataTableFilterField } from "~/types"
-
-type ToolTableProps = {
-  toolsPromise: ReturnType<typeof findTools>
-}
 
 const statusBadges: Record<ToolStatus, ComponentProps<typeof Badge>> = {
   [ToolStatus.Draft]: {
@@ -136,9 +133,9 @@ const columns: ColumnDef<Tool>[] = [
   },
 ]
 
-export function ToolTable({ toolsPromise }: ToolTableProps) {
-  const { tools, total, pageCount } = use(toolsPromise)
-  const [{ perPage, sort }] = useQueryStates(toolTableParamsSchema)
+export function ToolTable() {
+  const [params] = useQueryStates(toolTableParamsSchema)
+  const { data, isLoading } = useQuery(orpc.tools.list.queryOptions({ input: params }))
 
   // Search filters
   const filterFields: DataTableFilterField<Tool>[] = [
@@ -176,26 +173,30 @@ export function ToolTable({ toolsPromise }: ToolTableProps) {
   ]
 
   const { table } = useDataTable({
-    data: tools,
+    data: data?.tools ?? [],
     columns,
-    pageCount,
+    pageCount: data?.pageCount ?? 0,
     filterFields,
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnVisibility: { submitterEmail: false, createdAt: false },
       columnPinning: { right: ["actions"] },
     },
     getRowId: originalRow => originalRow.id,
   })
 
+  if (isLoading) {
+    return <DataTableSkeleton title="Tools" />
+  }
+
   return (
     <DataTable table={table}>
       <DataTableHeader
         title="Tools"
-        total={total}
+        total={data?.total ?? 0}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/tools/new">

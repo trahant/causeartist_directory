@@ -2,9 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ComponentProps } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { UserActions } from "~/app/admin/users/_components/user-actions"
 import { Avatar, AvatarImage } from "~/components/common/avatar"
@@ -16,8 +16,8 @@ import { Input } from "~/components/common/input"
 import { Kbd } from "~/components/common/kbd"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { updateUser } from "~/server/admin/users/actions"
 import type { findUserById } from "~/server/admin/users/queries"
 import { userSchema } from "~/server/admin/users/schema"
 
@@ -26,31 +26,34 @@ type UserFormProps = ComponentProps<"form"> & {
 }
 
 export function UserForm({ className, title, user, ...props }: UserFormProps) {
-  const resolver = zodResolver(userSchema)
+  const queryClient = useQueryClient()
 
-  // Update user
-  const { form, action, handleSubmitWithAction } = useHookFormAction(updateUser, resolver, {
-    formProps: {
-      defaultValues: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image ?? "",
-      },
-    },
-
-    actionProps: {
-      onSuccess: () => {
-        toast.success("User successfully updated")
-      },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
-      },
+  const form = useForm({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image ?? "",
     },
   })
 
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  const mutation = useMutation(
+    orpc.users.update.mutationOptions({
+      onSuccess: () => {
+        toast.success("User successfully updated")
+        queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   return (
     <Form {...form}>
@@ -63,7 +66,7 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
       </Stack>
 
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}
@@ -118,7 +121,7 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
 
           <Button
             size="md"
-            isPending={action.isPending}
+            isPending={mutation.isPending}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
           >
             Update user

@@ -2,14 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { getRandomString, slugify } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { addMonths, formatDate } from "date-fns"
 import { CalendarIcon, ClockIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, useMemo, useState } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { AdType } from "~/.generated/prisma/browser"
 import { AdActions } from "~/app/admin/ads/_components/ad-actions"
@@ -31,8 +31,8 @@ import {
 } from "~/components/common/select"
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { upsertAd } from "~/server/admin/ads/actions"
 import type { findAdById } from "~/server/admin/ads/queries"
 import { adSchema } from "~/server/admin/ads/schema"
 
@@ -42,40 +42,44 @@ type AdFormProps = ComponentProps<"form"> & {
 
 export function AdForm({ className, title, ad, ...props }: AdFormProps) {
   const router = useRouter()
-  const resolver = zodResolver(adSchema)
+  const queryClient = useQueryClient()
   const [isStartsAtOpen, setIsStartsAtOpen] = useState(false)
   const [isEndsAtOpen, setIsEndsAtOpen] = useState(false)
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(upsertAd, resolver, {
-    formProps: {
-      defaultValues: {
-        id: ad?.id ?? "",
-        name: ad?.name ?? "",
-        email: ad?.email ?? "",
-        description: ad?.description ?? "",
-        websiteUrl: ad?.websiteUrl ?? "",
-        faviconUrl: ad?.faviconUrl ?? "",
-        bannerUrl: ad?.bannerUrl ?? "",
-        buttonLabel: ad?.buttonLabel ?? "",
-        type: ad?.type ?? AdType.All,
-        startsAt: ad?.startsAt ?? new Date(),
-        endsAt: ad?.endsAt ?? addMonths(new Date(), 1),
-      },
-    },
-
-    actionProps: {
-      onSuccess: ({ data }) => {
-        toast.success(`Ad successfully ${ad ? "updated" : "created"}`)
-        router.push(`/admin/ads/${data?.id}`)
-      },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
-      },
+  const form = useForm({
+    resolver: zodResolver(adSchema),
+    defaultValues: {
+      id: ad?.id ?? "",
+      name: ad?.name ?? "",
+      email: ad?.email ?? "",
+      description: ad?.description ?? "",
+      websiteUrl: ad?.websiteUrl ?? "",
+      faviconUrl: ad?.faviconUrl ?? "",
+      bannerUrl: ad?.bannerUrl ?? "",
+      buttonLabel: ad?.buttonLabel ?? "",
+      type: ad?.type ?? AdType.All,
+      startsAt: ad?.startsAt ?? new Date(),
+      endsAt: ad?.endsAt ?? addMonths(new Date(), 1),
     },
   })
 
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  const mutation = useMutation(
+    orpc.ads.upsert.mutationOptions({
+      onSuccess: data => {
+        toast.success(`Ad successfully ${ad ? "updated" : "created"}`)
+        queryClient.invalidateQueries({ queryKey: orpc.ads.key() })
+        router.push(`/admin/ads/${data.id}`)
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   const [name, websiteUrl, startsAt, endsAt] = form.watch([
     "name",
@@ -133,7 +137,7 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
       </Stack>
 
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}
@@ -415,7 +419,7 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
 
           <Button
             size="md"
-            isPending={action.isPending}
+            isPending={mutation.isPending}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
           >
             {ad ? "Update ad" : "Create ad"}

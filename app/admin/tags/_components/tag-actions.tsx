@@ -1,7 +1,7 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CopyIcon, EllipsisIcon, TrashIcon } from "lucide-react"
-import { useAction } from "next-safe-action/hooks"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
@@ -17,8 +17,8 @@ import {
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { duplicateTag } from "~/server/admin/tags/actions"
 
 type TagActionsProps = ComponentProps<typeof Button> & {
   tag: Tag
@@ -27,34 +27,30 @@ type TagActionsProps = ComponentProps<typeof Button> & {
 export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
   const pathname = usePathname()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const indexPath = "/admin/tags"
   const singlePath = `${indexPath}/${tag.id}`
   const isSinglePage = pathname === singlePath
 
-  const { executeAsync } = useAction(duplicateTag, {
-    onSuccess: ({ data }) => {
-      if (isSinglePage) {
-        router.push(`${indexPath}/${data.id}`)
-      }
-    },
-  })
+  const duplicateMutation = useMutation(
+    orpc.tags.duplicate.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({ queryKey: orpc.tags.key() })
 
-  const handleDuplicate = () => {
-    toast.promise(
-      async () => {
-        const { serverError } = await executeAsync({ id: tag.id })
-
-        if (serverError) {
-          throw new Error(serverError)
+        if (isSinglePage) {
+          router.push(`${indexPath}/${data.id}`)
         }
       },
-      {
-        loading: "Duplicating tag...",
-        success: "Tag duplicated successfully",
-        error: err => `Failed to duplicate tag: ${err.message}`,
-      },
-    )
+    }),
+  )
+
+  const handleDuplicate = () => {
+    toast.promise(duplicateMutation.mutateAsync({ id: tag.id }), {
+      loading: "Duplicating tag...",
+      success: "Tag duplicated successfully",
+      error: err => `Failed to duplicate tag: ${err.message}`,
+    })
   }
 
   return (

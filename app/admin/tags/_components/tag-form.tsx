@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { slugify } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { type ComponentProps, use } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
 import { Button } from "~/components/common/button"
@@ -18,8 +18,8 @@ import { Link } from "~/components/common/link"
 import { RelationSelector } from "~/components/common/relation-selector"
 import { Stack } from "~/components/common/stack"
 import { useComputedField } from "~/hooks/use-computed-field"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { upsertTag } from "~/server/admin/tags/actions"
 import type { findTagById } from "~/server/admin/tags/queries"
 import { tagSchema } from "~/server/admin/tags/schema"
 import type { findToolList } from "~/server/admin/tools/queries"
@@ -31,32 +31,36 @@ type TagFormProps = ComponentProps<"form"> & {
 
 export function TagForm({ className, title, tag, toolsPromise, ...props }: TagFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const tools = use(toolsPromise)
-  const resolver = zodResolver(tagSchema)
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(upsertTag, resolver, {
-    formProps: {
-      defaultValues: {
-        id: tag?.id ?? "",
-        name: tag?.name ?? "",
-        slug: tag?.slug ?? "",
-        tools: tag?.tools.map(t => t.id) ?? [],
-      },
-    },
-
-    actionProps: {
-      onSuccess: ({ data }) => {
-        toast.success(`Tag successfully ${tag ? "updated" : "created"}`)
-        router.push(`/admin/tags/${data?.id}`)
-      },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
-      },
+  const form = useForm({
+    resolver: zodResolver(tagSchema),
+    defaultValues: {
+      id: tag?.id ?? "",
+      name: tag?.name ?? "",
+      slug: tag?.slug ?? "",
+      tools: tag?.tools.map(t => t.id) ?? [],
     },
   })
 
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  const mutation = useMutation(
+    orpc.tags.upsert.mutationOptions({
+      onSuccess: data => {
+        toast.success(`Tag successfully ${tag ? "updated" : "created"}`)
+        queryClient.invalidateQueries({ queryKey: orpc.tags.key() })
+        router.push(`/admin/tags/${data.id}`)
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   // Set the slug based on the name
   useComputedField({
@@ -78,7 +82,7 @@ export function TagForm({ className, title, tag, toolsPromise, ...props }: TagFo
       </Stack>
 
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}
@@ -129,7 +133,7 @@ export function TagForm({ className, title, tag, toolsPromise, ...props }: TagFo
 
           <Button
             size="md"
-            isPending={action.isPending}
+            isPending={mutation.isPending}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
           >
             {tag ? "Update tag" : "Create tag"}

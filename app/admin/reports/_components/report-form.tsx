@@ -2,9 +2,9 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ComponentProps } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { ReportActions } from "~/app/admin/reports/_components/report-actions"
 import { Button } from "~/components/common/button"
@@ -23,8 +23,8 @@ import {
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
 import { reportsConfig } from "~/config/reports"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { updateReport } from "~/server/admin/reports/actions"
 import type { findReportById } from "~/server/admin/reports/queries"
 import { reportSchema } from "~/server/admin/reports/schema"
 
@@ -33,30 +33,34 @@ type ReportFormProps = ComponentProps<"form"> & {
 }
 
 export function ReportForm({ className, title, report, ...props }: ReportFormProps) {
-  const resolver = zodResolver(reportSchema)
+  const queryClient = useQueryClient()
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(updateReport, resolver, {
-    formProps: {
-      defaultValues: {
-        id: report?.id ?? "",
-        email: report?.email ?? "",
-        type: report?.type,
-        message: report?.message ?? "",
-      },
-    },
-
-    actionProps: {
-      onSuccess: () => {
-        toast.success("Report successfully updated")
-      },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
-      },
+  const form = useForm({
+    resolver: zodResolver(reportSchema),
+    defaultValues: {
+      id: report?.id ?? "",
+      email: report?.email ?? "",
+      type: report?.type,
+      message: report?.message ?? "",
     },
   })
 
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  const mutation = useMutation(
+    orpc.reports.update.mutationOptions({
+      onSuccess: () => {
+        toast.success("Report successfully updated")
+        queryClient.invalidateQueries({ queryKey: orpc.reports.key() })
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   return (
     <Form {...form}>
@@ -69,7 +73,7 @@ export function ReportForm({ className, title, report, ...props }: ReportFormPro
       </Stack>
 
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @md:grid-cols-2", className)}
         noValidate
         {...props}
@@ -132,7 +136,7 @@ export function ReportForm({ className, title, report, ...props }: ReportFormPro
 
           <Button
             size="md"
-            isPending={action.isPending}
+            isPending={mutation.isPending}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
           >
             Update report

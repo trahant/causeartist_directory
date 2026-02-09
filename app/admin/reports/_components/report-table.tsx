@@ -2,8 +2,8 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import { useQueryStates } from "nuqs"
-import { use } from "react"
 import type { Report, Tool } from "~/.generated/prisma/browser"
 import { ReportActions } from "~/app/admin/reports/_components/report-actions"
 import { DateRangePicker } from "~/components/admin/date-range-picker"
@@ -17,15 +17,13 @@ import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { reportsConfig } from "~/config/reports"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findReports } from "~/server/admin/reports/queries"
+import { orpc } from "~/lib/orpc-query"
+import type { ReportTableSchema } from "~/server/admin/reports/schema"
 import { reportTableParamsSchema } from "~/server/admin/reports/schema"
 import type { DataTableFilterField } from "~/types"
 import { ReportTableToolbarActions } from "./report-table-toolbar-actions"
-
-type ReportTableProps = {
-  reportsPromise: ReturnType<typeof findReports>
-}
 
 const columns: ColumnDef<Report>[] = [
   {
@@ -107,9 +105,15 @@ const columns: ColumnDef<Report>[] = [
   },
 ]
 
-export function ReportTable({ reportsPromise }: ReportTableProps) {
-  const { reports, reportsTotal, pageCount } = use(reportsPromise)
-  const [{ perPage, sort }] = useQueryStates(reportTableParamsSchema)
+export function ReportTable() {
+  const [params] = useQueryStates(reportTableParamsSchema)
+  const { data, isLoading } = useQuery(
+    orpc.reports.list.queryOptions({ input: params as ReportTableSchema }),
+  )
+
+  const reports = data?.reports ?? []
+  const reportsTotal = data?.reportsTotal ?? 0
+  const pageCount = data?.pageCount ?? 0
 
   // Search filters
   const filterFields: DataTableFilterField<Report>[] = [
@@ -136,12 +140,16 @@ export function ReportTable({ reportsPromise }: ReportTableProps) {
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   })
+
+  if (isLoading) {
+    return <DataTableSkeleton title="Reports" />
+  }
 
   return (
     <DataTable table={table}>

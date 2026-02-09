@@ -1,0 +1,58 @@
+import * as z from "zod"
+import { adminProcedure } from "~/lib/orpc"
+import { findReports } from "~/server/admin/reports/queries"
+import type { ReportTableSchema } from "~/server/admin/reports/schema"
+import { reportSchema } from "~/server/admin/reports/schema"
+import { idsSchema } from "~/server/admin/shared/schema"
+
+const reportListSchema = z.object({
+  message: z.string().default(""),
+  type: z.array(z.string()).default([]),
+  sort: z
+    .array(z.object({ id: z.string(), desc: z.boolean() }))
+    .default([{ id: "createdAt", desc: true }]),
+  page: z.number().default(1),
+  perPage: z.number().default(50),
+  from: z.string().default(""),
+  to: z.string().default(""),
+  operator: z.enum(["and", "or"]).default("and"),
+})
+
+const list = adminProcedure.input(reportListSchema).handler(async ({ input }) => {
+  return findReports(input as ReportTableSchema)
+})
+
+const update = adminProcedure
+  .input(reportSchema)
+  .handler(async ({ input: { id, ...data }, context: { db, revalidate } }) => {
+    const report = await db.report.update({
+      where: { id },
+      data,
+    })
+
+    revalidate({
+      paths: ["/admin/reports"],
+    })
+
+    return report
+  })
+
+const remove = adminProcedure
+  .input(idsSchema)
+  .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
+    await db.report.deleteMany({
+      where: { id: { in: ids } },
+    })
+
+    revalidate({
+      paths: ["/admin/reports"],
+    })
+
+    return true
+  })
+
+export const reportRouter = {
+  list,
+  update,
+  remove,
+}

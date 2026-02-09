@@ -1,8 +1,8 @@
 "use client"
 
 import { isValidUrl } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CopyIcon, EllipsisIcon, GlobeIcon, TrashIcon } from "lucide-react"
-import { useAction } from "next-safe-action/hooks"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
@@ -19,8 +19,8 @@ import {
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
 import { ExternalLink } from "~/components/web/external-link"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { duplicateTool } from "~/server/admin/tools/actions"
 
 type ToolActionsProps = ComponentProps<typeof Button> & {
   tool: Tool
@@ -29,35 +29,30 @@ type ToolActionsProps = ComponentProps<typeof Button> & {
 export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => {
   const pathname = usePathname()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const indexPath = "/admin/tools"
   const singlePath = `${indexPath}/${tool.id}`
   const isSinglePage = pathname === singlePath
 
-  const { executeAsync } = useAction(duplicateTool, {
-    onSuccess: ({ data }) => {
-      if (isSinglePage) {
-        router.push(`${indexPath}/${data.id}`)
-      }
-    },
-  })
+  const duplicateMutation = useMutation(
+    orpc.tools.duplicate.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({ queryKey: orpc.tools.key() })
 
-  // TODO: Think about how to handle unique website URLs or remove this feature
-  const handleDuplicate = () => {
-    toast.promise(
-      async () => {
-        const { serverError } = await executeAsync({ id: tool.id })
-
-        if (serverError) {
-          throw new Error(serverError)
+        if (isSinglePage) {
+          router.push(`${indexPath}/${data.id}`)
         }
       },
-      {
-        loading: "Duplicating tool...",
-        success: "Tool duplicated successfully",
-        error: err => `Failed to duplicate tool: ${err.message}`,
-      },
-    )
+    }),
+  )
+
+  const handleDuplicate = () => {
+    toast.promise(duplicateMutation.mutateAsync({ id: tool.id }), {
+      loading: "Duplicating tool...",
+      success: "Tool duplicated successfully",
+      error: err => `Failed to duplicate tool: ${err.message}`,
+    })
   }
 
   return (

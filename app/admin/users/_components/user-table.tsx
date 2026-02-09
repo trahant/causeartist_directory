@@ -2,11 +2,12 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import { useQueryStates } from "nuqs"
 import type { ComponentProps } from "react"
-import { use } from "react"
 import type { User } from "~/.generated/prisma/browser"
 import { UserActions } from "~/app/admin/users/_components/user-actions"
+import { UserTableToolbarActions } from "~/app/admin/users/_components/user-table-toolbar-actions"
 import { DateRangePicker } from "~/components/admin/date-range-picker"
 import { RowCheckbox } from "~/components/admin/row-checkbox"
 import { Badge } from "~/components/common/badge"
@@ -15,17 +16,13 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findUsers } from "~/server/admin/users/queries"
+import { orpc } from "~/lib/orpc-query"
 import { userTableParamsSchema } from "~/server/admin/users/schema"
 import type { DataTableFilterField } from "~/types"
-import { UserTableToolbarActions } from "./user-table-toolbar-actions"
-
-type UserTableProps = {
-  usersPromise: ReturnType<typeof findUsers>
-}
 
 const roleBadges: Record<"admin" | "user", ComponentProps<typeof Badge>> = {
   admin: {
@@ -114,9 +111,9 @@ const columns: ColumnDef<User>[] = [
   },
 ]
 
-export function UserTable({ usersPromise }: UserTableProps) {
-  const { users, usersTotal, pageCount } = use(usersPromise)
-  const [{ perPage, sort }] = useQueryStates(userTableParamsSchema)
+export function UserTable() {
+  const [params] = useQueryStates(userTableParamsSchema)
+  const { data, isLoading } = useQuery(orpc.users.list.queryOptions({ input: params }))
 
   // Search filters
   const filterFields: DataTableFilterField<User>[] = [
@@ -128,24 +125,28 @@ export function UserTable({ usersPromise }: UserTableProps) {
   ]
 
   const { table } = useDataTable({
-    data: users,
+    data: data?.users ?? [],
     columns,
-    pageCount,
+    pageCount: data?.pageCount ?? 0,
     filterFields,
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
     enableRowSelection: row => row.original.role !== "admin",
   })
 
+  if (isLoading) {
+    return <DataTableSkeleton title="Users" />
+  }
+
   return (
     <DataTable table={table}>
-      <DataTableHeader title="Users" total={usersTotal}>
+      <DataTableHeader title="Users" total={data?.usersTotal ?? 0}>
         <DataTableToolbar table={table} filterFields={filterFields}>
           <UserTableToolbarActions table={table} />
           <DateRangePicker align="end" />

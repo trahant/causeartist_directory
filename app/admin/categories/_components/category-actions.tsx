@@ -1,7 +1,7 @@
 "use client"
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CopyIcon, EllipsisIcon, TrashIcon } from "lucide-react"
-import { useAction } from "next-safe-action/hooks"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
@@ -17,8 +17,8 @@ import {
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { duplicateCategory } from "~/server/admin/categories/actions"
 
 type CategoryActionsProps = ComponentProps<typeof Button> & {
   category: Category
@@ -27,34 +27,30 @@ type CategoryActionsProps = ComponentProps<typeof Button> & {
 export const CategoryActions = ({ category, className, ...props }: CategoryActionsProps) => {
   const pathname = usePathname()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const indexPath = "/admin/categories"
   const singlePath = `${indexPath}/${category.id}`
   const isSinglePage = pathname === singlePath
 
-  const { executeAsync } = useAction(duplicateCategory, {
-    onSuccess: ({ data }) => {
-      if (isSinglePage) {
-        router.push(`${indexPath}/${data.id}`)
-      }
-    },
-  })
+  const duplicateMutation = useMutation(
+    orpc.categories.duplicate.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({ queryKey: orpc.categories.key() })
 
-  const handleDuplicate = () => {
-    toast.promise(
-      async () => {
-        const { serverError } = await executeAsync({ id: category.id })
-
-        if (serverError) {
-          throw new Error(serverError)
+        if (isSinglePage) {
+          router.push(`${indexPath}/${data.id}`)
         }
       },
-      {
-        loading: "Duplicating category...",
-        success: "Category duplicated successfully",
-        error: err => `Failed to duplicate category: ${err.message}`,
-      },
-    )
+    }),
+  )
+
+  const handleDuplicate = () => {
+    toast.promise(duplicateMutation.mutateAsync({ id: category.id }), {
+      loading: "Duplicating category...",
+      success: "Category duplicated successfully",
+      error: err => `Failed to duplicate category: ${err.message}`,
+    })
   }
 
   return (

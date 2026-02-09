@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { formatDateTime, getRandomString, slugify } from "@primoui/utils"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { type ComponentProps, use, useMemo, useRef, useState } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import React, { type ComponentProps, useMemo, useRef, useState } from "react"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { type Tool, ToolStatus, ToolTier } from "~/.generated/prisma/browser"
 import { ToolActions } from "~/app/admin/tools/_components/tool-actions"
@@ -36,11 +36,11 @@ import { Markdown } from "~/components/web/markdown"
 import { siteConfig } from "~/config/site"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { isToolApproved } from "~/lib/tools"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findCategoryList } from "~/server/admin/categories/queries"
 import { contentSchema } from "~/server/admin/shared/schema"
 import type { findTagList } from "~/server/admin/tags/queries"
-import { upsertTool } from "~/server/admin/tools/actions"
 import type { findToolById } from "~/server/admin/tools/queries"
 import { toolSchema } from "~/server/admin/tools/schema"
 
@@ -76,43 +76,42 @@ export function ToolForm({
   ...props
 }: ToolFormProps) {
   const router = useRouter()
-  const categories = use(categoriesPromise)
-  const tags = use(tagsPromise)
-  const resolver = zodResolver(toolSchema)
+  const queryClient = useQueryClient()
+  const categories = React.use(categoriesPromise)
+  const tags = React.use(tagsPromise)
   const [isPreviewing, setIsPreviewing] = useState(false)
   const [isStatusPending, setIsStatusPending] = useState(false)
   const [isGenerationComplete, setIsGenerationComplete] = useState(true)
   const originalStatus = useRef(tool?.status ?? ToolStatus.Draft)
 
-  const { form, action } = useHookFormAction(upsertTool, resolver, {
-    formProps: {
-      defaultValues: {
-        id: tool?.id ?? "",
-        name: tool?.name ?? "",
-        slug: tool?.slug ?? "",
-        tagline: tool?.tagline ?? "",
-        description: tool?.description ?? "",
-        content: tool?.content ?? "",
-        websiteUrl: tool?.websiteUrl ?? "",
-        affiliateUrl: tool?.affiliateUrl ?? "",
-        faviconUrl: tool?.faviconUrl ?? "",
-        screenshotUrl: tool?.screenshotUrl ?? "",
-        tier: tool?.tier ?? ToolTier.Free,
-        submitterName: tool?.submitterName ?? "",
-        submitterEmail: tool?.submitterEmail ?? "",
-        submitterNote: tool?.submitterNote ?? "",
-        status: tool?.status ?? ToolStatus.Draft,
-        publishedAt: tool?.publishedAt ?? undefined,
-        categories: tool?.categories.map(c => c.id) ?? [],
-        tags: tool?.tags.map(t => t.id) ?? [],
-        notifySubmitter: true,
-      },
+  const form = useForm({
+    resolver: zodResolver(toolSchema),
+    defaultValues: {
+      id: tool?.id ?? "",
+      name: tool?.name ?? "",
+      slug: tool?.slug ?? "",
+      tagline: tool?.tagline ?? "",
+      description: tool?.description ?? "",
+      content: tool?.content ?? "",
+      websiteUrl: tool?.websiteUrl ?? "",
+      affiliateUrl: tool?.affiliateUrl ?? "",
+      faviconUrl: tool?.faviconUrl ?? "",
+      screenshotUrl: tool?.screenshotUrl ?? "",
+      tier: tool?.tier ?? ToolTier.Free,
+      submitterName: tool?.submitterName ?? "",
+      submitterEmail: tool?.submitterEmail ?? "",
+      submitterNote: tool?.submitterNote ?? "",
+      status: tool?.status ?? ToolStatus.Draft,
+      publishedAt: tool?.publishedAt ?? undefined,
+      categories: tool?.categories.map(c => c.id) ?? [],
+      tags: tool?.tags.map(t => t.id) ?? [],
+      notifySubmitter: true,
     },
+  })
 
-    actionProps: {
-      onSuccess: ({ data }) => {
-        if (!data) return
-
+  const mutation = useMutation(
+    orpc.tools.upsert.mutationOptions({
+      onSuccess: data => {
         if (data.status !== originalStatus.current) {
           toast.success(<ToolStatusChange tool={data} />)
           originalStatus.current = data.status
@@ -120,21 +119,21 @@ export function ToolForm({
           toast.success(`Tool successfully ${tool ? "updated" : "created"}`)
         }
 
-        // Redirect to the new tool
+        queryClient.invalidateQueries({ queryKey: orpc.tools.key() })
         router.push(`/admin/tools/${data.id}`)
       },
 
-      onError: ({ error }) => {
-        toast.error(error.serverError)
+      onError: error => {
+        toast.error(error.message)
       },
 
       onSettled: () => {
         setIsStatusPending(false)
       },
-    },
-  })
+    }),
+  )
 
-  useHotkeys([["mod+enter", () => form.handleSubmit(action.execute)()]], [], true)
+  useHotkeys([["mod+enter", () => form.handleSubmit(data => mutation.mutate(data))()]], [], true)
 
   // Set the slug based on the name
   useComputedField({
@@ -165,7 +164,7 @@ export function ToolForm({
       setIsStatusPending(true)
     }
 
-    action.execute(data)
+    mutation.mutate(data)
   })
 
   // Handle status change
@@ -521,7 +520,7 @@ export function ToolForm({
 
           <ToolPublishActions
             tool={tool}
-            isPending={!isStatusPending && action.isPending}
+            isPending={!isStatusPending && mutation.isPending}
             isStatusPending={isStatusPending}
             onStatusSubmit={handleStatusSubmit}
           />

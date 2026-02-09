@@ -2,10 +2,10 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import { PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
 import type { ComponentProps } from "react"
-import { use } from "react"
 import { type Ad, AdType } from "~/.generated/prisma/browser"
 import { AdActions } from "~/app/admin/ads/_components/ad-actions"
 import { AdTableToolbarActions } from "~/app/admin/ads/_components/ad-table-toolbar-actions"
@@ -19,16 +19,13 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findAds } from "~/server/admin/ads/queries"
+import { orpc } from "~/lib/orpc-query"
 import { adTableParamsSchema } from "~/server/admin/ads/schema"
 import type { DataTableFilterField } from "~/types"
-
-type AdTableProps = {
-  adsPromise: ReturnType<typeof findAds>
-}
 
 type AdStatus = "Active" | "Scheduled" | "Expired"
 
@@ -121,9 +118,9 @@ const columns: ColumnDef<Ad>[] = [
   },
 ]
 
-export function AdTable({ adsPromise }: AdTableProps) {
-  const { ads, adsTotal, pageCount } = use(adsPromise)
-  const [{ perPage, sort }] = useQueryStates(adTableParamsSchema)
+export function AdTable() {
+  const [params] = useQueryStates(adTableParamsSchema)
+  const { data, isLoading } = useQuery(orpc.ads.list.queryOptions({ input: params }))
 
   // Search filters
   const filterFields: DataTableFilterField<Ad>[] = [
@@ -143,26 +140,30 @@ export function AdTable({ adsPromise }: AdTableProps) {
   ]
 
   const { table } = useDataTable({
-    data: ads,
+    data: data?.ads ?? [],
     columns,
-    pageCount,
+    pageCount: data?.pageCount ?? 0,
     filterFields,
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnVisibility: { createdAt: false },
       columnPinning: { right: ["actions"] },
     },
     getRowId: originalRow => originalRow.id,
   })
 
+  if (isLoading) {
+    return <DataTableSkeleton title="Ads" />
+  }
+
   return (
     <DataTable table={table}>
       <DataTableHeader
         title="Ads"
-        total={adsTotal}
+        total={data?.adsTotal ?? 0}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/ads/new">

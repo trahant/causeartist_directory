@@ -2,9 +2,9 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import { HashIcon, PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
-import { use } from "react"
 import type { Category } from "~/.generated/prisma/browser"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
 import { CategoryTableToolbarActions } from "~/app/admin/categories/_components/category-table-toolbar-actions"
@@ -18,16 +18,13 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findCategories } from "~/server/admin/categories/queries"
+import { orpc } from "~/lib/orpc-query"
 import { categoryTableParamsSchema } from "~/server/admin/categories/schema"
 import type { DataTableFilterField } from "~/types"
-
-type CategoryTableProps = {
-  categoriesPromise: ReturnType<typeof findCategories>
-}
 
 const columns: ColumnDef<Category & { _count?: { tools: number } }>[] = [
   {
@@ -92,9 +89,9 @@ const columns: ColumnDef<Category & { _count?: { tools: number } }>[] = [
   },
 ]
 
-export function CategoryTable({ categoriesPromise }: CategoryTableProps) {
-  const { categories, categoriesTotal, pageCount } = use(categoriesPromise)
-  const [{ perPage, sort }] = useQueryStates(categoryTableParamsSchema)
+export function CategoryTable() {
+  const [params] = useQueryStates(categoryTableParamsSchema)
+  const { data, isLoading } = useQuery(orpc.categories.list.queryOptions({ input: params }))
 
   // Search filters
   const filterFields: DataTableFilterField<Category>[] = [
@@ -106,25 +103,29 @@ export function CategoryTable({ categoriesPromise }: CategoryTableProps) {
   ]
 
   const { table } = useDataTable({
-    data: categories,
+    data: data?.categories ?? [],
     columns,
-    pageCount,
+    pageCount: data?.pageCount ?? 0,
     filterFields,
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   })
 
+  if (isLoading) {
+    return <DataTableSkeleton title="Categories" />
+  }
+
   return (
     <DataTable table={table}>
       <DataTableHeader
         title="Categories"
-        total={categoriesTotal}
+        total={data?.categoriesTotal ?? 0}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/categories/new">

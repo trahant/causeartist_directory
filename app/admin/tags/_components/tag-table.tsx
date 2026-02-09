@@ -2,9 +2,9 @@
 
 import { formatDate } from "@primoui/utils"
 import type { ColumnDef } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
 import { HashIcon, PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
-import { use } from "react"
 import type { Tag } from "~/.generated/prisma/browser"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
 import { TagTableToolbarActions } from "~/app/admin/tags/_components/tag-table-toolbar-actions"
@@ -18,16 +18,13 @@ import { DataTable } from "~/components/data-table/data-table"
 import { DataTableColumnHeader } from "~/components/data-table/data-table-column-header"
 import { DataTableHeader } from "~/components/data-table/data-table-header"
 import { DataTableLink } from "~/components/data-table/data-table-link"
+import { DataTableSkeleton } from "~/components/data-table/data-table-skeleton"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { DataTableViewOptions } from "~/components/data-table/data-table-view-options"
 import { useDataTable } from "~/hooks/use-data-table"
-import type { findTags } from "~/server/admin/tags/queries"
+import { orpc } from "~/lib/orpc-query"
 import { tagTableParamsSchema } from "~/server/admin/tags/schema"
 import type { DataTableFilterField } from "~/types"
-
-type TagTableProps = {
-  tagsPromise: ReturnType<typeof findTags>
-}
 
 const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
   {
@@ -87,9 +84,9 @@ const columns: ColumnDef<Tag & { _count?: { tools: number } }>[] = [
   },
 ]
 
-export function TagTable({ tagsPromise }: TagTableProps) {
-  const { tags, tagsTotal, pageCount } = use(tagsPromise)
-  const [{ perPage, sort }] = useQueryStates(tagTableParamsSchema)
+export function TagTable() {
+  const [params] = useQueryStates(tagTableParamsSchema)
+  const { data, isLoading } = useQuery(orpc.tags.list.queryOptions({ input: params }))
 
   // Search filters
   const filterFields: DataTableFilterField<Tag>[] = [
@@ -101,25 +98,29 @@ export function TagTable({ tagsPromise }: TagTableProps) {
   ]
 
   const { table } = useDataTable({
-    data: tags,
+    data: data?.tags ?? [],
     columns,
-    pageCount,
+    pageCount: data?.pageCount ?? 0,
     filterFields,
     shallow: false,
     clearOnDefault: true,
     initialState: {
-      pagination: { pageIndex: 0, pageSize: perPage },
-      sorting: sort,
+      pagination: { pageIndex: 0, pageSize: params.perPage },
+      sorting: params.sort,
       columnPinning: { right: ["actions"] },
     },
     getRowId: (originalRow, index) => `${originalRow.id}-${index}`,
   })
 
+  if (isLoading) {
+    return <DataTableSkeleton title="Tags" />
+  }
+
   return (
     <DataTable table={table}>
       <DataTableHeader
         title="Tags"
-        total={tagsTotal}
+        total={data?.tagsTotal ?? 0}
         callToAction={
           <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
             <Link href="/admin/tags/new">
