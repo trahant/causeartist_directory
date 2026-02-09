@@ -62,6 +62,12 @@ export const AIRelationSuggestions = <T extends Relation>({
   })
 
   useEffect(() => {
+    if (!suggestions.length) {
+      requestedPromptRef.current = null
+    }
+  }, [suggestions])
+
+  useEffect(() => {
     // Skip: not enabled or missing required data
     if (!isAIEnabled || !debouncedPrompt || !relations.length) return
 
@@ -75,12 +81,17 @@ export const AIRelationSuggestions = <T extends Relation>({
     requestedPromptRef.current = debouncedPrompt
     const relationNames = relations.map(({ name }) => name).join(", ")
     complete(buildSuggestionPrompt(debouncedPrompt, maxSuggestions, relationNames))
-  }, [debouncedPrompt, isAIEnabled, relations])
+  }, [debouncedPrompt, isAIEnabled, relations, ids, suggestions])
 
   const handleSetIds = useCallback(
     (newIds: string[]) => {
       setIds(newIds)
-      setSuggestions(prev => prev.filter(({ id }) => !newIds.includes(id)))
+
+      if (newIds.length) {
+        setSuggestions(prev => prev.filter(({ id }) => !newIds.includes(id)))
+      } else {
+        setSuggestions([])
+      }
     },
     [setIds],
   )
