@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Tool } from "~/.generated/prisma/browser"
-import { ToolDeleteDialog } from "~/app/admin/tools/_components/tool-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -100,7 +100,13 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ToolDeleteDialog tools={[tool]} onExecute={() => isSinglePage && router.push(indexPath)}>
+      <DeleteDialog
+        ids={[tool.id]}
+        label="tool"
+        mutationOptions={orpc.tools.remove.mutationOptions}
+        queryKey={orpc.tools.key()}
+        onExecute={() => isSinglePage && router.push(indexPath)}
+      >
         <Button
           aria-label="Delete"
           variant="secondary"
@@ -109,7 +115,7 @@ export const ToolActions = ({ className, tool, ...props }: ToolActionsProps) => 
           className="text-red-500"
           {...props}
         />
-      </ToolDeleteDialog>
+      </DeleteDialog>
     </ButtonGroup>
   )
 }

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { User } from "~/.generated/prisma/browser"
-import { UserDeleteDialog } from "~/app/admin/users/_components/user-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -154,7 +154,13 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
       </DropdownMenu>
 
       {user.role !== "admin" && (
-        <UserDeleteDialog users={[user]} onExecute={() => isSinglePage && router.push(indexPath)}>
+        <DeleteDialog
+          ids={[user.id]}
+          label="user"
+          mutationOptions={orpc.users.remove.mutationOptions}
+          queryKey={orpc.users.key()}
+          onExecute={() => isSinglePage && router.push(indexPath)}
+        >
           <Button
             aria-label="Delete"
             variant="secondary"
@@ -163,7 +169,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
             className="text-red-500"
             {...props}
           />
-        </UserDeleteDialog>
+        </DeleteDialog>
       )}
     </ButtonGroup>
   )

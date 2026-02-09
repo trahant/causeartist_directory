@@ -1,9 +1,11 @@
 "use client"
 
 import { getHotkeyHandler } from "@mantine/hooks"
-import { type HookCallbacks, type HookSafeActionFn, useAction } from "next-safe-action/hooks"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import plur from "plur"
-import { type ComponentProps, useMemo } from "react"
+import type { PropsWithChildren } from "react"
+import { useMemo } from "react"
+import { toast } from "sonner"
 import { Button } from "~/components/common/button"
 import {
   Dialog,
@@ -16,32 +18,49 @@ import {
   DialogTrigger,
 } from "~/components/common/dialog"
 import { Kbd } from "~/components/common/kbd"
-import type { idsSchema } from "~/server/admin/shared/schema"
 
-type DeleteDialogProps<ServerError, CVE, Data> = ComponentProps<typeof Dialog> & {
+type DeleteDialogProps = PropsWithChildren<{
   ids: string[]
   label: string
-  action: HookSafeActionFn<ServerError, typeof idsSchema, CVE, Data>
-  callbacks?: HookCallbacks<ServerError, typeof idsSchema, CVE, Data>
-}
+  mutationOptions: (opts: {
+    onSuccess: () => void
+    onError: (error: Error) => void
+  }) => any
+  queryKey: unknown[]
+  onExecute?: () => void
+}>
 
-export const DeleteDialog = <ServerError, CVE, Data>({
+export const DeleteDialog = ({
   children,
   ids,
   label,
-  action,
-  callbacks,
+  mutationOptions,
+  queryKey,
+  onExecute,
   ...props
-}: DeleteDialogProps<ServerError, CVE, Data>) => {
-  const { execute, isPending } = useAction(action, callbacks)
+}: DeleteDialogProps) => {
+  const queryClient = useQueryClient()
   const pluralizedLabel = useMemo(() => plur(label, ids.length), [label, ids])
+
+  const deleteMutation = useMutation<unknown, Error, { ids: string[] }>(
+    mutationOptions({
+      onSuccess: () => {
+        toast.success(`${label.charAt(0).toUpperCase() + label.slice(1)}(s) deleted successfully`)
+        queryClient.invalidateQueries({ queryKey })
+        onExecute?.()
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
   const handleKeyDown = getHotkeyHandler([
     [
       "mod+Enter",
       e => {
         e.stopPropagation()
-        execute({ ids })
+        deleteMutation.mutate({ ids })
       },
     ],
   ])
@@ -74,9 +93,9 @@ export const DeleteDialog = <ServerError, CVE, Data>({
             size="md"
             variant="destructive"
             className="min-w-28"
-            onClick={() => execute({ ids })}
+            onClick={() => deleteMutation.mutate({ ids })}
             suffix={<Kbd variant="outline" keys={["meta", "enter"]} />}
-            isPending={isPending}
+            isPending={deleteMutation.isPending}
           >
             Delete {pluralizedLabel}
           </Button>

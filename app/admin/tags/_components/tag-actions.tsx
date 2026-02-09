@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Tag } from "~/.generated/prisma/browser"
-import { TagDeleteDialog } from "~/app/admin/tags/_components/tag-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -89,7 +89,13 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <TagDeleteDialog tags={[tag]} onExecute={() => isSinglePage && router.push(indexPath)}>
+      <DeleteDialog
+        ids={[tag.id]}
+        label="tag"
+        mutationOptions={orpc.tags.remove.mutationOptions}
+        queryKey={orpc.tags.key()}
+        onExecute={() => isSinglePage && router.push(indexPath)}
+      >
         <Button
           aria-label="Delete"
           variant="secondary"
@@ -98,7 +104,7 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
           className="text-red-500"
           {...props}
         />
-      </TagDeleteDialog>
+      </DeleteDialog>
     </ButtonGroup>
   )
 }

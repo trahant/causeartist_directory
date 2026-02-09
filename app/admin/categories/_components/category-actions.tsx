@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import type { Category } from "~/.generated/prisma/browser"
-import { CategoryDeleteDialog } from "~/app/admin/categories/_components/category-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -89,8 +89,11 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CategoryDeleteDialog
-        categories={[category]}
+      <DeleteDialog
+        ids={[category.id]}
+        label="category"
+        mutationOptions={orpc.categories.remove.mutationOptions}
+        queryKey={orpc.categories.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button
@@ -101,7 +104,7 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
           className="text-red-500"
           {...props}
         />
-      </CategoryDeleteDialog>
+      </DeleteDialog>
     </ButtonGroup>
   )
 }

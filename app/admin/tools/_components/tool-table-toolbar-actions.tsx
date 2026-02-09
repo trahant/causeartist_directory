@@ -3,8 +3,9 @@
 import type { Table } from "@tanstack/react-table"
 import { TrashIcon } from "lucide-react"
 import type { Tool } from "~/.generated/prisma/browser"
-import { ToolDeleteDialog } from "~/app/admin/tools/_components/tool-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
+import { orpc } from "~/lib/orpc-query"
 
 interface ToolTableToolbarActionsProps {
   table: Table<Tool>
@@ -18,10 +19,15 @@ export function ToolTableToolbarActions({ table }: ToolTableToolbarActionsProps)
   }
 
   return (
-    <ToolDeleteDialog tools={rows.map(row => row.original)}>
+    <DeleteDialog
+      ids={rows.map(row => row.original.id)}
+      label="tool"
+      mutationOptions={orpc.tools.remove.mutationOptions}
+      queryKey={orpc.tools.key()}
+    >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})
       </Button>
-    </ToolDeleteDialog>
+    </DeleteDialog>
   )
 }

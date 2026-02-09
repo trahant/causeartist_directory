@@ -3,8 +3,9 @@
 import type { Table } from "@tanstack/react-table"
 import { TrashIcon } from "lucide-react"
 import type { Ad } from "~/.generated/prisma/browser"
-import { AdDeleteDialog } from "~/app/admin/ads/_components/ad-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
+import { orpc } from "~/lib/orpc-query"
 
 interface AdTableToolbarActionsProps {
   table: Table<Ad>
@@ -18,10 +19,15 @@ export function AdTableToolbarActions({ table }: AdTableToolbarActionsProps) {
   }
 
   return (
-    <AdDeleteDialog ads={rows.map(row => row.original)}>
+    <DeleteDialog
+      ids={rows.map(row => row.original.id)}
+      label="ad"
+      mutationOptions={orpc.ads.remove.mutationOptions}
+      queryKey={orpc.ads.key()}
+    >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})
       </Button>
-    </AdDeleteDialog>
+    </DeleteDialog>
   )
 }

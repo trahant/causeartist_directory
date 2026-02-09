@@ -4,7 +4,7 @@ import { EllipsisIcon, TrashIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import type { Report } from "~/.generated/prisma/browser"
-import { ReportDeleteDialog } from "~/app/admin/reports/_components/report-delete-dialog"
+import { DeleteDialog } from "~/components/admin/dialogs/delete-dialog"
 import { Button } from "~/components/common/button"
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import {
 } from "~/components/common/dropdown-menu"
 import { Link } from "~/components/common/link"
 import { ButtonGroup } from "~/components/common/button-group"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 
 type ReportActionsProps = ComponentProps<typeof Button> & {
@@ -51,8 +52,11 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ReportDeleteDialog
-        reports={[report]}
+      <DeleteDialog
+        ids={[report.id]}
+        label="report"
+        mutationOptions={orpc.reports.remove.mutationOptions}
+        queryKey={orpc.reports.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button
@@ -63,7 +67,7 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
           className="text-red-500"
           {...props}
         />
-      </ReportDeleteDialog>
+      </DeleteDialog>
     </ButtonGroup>
   )
 }
