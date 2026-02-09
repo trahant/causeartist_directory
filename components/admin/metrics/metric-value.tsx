@@ -1,7 +1,7 @@
 "use client"
 
 import { formatDistanceToNow } from "date-fns"
-import { type ComponentProps, use } from "react"
+import type { ComponentProps } from "react"
 import { MetricHeader, MetricHeaderSkeleton } from "~/components/admin/metrics/metric-header"
 import { Card } from "~/components/common/card"
 import { Link } from "~/components/common/link"
@@ -19,23 +19,20 @@ type MetricItem = {
 type MetricValueProps = ComponentProps<typeof Card> & {
   label: string
   href: string
-  query: Promise<number>
-  items?: Promise<MetricItem[]>
+  count: number
+  items?: MetricItem[]
 }
 
-const MetricValue = ({ label, href, query, items, ...props }: MetricValueProps) => {
-  const count = use(query)
-  const recentItems = items ? use(items) : undefined
-
+const MetricValue = ({ label, href, count, items, ...props }: MetricValueProps) => {
   return (
     <Card hover={false} {...props}>
       <Link href={href}>
         <MetricHeader title={label} value={count.toLocaleString()} />
       </Link>
 
-      {recentItems && recentItems.length > 0 && (
+      {items && items.length > 0 && (
         <Stack size="sm" direction="column" className="items-stretch w-full">
-          {recentItems.map(item => (
+          {items.map(item => (
             <Tile key={item.id} asChild>
               <Link href={item.href}>
                 <TileTitle className="text-sm">{item.name}</TileTitle>
@@ -60,7 +57,7 @@ const MetricValueSkeleton = () => {
 
       <div className="flex flex-col gap-1 w-full">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="w-full h-8" />
+          <Skeleton key={i} className="w-full h-5" />
         ))}
       </div>
     </Card>

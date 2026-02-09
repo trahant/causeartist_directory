@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation"
 import { BookmarkTable } from "~/app/(web)/dashboard/bookmarks/table"
 import { getServerSession } from "~/lib/auth"
-import { findTools } from "~/server/admin/tools/queries"
-import { toolListCache } from "~/server/admin/tools/schema"
+import { findTools } from "~/server/shared/tools/queries"
+import { toolListCache } from "~/server/shared/tools/schema"
 
 export const BookmarkListing = async ({ searchParams }: PageProps<"/dashboard/bookmarks">) => {
   const params = toolListCache.parse(await searchParams)

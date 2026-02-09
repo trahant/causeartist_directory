@@ -9,28 +9,18 @@ const list = adminProcedure.input(reportListSchema).handler(async ({ input }) =>
 
 const update = adminProcedure
   .input(reportSchema)
-  .handler(async ({ input: { id, ...data }, context: { db, revalidate } }) => {
-    const report = await db.report.update({
+  .handler(async ({ input: { id, ...data }, context: { db } }) => {
+    return db.report.update({
       where: { id },
       data,
     })
-
-    revalidate({
-      paths: ["/admin/reports"],
-    })
-
-    return report
   })
 
 const remove = adminProcedure
   .input(idsSchema)
-  .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
+  .handler(async ({ input: { ids }, context: { db } }) => {
     await db.report.deleteMany({
       where: { id: { in: ids } },
-    })
-
-    revalidate({
-      paths: ["/admin/reports"],
     })
 
     return true

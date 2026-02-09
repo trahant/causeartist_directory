@@ -35,7 +35,6 @@ const upsert = adminProcedure
         })
 
     revalidate({
-      paths: ["/admin/tags"],
       tags: ["tags", `tag-${tag.slug}`],
     })
 
@@ -63,7 +62,6 @@ const duplicate = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/tags"],
       tags: ["tags"],
     })
 
@@ -78,7 +76,6 @@ const remove = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/tags"],
       tags: ["tags"],
     })
 

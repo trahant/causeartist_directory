@@ -1,6 +1,6 @@
 import {
-  createSearchParamsCache,
   createStandardSchemaV1,
+  type inferParserType,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -20,8 +20,7 @@ export const categoryListParams = {
 }
 
 export const categoryListSchema = createStandardSchemaV1(categoryListParams)
-export const categoryListCache = createSearchParamsCache(categoryListParams)
-export type CategoryListParams = Awaited<ReturnType<typeof categoryListCache.parse>>
+export type CategoryListParams = inferParserType<typeof categoryListParams>
 
 export const categorySchema = z.object({
   id: z.string().optional(),

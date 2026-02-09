@@ -16,8 +16,8 @@ import { DataTableColumnHeader } from "~/components/data-table/data-table-column
 import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { useDataTable } from "~/hooks/use-data-table"
-import { findTools } from "~/server/admin/tools/queries"
-import { toolListParams } from "~/server/admin/tools/schema"
+import type { findTools } from "~/server/shared/tools/queries"
+import { toolListParams } from "~/server/shared/tools/schema"
 import { removeBookmark } from "~/server/web/actions/bookmark"
 import type { DataTableFilterField } from "~/types"
 

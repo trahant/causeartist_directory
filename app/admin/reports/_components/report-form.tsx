@@ -38,10 +38,10 @@ export function ReportForm({ className, title, report, ...props }: ReportFormPro
   const form = useForm({
     resolver: zodResolver(reportSchema),
     defaultValues: {
-      id: report?.id ?? "",
-      email: report?.email ?? "",
-      type: report?.type,
-      message: report?.message ?? "",
+      id: report.id,
+      email: report.email,
+      type: report.type,
+      message: report.message ?? "",
     },
   })
 

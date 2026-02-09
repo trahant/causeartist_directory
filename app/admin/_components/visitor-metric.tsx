@@ -1,43 +1,31 @@
-import { cacheLife, cacheTag } from "next/cache"
-import type { ComponentProps } from "react"
-import { MetricChart } from "~/components/admin/metrics/metric-chart"
-import type { Card } from "~/components/common/card"
-import { getPlausibleVisitors } from "~/lib/analytics"
-import { calculateMetricStats, fillMissingDates, getMetricDateRange } from "~/lib/metrics"
+"use client"
 
-const getVisitors = async () => {
-  "use cache"
+import { useQuery } from "@tanstack/react-query"
+import { MetricChart, MetricChartSkeleton } from "~/components/admin/metrics/metric-chart"
+import { orpc } from "~/lib/orpc-query"
 
-  cacheTag("analytics")
-  cacheLife("hours")
+const staleTime = 60 * 60 * 1000 // 1 hour
 
-  const { today, startDate, dateRange } = getMetricDateRange()
-  const visitors = await getPlausibleVisitors(dateRange)
-  const results = fillMissingDates(visitors, startDate, today)
-  const { total, average } = calculateMetricStats(results)
+export function VisitorMetric() {
+  const { data } = useQuery(orpc.metrics.visitors.queryOptions({ staleTime }))
 
-  return { results, totalVisitors: total, averageVisitors: average }
-}
-
-const VisitorMetric = async ({ ...props }: ComponentProps<typeof Card>) => {
-  const { results, totalVisitors, averageVisitors } = await getVisitors()
+  if (!data) {
+    return <MetricChartSkeleton />
+  }
 
   return (
     <MetricChart
       header={{
         title: "Visitors",
-        value: totalVisitors.toLocaleString(),
+        value: data.totalVisitors.toLocaleString(),
         note: "last 30 days",
       }}
       chart={{
-        data: results,
+        data: data.results,
         dataLabel: "Visitor",
-        average: averageVisitors,
+        average: data.averageVisitors,
         cellClassName: "bg-chart-4",
       }}
-      {...props}
     />
   )
 }
-
-export { VisitorMetric }

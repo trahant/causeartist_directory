@@ -1,6 +1,6 @@
 import {
-  createSearchParamsCache,
   createStandardSchemaV1,
+  type inferParserType,
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
@@ -22,8 +22,7 @@ export const adListParams = {
 }
 
 export const adListSchema = createStandardSchemaV1(adListParams)
-export const adListCache = createSearchParamsCache(adListParams)
-export type AdListParams = Awaited<ReturnType<typeof adListCache.parse>>
+export type AdListParams = inferParserType<typeof adListParams>
 
 export const adSchema = z
   .object({

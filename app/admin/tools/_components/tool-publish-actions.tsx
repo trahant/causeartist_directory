@@ -19,11 +19,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/common/pop
 import { RadioGroup, RadioGroupItem } from "~/components/common/radio-group"
 import { Stack } from "~/components/common/stack"
 import { cx } from "~/lib/utils"
-import type { findToolById } from "~/server/admin/tools/queries"
 import type { ToolSchema } from "~/server/admin/tools/schema"
 
 type ToolPublishActionsProps = ComponentProps<typeof Stack> & {
-  tool?: NonNullable<Awaited<ReturnType<typeof findToolById>>>
+  tool?: { status: ToolStatus }
   isPending: boolean
   isStatusPending: boolean
   onStatusSubmit: (status: ToolStatus, publishedAt: Date | null) => void

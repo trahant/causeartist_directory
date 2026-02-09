@@ -22,8 +22,9 @@ import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findTagById } from "~/server/admin/tags/queries"
 import { tagSchema } from "~/server/admin/tags/schema"
+
 type TagFormProps = ComponentProps<"form"> & {
-  tag?: Awaited<ReturnType<typeof findTagById>>
+  tag?: NonNullable<Awaited<ReturnType<typeof findTagById>>>
 }
 
 export function TagForm({ className, title, tag, ...props }: TagFormProps) {

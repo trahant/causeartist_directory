@@ -22,7 +22,6 @@ const upsert = adminProcedure
         })
 
     revalidate({
-      paths: ["/admin/ads"],
       tags: ["ads"],
     })
 
@@ -56,7 +55,6 @@ const duplicate = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/ads"],
       tags: ["ads"],
     })
 
@@ -71,7 +69,6 @@ const remove = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/ads"],
       tags: ["ads"],
     })
 

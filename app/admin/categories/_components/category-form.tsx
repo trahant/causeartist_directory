@@ -25,8 +25,9 @@ import { cx } from "~/lib/utils"
 import type { findCategoryById } from "~/server/admin/categories/queries"
 import { categorySchema } from "~/server/admin/categories/schema"
 import { descriptionSchema } from "~/server/admin/shared/schema"
+
 type CategoryFormProps = ComponentProps<"form"> & {
-  category?: Awaited<ReturnType<typeof findCategoryById>>
+  category?: NonNullable<Awaited<ReturnType<typeof findCategoryById>>>
 }
 
 export function CategoryForm({ className, title, category, ...props }: CategoryFormProps) {

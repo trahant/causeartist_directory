@@ -1,55 +1,31 @@
-import { format } from "date-fns"
-import { cacheLife, cacheTag } from "next/cache"
-import type { ComponentProps } from "react"
-import { MetricChart } from "~/components/admin/metrics/metric-chart"
-import type { Card } from "~/components/common/card"
-import { calculateMetricStats, fillMissingDates, getMetricDateRange } from "~/lib/metrics"
-import { db } from "~/services/db"
+"use client"
 
-const getUsers = async () => {
-  "use cache"
+import { useQuery } from "@tanstack/react-query"
+import { MetricChart, MetricChartSkeleton } from "~/components/admin/metrics/metric-chart"
+import { orpc } from "~/lib/orpc-query"
 
-  cacheTag("users")
-  cacheLife("hours")
+const staleTime = 60 * 60 * 1000 // 1 hour
 
-  const { today, startDate } = getMetricDateRange()
+export function UserMetric() {
+  const { data } = useQuery(orpc.metrics.userMetric.queryOptions({ staleTime }))
 
-  const users = await db.user.findMany({
-    where: { createdAt: { gte: startDate } },
-  })
-
-  // Group users by date
-  const usersByDate = users.reduce<Record<string, number>>((acc, user) => {
-    const date = format(user.createdAt, "yyyy-MM-dd")
-    acc[date] = (acc[date] || 0) + 1
-    return acc
-  }, {})
-
-  const results = fillMissingDates(usersByDate, startDate, today)
-  const { total, average } = calculateMetricStats(results)
-
-  return { results, totalUsers: total, averageUsers: average }
-}
-
-const UserMetric = async ({ ...props }: ComponentProps<typeof Card>) => {
-  const { results, totalUsers, averageUsers } = await getUsers()
+  if (!data) {
+    return <MetricChartSkeleton />
+  }
 
   return (
     <MetricChart
       header={{
         title: "Users",
-        value: totalUsers.toLocaleString(),
+        value: data.totalUsers.toLocaleString(),
         note: "last 30 days",
       }}
       chart={{
-        data: results,
+        data: data.results,
         dataLabel: "User",
-        average: averageUsers,
+        average: data.averageUsers,
         cellClassName: "bg-chart-1",
       }}
-      {...props}
     />
   )
 }
-
-export { UserMetric }

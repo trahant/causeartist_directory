@@ -35,7 +35,6 @@ const upsert = adminProcedure
         })
 
     revalidate({
-      paths: ["/admin/categories"],
       tags: ["categories", `category-${category.slug}`],
     })
 
@@ -65,7 +64,6 @@ const duplicate = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/categories"],
       tags: ["categories"],
     })
 
@@ -80,7 +78,6 @@ const remove = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/categories"],
       tags: ["categories"],
     })
 

@@ -58,7 +58,6 @@ const upsert = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/tools"],
       tags: ["tools", `tool-${tool.slug}`, "schedule"],
     })
 
@@ -97,7 +96,6 @@ const duplicate = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/tools"],
       tags: ["tools"],
     })
 
@@ -121,7 +119,6 @@ const remove = adminProcedure
     })
 
     revalidate({
-      paths: ["/admin/tools"],
       tags: ["tools"],
     })
 

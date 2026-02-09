@@ -1,6 +1,6 @@
 import {
-  createSearchParamsCache,
   createStandardSchemaV1,
+  type inferParserType,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -20,8 +20,7 @@ export const tagListParams = {
 }
 
 export const tagListSchema = createStandardSchemaV1(tagListParams)
-export const tagListCache = createSearchParamsCache(tagListParams)
-export type TagListParams = Awaited<ReturnType<typeof tagListCache.parse>>
+export type TagListParams = inferParserType<typeof tagListParams>
 
 export const tagSchema = z.object({
   id: z.string().optional(),

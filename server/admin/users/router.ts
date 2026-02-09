@@ -9,51 +9,33 @@ const list = adminProcedure.input(userListSchema).handler(async ({ input }) => {
   return findUsers(input)
 })
 
-const update = adminProcedure
-  .input(userSchema)
-  .handler(async ({ input, context: { db, revalidate } }) => {
-    const { id, ...data } = input
+const update = adminProcedure.input(userSchema).handler(async ({ input, context: { db } }) => {
+  const { id, ...data } = input
 
-    const user = await db.user.update({
-      where: { id },
-      data,
-    })
-
-    revalidate({
-      paths: ["/admin/users"],
-    })
-
-    return user
+  return db.user.update({
+    where: { id },
+    data,
   })
+})
 
 const updateRole = adminProcedure
   .input(userSchema.pick({ id: true, role: true }))
-  .handler(async ({ input: { id, role }, context: { db, revalidate } }) => {
-    const user = await db.user.update({
+  .handler(async ({ input: { id, role }, context: { db } }) => {
+    return db.user.update({
       where: { id },
       data: { role },
     })
-
-    revalidate({
-      paths: ["/admin/users"],
-    })
-
-    return user
   })
 
 const remove = adminProcedure
   .input(idsSchema)
-  .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
+  .handler(async ({ input: { ids }, context: { db } }) => {
     await db.user.deleteMany({
       where: { id: { in: ids }, role: { not: "admin" } },
     })
 
     after(async () => {
       await removeS3Directories(ids.map(id => `users/${id}`))
-    })
-
-    revalidate({
-      paths: ["/admin/users"],
     })
 
     return true
