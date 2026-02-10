@@ -22,7 +22,7 @@ import { cx } from "~/lib/utils"
 import type { ToolSchema } from "~/server/admin/tools/schema"
 
 type ToolPublishActionsProps = ComponentProps<typeof Stack> & {
-  tool?: { status: ToolStatus }
+  toolStatus: ToolStatus
   isPending: boolean
   isStatusPending: boolean
   onStatusSubmit: (status: ToolStatus, publishedAt: Date | null) => void
@@ -44,7 +44,7 @@ type ActionConfig = Omit<ButtonProps, "popover"> & {
 }
 
 export const ToolPublishActions = ({
-  tool,
+  toolStatus,
   isPending,
   isStatusPending,
   onStatusSubmit,
@@ -243,7 +243,7 @@ export const ToolPublishActions = ({
     <Stack size="sm" {...props}>
       {children}
 
-      {toolActions[tool?.status ?? ToolStatus.Draft].map(({ popover, ...action }) => {
+      {toolActions[toolStatus].map(({ popover, ...action }) => {
         if (popover) {
           const opts = popover.options
           const currentOption = opts.find(o => o.status === currentStatus) || opts[0]

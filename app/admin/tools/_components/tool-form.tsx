@@ -508,7 +508,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
           </Button>
 
           <ToolPublishActions
-            tool={tool}
+            toolStatus={tool?.status ?? ToolStatus.Draft}
             isPending={!isStatusPending && mutation.isPending}
             isStatusPending={isStatusPending}
             onStatusSubmit={handleStatusSubmit}
