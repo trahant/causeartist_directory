@@ -11,7 +11,7 @@ import { Intro, IntroTitle } from "~/components/web/ui/intro"
 import { siteConfig } from "~/config/site"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
-import { findTag, findTagSlugs } from "~/server/web/tags/queries"
+import { findTag } from "~/server/web/tags/queries"
 
 type Props = PageProps<"/tags/[slug]">
 
@@ -43,11 +43,6 @@ const getData = cache(async ({ params }: Props) => {
 
   return { tag, ...data }
 })
-
-export const generateStaticParams = async () => {
-  const tags = await findTagSlugs({})
-  return tags.map(({ slug }) => ({ slug }))
-}
 
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const { url, metadata } = await getData(props)

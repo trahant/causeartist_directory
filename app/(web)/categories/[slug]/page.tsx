@@ -12,7 +12,7 @@ import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { siteConfig } from "~/config/site"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
-import { findCategory, findCategorySlugs } from "~/server/web/categories/queries"
+import { findCategory } from "~/server/web/categories/queries"
 
 type Props = PageProps<"/categories/[slug]">
 
@@ -44,11 +44,6 @@ const getData = cache(async ({ params }: Props) => {
 
   return { category, ...data }
 })
-
-export const generateStaticParams = async () => {
-  const categories = await findCategorySlugs({})
-  return categories.map(({ slug }) => ({ slug }))
-}
 
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const { url, metadata } = await getData(props)
