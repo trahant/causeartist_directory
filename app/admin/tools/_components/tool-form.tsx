@@ -335,7 +335,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
                   )}
                 />
               ) : (
-                <TextArea id={field.name} className="min-h-18" {...field} />
+                <TextArea id={field.name} className="min-h-48" {...field} />
               )}
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

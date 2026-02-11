@@ -12,7 +12,7 @@ export const TextArea = ({ className, size, ...props }: TextAreaProps) => {
       <textarea
         className={cx(
           inputVariants({ size, className }),
-          "leading-normal! resize-none field-sizing-content",
+          "leading-normal! resize-y field-sizing-content",
         )}
         {...props}
       />

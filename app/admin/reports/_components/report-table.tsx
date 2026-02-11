@@ -56,12 +56,13 @@ const columns: ColumnDef<Report>[] = [
     accessorKey: "id",
     enableSorting: false,
     enableHiding: false,
-    size: 80,
+    size: 100,
     header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
     cell: ({ row }) => (
       <DataTableLink
         href={`/admin/reports/${row.original.id}`}
         title={`#${row.original.id.slice(-6).toUpperCase()}`}
+        className="font-mono"
       />
     ),
   },

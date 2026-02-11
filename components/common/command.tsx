@@ -98,7 +98,7 @@ const CommandItem = ({ className, ...props }: ComponentProps<typeof CommandPrimi
   return (
     <CommandPrimitive.Item
       className={cx(
-        "relative flex items-center gap-2 rounded-sm px-2 py-1.5 scroll-m-2 text-sm select-none cursor-pointer transition-colors outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
+        "relative flex items-center gap-2 rounded-sm px-2 py-1.5 scroll-m-2 text-sm select-none cursor-pointer outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled='true']:pointer-events-none data-[disabled='true']:opacity-50",
         className,
       )}
       {...props}
