@@ -24,6 +24,7 @@ export function GET() {
     headers: {
       "Content-Type": "application/xml",
       "Content-Length": Buffer.byteLength(sitemapIndexXML).toString(),
+      "Cache-Control": "public, max-age=86400",
     },
   })
 }

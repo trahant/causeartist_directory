@@ -26,6 +26,9 @@ const nextConfig: NextConfig = {
       "@content-collections/core",
       "@content-collections/mdx",
       "@content-collections/next",
+      "lucide-react",
+      "date-fns",
+      "motion",
     ],
   },
 

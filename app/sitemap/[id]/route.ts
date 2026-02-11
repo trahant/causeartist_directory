@@ -121,6 +121,7 @@ export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">)
     headers: {
       "Content-Type": "application/xml",
       "Content-Length": Buffer.byteLength(xml).toString(),
+      "Cache-Control": "public, max-age=86400",
     },
   })
 }

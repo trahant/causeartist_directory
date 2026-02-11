@@ -108,10 +108,10 @@ export const Calendar = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <Card hover={false} className={cx("gap-2", className)} {...props}>
       <MetricHeader
-        title="Schedule Calendar"
+        title="Calendar"
         value={format(currentMonth, "MMM yyyy")}
         note={
-          <ButtonGroup>
+          <ButtonGroup className="-my-1.5">
             {!isCurrentMonth && (
               <Button
                 variant="secondary"
