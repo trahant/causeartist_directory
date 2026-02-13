@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse, type ProxyConfig } from "next/server"
 import { auth } from "~/lib/auth"
 
 export const config: ProxyConfig = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/auth/:path*", "/submit/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/auth/:path*", "/submit"],
 }
 
 export default async function (req: NextRequest) {
