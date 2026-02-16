@@ -40,7 +40,7 @@ enum ReportType {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid(2))
   name          String
   email         String    @unique
   emailVerified Boolean   @default(false)
@@ -63,7 +63,7 @@ model User {
 }
 
 model Session {
-  id             String   @id @default(cuid())
+  id             String   @id @default(cuid(2))
   token          String   @unique
   expiresAt      DateTime
   ipAddress      String?
@@ -81,7 +81,7 @@ model Session {
 }
 
 model Account {
-  id                    String    @id @default(cuid())
+  id                    String    @id @default(cuid(2))
   accountId             String
   providerId            String
   accessToken           String?
@@ -103,7 +103,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id @default(cuid())
+  id         String   @id @default(cuid(2))
   identifier String
   value      String
   expiresAt  DateTime
@@ -112,7 +112,7 @@ model Verification {
 }
 
 model Ad {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid(2))
   email       String
   name        String
   description String?
@@ -129,7 +129,7 @@ model Ad {
 }
 
 model Tool {
-  id             String     @id @default(cuid())
+  id             String     @id @default(cuid(2))
   name           String     @db.Citext
   slug           String     @unique
   websiteUrl     String
@@ -166,7 +166,7 @@ model Tool {
 }
 
 model Category {
-  id          String   @id @default(cuid())
+  id          String   @id @default(cuid(2))
   name        String   @db.Citext
   slug        String   @unique
   label       String?
@@ -182,7 +182,7 @@ model Category {
 }
 
 model Tag {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid(2))
   name      String   @db.Citext
   slug      String   @unique
   updatedAt DateTime @updatedAt
@@ -196,7 +196,7 @@ model Tag {
 }
 
 model Report {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid(2))
   type      ReportType @default(Other)
   message   String?
   email     String   @default("")
@@ -212,7 +212,7 @@ model Report {
 }
 
 model Bookmark {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid(2))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

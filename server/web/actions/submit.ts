@@ -1,14 +1,14 @@
 "use server"
 
-import { checkUrlAvailability, getDomain, tryCatch } from "@primoui/utils"
+import { getDomain, tryCatch } from "@primoui/utils"
 import { getTranslations } from "next-intl/server"
 import { after } from "next/server"
 import { ToolStatus } from "~/.generated/prisma/client"
-import { siteConfig } from "~/config/site"
 import { isDev } from "~/env"
 import { notifySubmitterOfToolSubmitted } from "~/lib/notifications"
 import { isRateLimited } from "~/lib/rate-limiter"
 import { userActionClient } from "~/lib/safe-actions"
+import { generateUniqueSlug } from "~/lib/slugs"
 import { createSubmitToolSchema } from "~/server/web/shared/schema"
 import { db } from "~/services/db"
 import { createResendContact } from "~/services/resend"
@@ -26,16 +26,10 @@ export const submitTool = userActionClient
   .action(async ({ parsedInput: { newsletterOptIn, ...data }, ctx: { user } }) => {
     const t = await getTranslations("forms.submit")
     const domain = getDomain(data.websiteUrl)
-    const userAgent = `Mozilla/5.0 (compatible; ${siteConfig.name}/1.0; +${siteConfig.url})`
 
     // Rate limiting check
     if (user.role !== "admin" && (await isRateLimited("submission"))) {
       throw new Error(t("errors.rate_limited"))
-    }
-
-    // Check if the website URL is accessible
-    if (!(await checkUrlAvailability(data.websiteUrl, { userAgent }))) {
-      throw new Error(t("errors.url_not_accessible"))
     }
 
     if (newsletterOptIn) {
@@ -70,6 +64,11 @@ export const submitTool = userActionClient
       return existingTool
     }
 
+    // Generate a unique slug for the new tool
+    const slug = await generateUniqueSlug(data.name, slug =>
+      db.tool.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+    )
+
     // Save the tool to the database with Pending status for user submissions
     const { data: tool, error } = await tryCatch(
       db.tool.create({
@@ -77,7 +76,7 @@ export const submitTool = userActionClient
           ...data,
           submitterEmail: user.email,
           submitterName: user.name,
-          slug: "",
+          slug,
           status: ToolStatus.Pending,
           owner,
         },

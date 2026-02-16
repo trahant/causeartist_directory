@@ -1,4 +1,5 @@
 import { adminProcedure } from "~/lib/orpc"
+import { generateUniqueSlug } from "~/lib/slugs"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 import { findTagList, findTags } from "~/server/admin/tags/queries"
 import { tagListSchema, tagSchema } from "~/server/admin/tags/schema"
@@ -16,23 +17,28 @@ const upsert = adminProcedure
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, tools, ...data } = input
     const toolIds = tools?.map(id => ({ id }))
+    const existing = await db.tag.findUnique({ where: { id }, select: { slug: true } })
 
-    const tag = id
-      ? await db.tag.update({
-          where: { id },
-          data: {
-            ...data,
-            slug: data.slug || "",
-            tools: { set: toolIds },
-          },
-        })
-      : await db.tag.create({
-          data: {
-            ...data,
-            slug: data.slug || "",
-            tools: { connect: toolIds },
-          },
-        })
+    const slug = await generateUniqueSlug(
+      data.slug || data.name,
+      slug => db.tag.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+      existing?.slug,
+    )
+
+    const tag = await db.tag.upsert({
+      where: { id },
+      create: {
+        id,
+        ...data,
+        slug,
+        tools: { connect: toolIds },
+      },
+      update: {
+        ...data,
+        slug,
+        tools: { set: toolIds },
+      },
+    })
 
     revalidate({
       tags: ["tags", `tag-${tag.slug}`],
@@ -53,10 +59,16 @@ const duplicate = adminProcedure
       throw new Error("Tag not found")
     }
 
+    const name = `${tag.name} (Copy)`
+
+    const slug = await generateUniqueSlug(name, slug =>
+      db.tag.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+    )
+
     const newTag = await db.tag.create({
       data: {
-        name: `${tag.name} (Copy)`,
-        slug: "",
+        name,
+        slug,
         tools: { connect: tag.tools },
       },
     })

@@ -30,7 +30,7 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
 
   const form = useForm({
     resolver: zodResolver(userSchema),
-    defaultValues: {
+    values: {
       id: user.id,
       name: user.name,
       email: user.email,

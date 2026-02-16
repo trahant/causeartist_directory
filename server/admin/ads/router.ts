@@ -1,3 +1,5 @@
+import { after } from "next/server"
+import { removeS3Directories } from "~/lib/media"
 import { adminProcedure } from "~/lib/orpc"
 import { findAds } from "~/server/admin/ads/queries"
 import { adListSchema, adSchema } from "~/server/admin/ads/schema"
@@ -12,14 +14,11 @@ const upsert = adminProcedure
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, ...data } = input
 
-    const ad = id
-      ? await db.ad.update({
-          where: { id },
-          data,
-        })
-      : await db.ad.create({
-          data,
-        })
+    const ad = await db.ad.upsert({
+      where: { id },
+      create: { id, ...data },
+      update: data,
+    })
 
     revalidate({
       tags: ["ads"],
@@ -66,6 +65,10 @@ const remove = adminProcedure
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.ad.deleteMany({
       where: { id: { in: ids } },
+    })
+
+    after(async () => {
+      await removeS3Directories(ids.map(id => `ads/${id}`))
     })
 
     revalidate({

@@ -4,7 +4,7 @@ import { ToolStatus, ToolTier } from "~/.generated/prisma/browser"
 export { toolListParams, toolListSchema, type ToolListParams } from "~/server/shared/tools/schema"
 
 export const toolSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string().min(1, "Name is required"),
   slug: z.string().optional(),
   websiteUrl: z.url({ protocol: /^https?$/, normalize: true }).min(1, "Website is required"),

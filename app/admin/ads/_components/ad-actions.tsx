@@ -76,7 +76,7 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuSeparator />
+          {!isSinglePage && <DropdownMenuSeparator />}
 
           <DropdownMenuItem onSelect={handleDuplicate}>
             <CopyIcon />

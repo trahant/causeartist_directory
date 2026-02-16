@@ -2,10 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
+import { createId } from "@paralleldrive/cuid2"
 import { slugify } from "@primoui/utils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import type { ComponentProps } from "react"
+import { type ComponentProps, useMemo } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { TagActions } from "~/app/admin/tags/_components/tag-actions"
@@ -32,10 +33,12 @@ export function TagForm({ className, title, tag, ...props }: TagFormProps) {
   const queryClient = useQueryClient()
   const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
 
+  const id = useMemo(() => tag?.id ?? createId(), [tag?.id])
+
   const form = useForm({
     resolver: zodResolver(tagSchema),
-    defaultValues: {
-      id: tag?.id ?? "",
+    values: {
+      id,
       name: tag?.name ?? "",
       slug: tag?.slug ?? "",
       tools: tag?.tools.map(t => t.id) ?? [],

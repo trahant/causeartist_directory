@@ -23,7 +23,7 @@ export const tagListSchema = createStandardSchemaV1(tagListParams)
 export type TagListParams = inferParserType<typeof tagListParams>
 
 export const tagSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string().min(1, "Name is required"),
   slug: z.string().optional(),
   tools: z.array(z.string()).optional(),

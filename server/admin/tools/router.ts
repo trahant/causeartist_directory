@@ -3,6 +3,7 @@ import { z } from "zod"
 import { removeS3Directories } from "~/lib/media"
 import { notifySubmitterOfToolPublished, notifySubmitterOfToolScheduled } from "~/lib/notifications"
 import { adminProcedure } from "~/lib/orpc"
+import { generateUniqueSlug } from "~/lib/slugs"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 import { findScheduledTools, findToolList, findTools } from "~/server/admin/tools/queries"
 import { toolListSchema, toolSchema } from "~/server/admin/tools/schema"
@@ -31,24 +32,28 @@ const upsert = adminProcedure
     const tagIds = tags?.map(id => ({ id }))
     const existingTool = id ? await db.tool.findUnique({ where: { id } }) : null
 
-    const tool = id
-      ? await db.tool.update({
-          where: { id },
-          data: {
-            ...data,
-            slug: data.slug || "",
-            categories: { set: categoryIds },
-            tags: { set: tagIds },
-          },
-        })
-      : await db.tool.create({
-          data: {
-            ...data,
-            slug: data.slug || "",
-            categories: { connect: categoryIds },
-            tags: { connect: tagIds },
-          },
-        })
+    const slug = await generateUniqueSlug(
+      data.slug || data.name,
+      slug => db.tool.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+      existingTool?.slug,
+    )
+
+    const tool = await db.tool.upsert({
+      where: { id },
+      create: {
+        id,
+        ...data,
+        slug,
+        categories: { connect: categoryIds },
+        tags: { connect: tagIds },
+      },
+      update: {
+        ...data,
+        slug,
+        categories: { set: categoryIds },
+        tags: { set: tagIds },
+      },
+    })
 
     after(async () => {
       if (notifySubmitter && (!existingTool || existingTool.status !== tool.status)) {
@@ -79,10 +84,16 @@ const duplicate = adminProcedure
       throw new Error("Tool not found")
     }
 
+    const name = `${tool.name} (Copy)`
+
+    const slug = await generateUniqueSlug(name, slug =>
+      db.tool.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+    )
+
     const newTool = await db.tool.create({
       data: {
-        name: `${tool.name} (Copy)`,
-        slug: "",
+        name,
+        slug,
         websiteUrl: tool.websiteUrl,
         affiliateUrl: tool.affiliateUrl,
         tagline: tool.tagline,
@@ -105,17 +116,12 @@ const duplicate = adminProcedure
 const remove = adminProcedure
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
-    const tools = await db.tool.findMany({
-      where: { id: { in: ids } },
-      select: { slug: true },
-    })
-
     await db.tool.deleteMany({
       where: { id: { in: ids } },
     })
 
     after(async () => {
-      await removeS3Directories(tools.map(({ slug }) => `tools/${slug}`))
+      await removeS3Directories(ids.map(id => `tools/${id}`))
     })
 
     revalidate({

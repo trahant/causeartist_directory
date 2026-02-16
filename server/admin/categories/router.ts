@@ -1,4 +1,5 @@
 import { adminProcedure } from "~/lib/orpc"
+import { generateUniqueSlug } from "~/lib/slugs"
 import { findCategories, findCategoryList } from "~/server/admin/categories/queries"
 import { categoryListSchema, categorySchema } from "~/server/admin/categories/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
@@ -16,23 +17,28 @@ const upsert = adminProcedure
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, tools, ...data } = input
     const toolIds = tools?.map(id => ({ id }))
+    const existing = await db.category.findUnique({ where: { id }, select: { slug: true } })
 
-    const category = id
-      ? await db.category.update({
-          where: { id },
-          data: {
-            ...data,
-            slug: data.slug || "",
-            tools: { set: toolIds },
-          },
-        })
-      : await db.category.create({
-          data: {
-            ...data,
-            slug: data.slug || "",
-            tools: { connect: toolIds },
-          },
-        })
+    const slug = await generateUniqueSlug(
+      data.slug || data.name,
+      slug => db.category.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+      existing?.slug,
+    )
+
+    const category = await db.category.upsert({
+      where: { id },
+      create: {
+        id,
+        ...data,
+        slug,
+        tools: { connect: toolIds },
+      },
+      update: {
+        ...data,
+        slug,
+        tools: { set: toolIds },
+      },
+    })
 
     revalidate({
       tags: ["categories", `category-${category.slug}`],
@@ -53,10 +59,16 @@ const duplicate = adminProcedure
       throw new Error("Category not found")
     }
 
+    const name = `${category.name} (Copy)`
+
+    const slug = await generateUniqueSlug(name, slug =>
+      db.category.findUnique({ where: { slug }, select: { slug: true } }).then(Boolean),
+    )
+
     const newCategory = await db.category.create({
       data: {
-        name: `${category.name} (Copy)`,
-        slug: "",
+        name,
+        slug,
         label: category.label,
         description: category.description,
         tools: { connect: category.tools },

@@ -26,7 +26,7 @@ export type AdListParams = inferParserType<typeof adListParams>
 
 export const adSchema = z
   .object({
-    id: z.string().optional(),
+    id: z.string(),
     name: z.string().min(1, "Name is required"),
     email: z.email("Valid email is required"),
     description: z.string().optional(),

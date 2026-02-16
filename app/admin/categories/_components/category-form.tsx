@@ -2,10 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
+import { createId } from "@paralleldrive/cuid2"
 import { slugify } from "@primoui/utils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import type { ComponentProps } from "react"
+import { type ComponentProps, useMemo } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { CategoryActions } from "~/app/admin/categories/_components/category-actions"
@@ -35,10 +36,12 @@ export function CategoryForm({ className, title, category, ...props }: CategoryF
   const queryClient = useQueryClient()
   const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
 
+  const id = useMemo(() => category?.id ?? createId(), [category?.id])
+
   const form = useForm({
     resolver: zodResolver(categorySchema),
-    defaultValues: {
-      id: category?.id ?? "",
+    values: {
+      id,
       name: category?.name ?? "",
       slug: category?.slug ?? "",
       label: category?.label ?? "",

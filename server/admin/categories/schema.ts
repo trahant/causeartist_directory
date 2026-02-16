@@ -23,7 +23,7 @@ export const categoryListSchema = createStandardSchemaV1(categoryListParams)
 export type CategoryListParams = inferParserType<typeof categoryListParams>
 
 export const categorySchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string().min(1, "Name is required"),
   slug: z.string().optional(),
   label: z.string().optional(),

@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { formatDateTime, getRandomString, slugify } from "@primoui/utils"
+import { createId } from "@paralleldrive/cuid2"
+import { formatDateTime, slugify } from "@primoui/utils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
@@ -73,10 +74,12 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   const [isGenerationComplete, setIsGenerationComplete] = useState(true)
   const originalStatus = useRef(tool?.status ?? ToolStatus.Draft)
 
+  const id = useMemo(() => tool?.id ?? createId(), [tool?.id])
+
   const form = useForm({
     resolver: zodResolver(toolSchema),
-    defaultValues: {
-      id: tool?.id ?? "",
+    values: {
+      id,
       name: tool?.name ?? "",
       slug: tool?.slug ?? "",
       tagline: tool?.tagline ?? "",
@@ -134,15 +137,9 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   })
 
   // Keep track of the form values
-  const [name, slug, websiteUrl, description] = form.watch([
-    "name",
-    "slug",
-    "websiteUrl",
-    "description",
-  ])
+  const [name, websiteUrl, description] = form.watch(["name", "websiteUrl", "description"])
 
-  // Store the upload path in a memoized value
-  const path = useMemo(() => `tools/${slug || getRandomString(12)}`, [slug])
+  const path = `tools/${id}`
 
   // Handle form submission
   const handleSubmit = form.handleSubmit((data, event) => {

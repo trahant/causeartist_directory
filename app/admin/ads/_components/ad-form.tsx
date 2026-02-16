@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { getRandomString, slugify } from "@primoui/utils"
+import { createId } from "@paralleldrive/cuid2"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { addMonths, formatDate } from "date-fns"
 import { CalendarIcon, ClockIcon } from "lucide-react"
@@ -46,10 +46,12 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
   const [isStartsAtOpen, setIsStartsAtOpen] = useState(false)
   const [isEndsAtOpen, setIsEndsAtOpen] = useState(false)
 
+  const id = useMemo(() => ad?.id ?? createId(), [ad?.id])
+
   const form = useForm({
     resolver: zodResolver(adSchema),
-    defaultValues: {
-      id: ad?.id ?? "",
+    values: {
+      id,
       name: ad?.name ?? "",
       email: ad?.email ?? "",
       description: ad?.description ?? "",
@@ -81,14 +83,9 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
 
   useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
-  const [name, websiteUrl, startsAt, endsAt] = form.watch([
-    "name",
-    "websiteUrl",
-    "startsAt",
-    "endsAt",
-  ])
+  const [websiteUrl, startsAt, endsAt] = form.watch(["websiteUrl", "startsAt", "endsAt"])
 
-  const path = useMemo(() => `ads/${name ? slugify(name) : getRandomString(12)}`, [name])
+  const path = `ads/${id}`
 
   const formatDateDisplay = (date: Date) => formatDate(date, "yyyy-MM-dd")
   const formatTimeDisplay = (date: Date) => formatDate(date, "HH:mm")
