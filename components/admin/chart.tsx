@@ -41,7 +41,7 @@ export const Chart = ({
       {average !== undefined && (
         <div
           className="absolute inset-x-0 z-10 flex items-center pointer-events-none"
-          style={{ bottom: `${(average / maxValue) * 100}%` }}
+          style={{ bottom: maxValue > 0 ? `${(average / maxValue) * 100}%` : "0%" }}
         >
           <div className="h-px w-full flex-1 border border-dashed border-foreground/15" />
 
@@ -77,7 +77,7 @@ export const Chart = ({
                   index === data.length - 1 && "opacity-50",
                   cellClassName,
                 )}
-                style={{ height: `${(item.value / maxValue) * 100}%` }}
+                style={{ height: maxValue > 0 ? `${(item.value / maxValue) * 100}%` : "0%" }}
               />
             </div>
           </Tooltip>
