@@ -1,4 +1,5 @@
 import { isTruthy } from "@primoui/utils"
+import { redirect } from "next/navigation"
 import { createLoader, parseAsString, type SearchParams } from "nuqs/server"
 import type { ComponentProps } from "react"
 import { Product } from "~/components/web/products/product"
@@ -24,6 +25,10 @@ export const ProductQuery = async ({
   const items = products
     .map(item => ({ ...item, customProps: getProductProps?.(item) }))
     .filter(({ customProps }) => isTruthy(customProps))
+
+  if (checkoutData.successUrl && !items.some(({ customProps }) => !customProps?.isDisabled)) {
+    throw redirect(checkoutData.successUrl)
+  }
 
   return (
     <ProductList {...props}>
