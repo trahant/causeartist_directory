@@ -17,6 +17,7 @@ import { Stack } from "~/components/common/stack"
 import { Tooltip } from "~/components/common/tooltip"
 import { AdsCalendar } from "~/components/web/ads/ads-calendar"
 import { Price } from "~/components/web/price"
+import { toUTCMidnight } from "~/lib/ads"
 import { adsConfig } from "~/config/ads"
 import { siteConfig } from "~/config/site"
 import { type AdSpot, useAds } from "~/hooks/use-ads"
@@ -93,8 +94,8 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
 
     const adData = validSelections.map(selection => ({
       type: selection.type,
-      startsAt: selection.dateRange?.from?.getTime() ?? 0,
-      endsAt: selection.dateRange?.to?.getTime() ?? 0,
+      startsAt: selection.dateRange?.from ? toUTCMidnight(selection.dateRange.from) : 0,
+      endsAt: selection.dateRange?.to ? toUTCMidnight(selection.dateRange.to) : 0,
     }))
 
     execute({

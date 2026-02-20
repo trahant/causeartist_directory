@@ -9,6 +9,22 @@ import {
 } from "date-fns"
 import { adsConfig } from "~/config/ads"
 
+/**
+ * Convert a local Date to UTC midnight epoch ms of the same calendar day.
+ * Ensures "Feb 1" is always stored as 2025-02-01T00:00:00Z regardless of timezone.
+ */
+export const toUTCMidnight = (date: Date) => {
+  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+/**
+ * Create a local Date representing the same calendar day as a UTC-midnight Date.
+ * Ensures "2025-02-01T00:00:00Z" displays as Feb 1 in every timezone.
+ */
+export const fromUTCDate = (date: Date) => {
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+}
+
 type PricingItem = {
   price: number
   duration?: number

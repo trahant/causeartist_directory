@@ -13,7 +13,7 @@ import { ExternalLink } from "~/components/web/external-link"
 import { Price } from "~/components/web/price"
 import { siteConfig } from "~/config/site"
 import type { AdSpot, AdsSelection, useAds } from "~/hooks/use-ads"
-import { getFirstAvailableMonth } from "~/lib/ads"
+import { fromUTCDate, getFirstAvailableMonth } from "~/lib/ads"
 import { cx } from "~/lib/utils"
 import type { AdMany } from "~/server/web/ads/payloads"
 
@@ -43,8 +43,8 @@ export const AdsCalendar = ({
       ads
         .filter(({ type }) => type === adSpot.type || type === "All")
         .map(({ startsAt, endsAt }) => ({
-          from: startOfDay(startsAt),
-          to: startOfDay(endsAt),
+          from: fromUTCDate(startsAt),
+          to: fromUTCDate(endsAt),
         })),
     [ads, adSpot.type],
   )
