@@ -1,6 +1,6 @@
 "use client"
 
-import { formatDate, parse } from "date-fns"
+import { formatDate } from "date-fns"
 import { BadgeCheckIcon, CalendarIcon } from "lucide-react"
 import { type ComponentProps, type ReactNode, useState } from "react"
 import { useFormContext } from "react-hook-form"
@@ -53,12 +53,12 @@ export const ToolPublishActions = ({
 }: ToolPublishActionsProps) => {
   const { control, watch } = useFormContext<ToolSchema>()
   const [status, submitterEmail, publishedAt] = watch(["status", "submitterEmail", "publishedAt"])
-  const publishedAtDate = new Date(publishedAt ?? new Date())
+  const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date()
 
   const [isOpen, setIsOpen] = useState(false)
   const [currentStatus, setCurrentStatus] = useState(status)
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(formatDate(publishedAtDate, "yyyy-MM-dd"))
+  const [selectedDate, setSelectedDate] = useState<Date>(publishedAtDate)
   const [selectedTime, setSelectedTime] = useState(formatDate(publishedAtDate, "HH:mm"))
 
   const handlePublished = () => {
@@ -67,7 +67,9 @@ export const ToolPublishActions = ({
   }
 
   const handleScheduled = () => {
-    const scheduledDate = parse(`${selectedDate} ${selectedTime}`, "yyyy-MM-dd HH:mm", new Date())
+    const [hours, minutes] = selectedTime.split(":").map(Number)
+    const scheduledDate = new Date(selectedDate)
+    scheduledDate.setHours(hours, minutes, 0, 0)
     onStatusSubmit(ToolStatus.Scheduled, scheduledDate)
     setIsOpen(false)
   }
@@ -294,7 +296,7 @@ export const ToolPublishActions = ({
                                     suffix={<CalendarIcon />}
                                     className="w-full tabular-nums"
                                   >
-                                    {selectedDate}
+                                    {formatDate(selectedDate, "yyyy-MM-dd")}
                                   </Button>
 
                                   <Input
@@ -312,12 +314,12 @@ export const ToolPublishActions = ({
 
                                       <Calendar
                                         mode="single"
-                                        selected={parse(selectedDate, "yyyy-MM-dd", new Date())}
-                                        defaultMonth={parse(selectedDate, "yyyy-MM-dd", new Date())}
+                                        selected={selectedDate}
+                                        defaultMonth={selectedDate}
                                         disabled={{ before: new Date() }}
                                         onSelect={date => {
                                           if (date) {
-                                            setSelectedDate(formatDate(date, "yyyy-MM-dd"))
+                                            setSelectedDate(date)
                                           }
                                           setIsScheduleOpen(false)
                                         }}
