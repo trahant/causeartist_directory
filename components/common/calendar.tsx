@@ -23,11 +23,15 @@ const Calendar = ({ classNames, ...props }: ComponentProps<typeof DayPicker>) =>
     className: "text-lg p-1 pointer-events-auto",
   })
 
-  // Use next-intl formatter for i18n date formatting
+  // Use next-intl formatter for i18n date formatting.
+  // Override timeZone to the browser's local timezone because react-day-picker
+  // creates dates in local time, while next-intl may default to UTC.
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
   const formatters: Partial<Formatters> = {
-    formatCaption: date => format.dateTime(date, { month: "long", year: "numeric" }),
-    formatWeekdayName: date => format.dateTime(date, { weekday: "short" }),
-    formatMonthDropdown: date => format.dateTime(date, { month: "long" }),
+    formatCaption: date => format.dateTime(date, { month: "long", year: "numeric", timeZone }),
+    formatWeekdayName: date => format.dateTime(date, { weekday: "short", timeZone }),
+    formatMonthDropdown: date => format.dateTime(date, { month: "long", timeZone }),
   }
 
   return (
