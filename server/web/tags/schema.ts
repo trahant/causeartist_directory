@@ -3,11 +3,12 @@ import {
   type inferParserType,
   parseAsInteger,
   parseAsString,
+  parseAsStringEnum,
 } from "nuqs/server"
 
 export const tagsSearchParams = {
   q: parseAsString.withDefault(""),
-  sort: parseAsString.withDefault(""),
+  sort: parseAsStringEnum(["", "name.asc", "name.desc"]).withDefault(""),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(96),
   letter: parseAsString.withDefault(""),
