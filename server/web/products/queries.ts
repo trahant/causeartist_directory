@@ -58,10 +58,11 @@ export const findStripeCoupon = async (code?: string) => {
       code,
       limit: 1,
       active: true,
-      expand: ["data.coupon.applies_to"],
+      expand: ["data.promotion.coupon.applies_to"],
     })
 
-    return promoCodes.data[0]?.coupon
+    const coupon = promoCodes.data[0]?.promotion?.coupon
+    return typeof coupon === "object" && coupon !== null ? coupon : undefined
   } catch (error) {
     console.error(`Failed to fetch coupon ${code}:`, error)
     // For coupons, we return undefined instead of throwing to allow graceful degradation
