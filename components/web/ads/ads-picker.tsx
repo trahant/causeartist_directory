@@ -121,7 +121,7 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
             className="group shrink-0 flex-1 min-w-76 snap-center border-l -ml-px"
           >
             {type === adSpot.type && (
-              <div className="absolute inset-px border-2 border-primary/50 rounded-sm" />
+              <div className="absolute inset-px -z-10 border-2 border-primary/50 rounded-sm" />
             )}
           </AdsCalendar>
         ))}
