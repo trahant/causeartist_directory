@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { ErrorContext } from "better-auth/react"
 import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -10,7 +9,7 @@ import { createNewsletterSchema } from "~/server/web/shared/schema"
 
 type UseMagicLinkProps = {
   onSuccess?: (email: string) => void
-  onError?: (error: ErrorContext) => void
+  onError?: (error: Error) => void
 }
 
 export const useMagicLink = ({ onSuccess, onError }: UseMagicLinkProps = {}) => {
@@ -23,20 +22,26 @@ export const useMagicLink = ({ onSuccess, onError }: UseMagicLinkProps = {}) => 
   const defaultValues = { captcha: "", email: "" } as const
   const form = useForm<z.infer<typeof schema>>({ resolver, defaultValues })
 
-  const handleSignIn = ({ email }: z.infer<typeof schema>) => {
-    signIn.magicLink({
-      email,
-      callbackURL,
-      fetchOptions: {
-        onResponse: () => {
-          setIsPending(false)
-          form.reset()
+  const handleSignIn = async ({ email }: z.infer<typeof schema>) => {
+    try {
+      await signIn.magicLink({
+        email,
+        callbackURL,
+        fetchOptions: {
+          onResponse: () => {
+            setIsPending(false)
+            form.reset()
+          },
+          onRequest: () => setIsPending(true),
+          onSuccess: () => onSuccess?.(email),
+          onError: ({ error }) => onError?.(error),
         },
-        onRequest: () => setIsPending(true),
-        onSuccess: () => onSuccess?.(email),
-        onError: error => onError?.(error),
-      },
-    })
+      })
+    } catch (e) {
+      setIsPending(false)
+      form.reset()
+      onError?.(e instanceof Error ? e : new Error("Something went wrong"))
+    }
   }
 
   return { form, handleSignIn, isPending }

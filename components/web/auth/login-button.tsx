@@ -17,19 +17,25 @@ export const LoginButton = ({ provider, ...props }: LoginButtonProps) => {
   const [isPending, setIsPending] = useState(false)
   const callbackURL = useAuthCallbackUrl()
 
-  const handleSignIn = () => {
-    signIn.social({
-      provider,
-      callbackURL,
-      fetchOptions: {
-        onRequest: () => {
-          setIsPending(true)
+  const handleSignIn = async () => {
+    try {
+      await signIn.social({
+        provider,
+        callbackURL,
+        fetchOptions: {
+          onRequest: () => {
+            setIsPending(true)
+          },
+          onError: ({ error }) => {
+            toast.error(error.message)
+            setIsPending(false)
+          },
         },
-        onError: ({ error }) => {
-          toast.error(error.message)
-        },
-      },
-    })
+      })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Something went wrong")
+      setIsPending(false)
+    }
   }
 
   return (

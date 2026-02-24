@@ -21,7 +21,7 @@ export const LoginForm = ({ ...props }: ComponentProps<"form">) => {
       router.push(`/auth/verify?email=${email}`)
     },
 
-    onError: ({ error }) => {
+    onError: error => {
       toast.error(error.message)
     },
   })
