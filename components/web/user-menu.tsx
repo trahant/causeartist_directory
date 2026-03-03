@@ -80,13 +80,13 @@ export const UserMenu = () => {
           )}
 
           <DropdownMenuItem asChild>
-            <NavLink href="/dashboard" prefix={<UserIcon />}>
+            <NavLink href="/dashboard" prefix={<UserIcon />} exact>
               {t("navigation.dashboard")}
             </NavLink>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
-            <NavLink href="/dashboard/bookmarks" prefix={<BookmarkIcon />}>
+            <NavLink href="/dashboard/bookmarks" prefix={<BookmarkIcon />} exact>
               {t("navigation.bookmarks")}
             </NavLink>
           </DropdownMenuItem>

@@ -30,7 +30,7 @@ const upsert = adminProcedure
     const { id, categories, tags, notifySubmitter, ...data } = input
     const categoryIds = categories?.map(id => ({ id }))
     const tagIds = tags?.map(id => ({ id }))
-    const existingTool = id ? await db.tool.findUnique({ where: { id } }) : null
+    const existingTool = await db.tool.findUnique({ where: { id } })
 
     const slug = await generateUniqueSlug(
       data.slug || data.name,

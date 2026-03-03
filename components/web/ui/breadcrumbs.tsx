@@ -28,7 +28,13 @@ export const Breadcrumbs = ({ className, items, ...props }: BreadcrumbsProps) =>
   return (
     <>
       {breadcrumbsConfig.enabled && (
-        <Stack size="sm" className={cx("-mb-fluid-md pb-3 text-sm", className)} asChild {...props}>
+        <Stack
+          size="sm"
+          wrap={false}
+          className={cx("-mb-fluid-md pb-3 text-sm", className)}
+          asChild
+          {...props}
+        >
           <nav>
             {breadcrumbItems.map(({ url, title }, index) => (
               <Fragment key={index}>

@@ -99,7 +99,7 @@ export function TagTable() {
     {
       id: "name",
       label: "Name",
-      placeholder: "Filter by name...",
+      placeholder: "Search by name...",
     },
   ]
 

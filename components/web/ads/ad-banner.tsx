@@ -32,6 +32,7 @@ export const AdBanner = async ({ className, ...props }: ComponentProps<typeof Ca
               src={ad.faviconUrl}
               title={ad.name}
               size={32}
+              loading="eager"
               className="float-left align-middle p-0 mr-1.5 size-3.5 rounded-sm sm:size-4"
             />
             <strong className="font-medium text-foreground">{ad.name}</strong> — {ad.description}

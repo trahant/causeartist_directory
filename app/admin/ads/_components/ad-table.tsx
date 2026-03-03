@@ -133,7 +133,7 @@ export function AdTable() {
     {
       id: "name",
       label: "Name",
-      placeholder: "Filter by name...",
+      placeholder: "Search by name...",
     },
     {
       id: "type",

@@ -104,7 +104,7 @@ export function CategoryTable() {
     {
       id: "name",
       label: "Name",
-      placeholder: "Filter by name...",
+      placeholder: "Search by name...",
     },
   ]
 

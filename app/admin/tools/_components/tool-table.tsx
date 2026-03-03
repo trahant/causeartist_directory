@@ -148,7 +148,7 @@ export function ToolTable() {
     {
       id: "name",
       label: "Name",
-      placeholder: "Filter by name...",
+      placeholder: "Search by name...",
     },
     {
       id: "status",

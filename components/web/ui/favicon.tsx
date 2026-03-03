@@ -27,6 +27,7 @@ export const Favicon = ({
   title,
   contained,
   size = 64,
+  loading = "lazy",
   ...props
 }: FaviconProps) => {
   if (!src) return null
@@ -35,7 +36,7 @@ export const Favicon = ({
     <Image
       src={src}
       alt={title ? `Favicon of ${title}` : "Favicon"}
-      loading="lazy"
+      loading={loading}
       width={size}
       height={size}
       className={cx(faviconVariants({ contained, className }))}

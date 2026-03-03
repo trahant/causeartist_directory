@@ -69,9 +69,9 @@ export const FormMedia = <T extends FieldValues>({
       </Stack>
 
       <Stack size="sm">
-        {children}
-
         <Input type="url" className="flex-1" {...field} />
+
+        {children}
       </Stack>
 
       {error && <FieldError errors={[error as { message?: string }]} />}

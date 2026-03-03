@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { createId } from "@paralleldrive/cuid2"
+import { isValidImageSrc } from "@primoui/utils"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { addMonths, formatDate, parse } from "date-fns"
 import { CalendarIcon, ClockIcon } from "lucide-react"
@@ -206,7 +207,7 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
               fetchType="favicon"
               websiteUrl={websiteUrl}
             >
-              {field.value && (
+              {isValidImageSrc(field.value) && (
                 <Image
                   src={field.value}
                   alt="Favicon"
@@ -224,7 +225,7 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
           name="bannerUrl"
           render={({ field }) => (
             <FormMedia form={form} field={field} path={`${path}/banner`}>
-              {field.value && (
+              {isValidImageSrc(field.value) && (
                 <Image
                   src={field.value}
                   alt="Banner"

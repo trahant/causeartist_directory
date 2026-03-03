@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
+import { isValidImageSrc } from "@primoui/utils"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
@@ -103,7 +104,7 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FormMedia form={form} field={field} path={`users/${user.id}/avatar`}>
-                {field.value && (
+                {isValidImageSrc(field.value) && (
                   <Avatar className="size-8 border box-content">
                     <AvatarImage src={field.value} />
                   </Avatar>

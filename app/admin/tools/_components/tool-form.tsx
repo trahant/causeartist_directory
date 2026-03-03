@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { createId } from "@paralleldrive/cuid2"
-import { formatDateTime, slugify } from "@primoui/utils"
+import { formatDateTime, isValidImageSrc, slugify } from "@primoui/utils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { EyeIcon, InfoIcon, PencilIcon } from "lucide-react"
 import Image from "next/image"
@@ -390,7 +390,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
               fetchType="favicon"
               websiteUrl={websiteUrl}
             >
-              {field.value && (
+              {isValidImageSrc(field.value) && (
                 <Image
                   src={field.value}
                   alt="Favicon"
@@ -414,7 +414,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
               fetchType="screenshot"
               websiteUrl={websiteUrl}
             >
-              {field.value && (
+              {isValidImageSrc(field.value) && (
                 <Image
                   src={field.value}
                   alt="Screenshot"
