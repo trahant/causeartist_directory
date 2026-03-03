@@ -15,10 +15,7 @@
     "moduleResolution": "Bundler",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": {
-      "~/*": ["./*"],
-      "content-collections": ["./.content-collections/generated"]
-    }
+    "paths": { "~/*": ["./*"] }
   },
   "include": [
     "next-env.d.ts",

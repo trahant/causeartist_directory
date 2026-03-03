@@ -66,7 +66,7 @@ export const OgBase = ({ title, description, faviconUrl, siteName, siteTagline }
               textWrap: "balance",
             }}
           >
-            {title}
+            {getExcerpt(title, 60)}
           </p>
         </div>
 

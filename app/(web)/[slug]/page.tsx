@@ -72,7 +72,9 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
     faviconUrl: String(tool.faviconUrl),
   }
 
-  return getPageMetadata({ url, metadata, ogImage })
+  const robots = !isToolPublished(tool) ? { index: false, follow: false } : undefined
+
+  return getPageMetadata({ url, metadata: { ...metadata, robots }, ogImage })
 }
 
 export default async function (props: Props) {

@@ -36,10 +36,10 @@ export async function GET() {
   const rssSearchParams = { utm_source: domain, utm_medium: "rss" }
 
   const feed = new RSS({
-    title: name,
+    title: `${name} - Tools`,
     description: t("brand.description"),
     site_url: setQueryParams(url, rssSearchParams),
-    feed_url: `${url}/rss.xml`,
+    feed_url: `${url}/rss/tools.xml`,
     copyright: `${new Date().getFullYear()} ${name}`,
     language: "en",
     ttl: 14400,

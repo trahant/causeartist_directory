@@ -2,6 +2,7 @@ import { adminProcedure } from "~/lib/orpc"
 import { adRouter } from "~/server/admin/ads/router"
 import { categoryRouter } from "~/server/admin/categories/router"
 import { metricRouter } from "~/server/admin/metrics/router"
+import { postRouter } from "~/server/admin/posts/router"
 import { reportRouter } from "~/server/admin/reports/router"
 import { tagRouter } from "~/server/admin/tags/router"
 import { toolRouter } from "~/server/admin/tools/router"
@@ -21,6 +22,7 @@ export const adminRouter = {
   ping,
   metrics: metricRouter,
   tools: toolRouter,
+  posts: postRouter,
   categories: categoryRouter,
   tags: tagRouter,
   ads: adRouter,

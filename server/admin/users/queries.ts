@@ -59,3 +59,11 @@ export const findUserById = async (id: string) => {
     where: { id },
   })
 }
+
+export const findUserList = async () => {
+  return db.user.findMany({
+    where: { role: "admin" },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  })
+}

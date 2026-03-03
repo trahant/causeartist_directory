@@ -13,8 +13,8 @@ import type {
   WebPage,
   WebSite,
 } from "schema-dts"
-import type { Post } from "~/.content-collections/generated"
 import { siteConfig } from "~/config/site"
+import type { PostMany, PostOne } from "~/server/web/posts/payloads"
 import type { ToolMany, ToolOne } from "~/server/web/tools/payloads"
 
 /**
@@ -222,34 +222,25 @@ export const generateFAQ = (questions: Array<{ question: string; answer: string 
 /**
  * Generates article/blog posting schema
  */
-export const generateArticle = (url: string, post: Post): Article => {
-  const { title, description, publishedAt, updatedAt, author, image, content, locale } = post
-
+export const generateArticle = (url: string, post: PostOne): Article => {
   return {
     "@type": "Article",
-    headline: title,
-    description,
+    headline: post.title,
+    description: post.description || undefined,
     url: toAbsoluteUrl(url),
-    datePublished: publishedAt.toISOString(),
-    dateModified: (updatedAt ?? publishedAt).toISOString(),
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: (post.updatedAt ?? post.publishedAt)?.toISOString(),
     publisher: getOrganization(),
-    author: author
-      ? {
-          "@type": "Person",
-          name: author.name,
-          url: author.url ? toAbsoluteUrl(author.url) : undefined,
-        }
-      : getOrganization(),
-    image: image
+    author: post.author ? { "@type": "Person", name: post.author.name } : getOrganization(),
+    image: post.imageUrl
       ? {
           "@type": "ImageObject",
-          url: image,
+          url: post.imageUrl,
           width: "1200",
           height: "630",
         }
       : undefined,
-    wordCount: content.split(/\s+/).length,
-    inLanguage: locale,
+    inLanguage: "en",
   }
 }
 
@@ -283,7 +274,7 @@ export const generateBlog = (
   url: string,
   name: string,
   description: string | undefined,
-  posts: Post[],
+  posts: PostMany[],
 ): Blog => {
   const absoluteUrl = toAbsoluteUrl(url)
   return {
@@ -296,9 +287,9 @@ export const generateBlog = (
       "@type": "BlogPosting",
       headline: post.title,
       description: post.description || undefined,
-      url: toAbsoluteUrl(`/blog/${post._meta.path}`),
-      datePublished: post.publishedAt.toISOString(),
-      dateModified: (post.updatedAt ?? post.publishedAt).toISOString(),
+      url: toAbsoluteUrl(`/blog/${post.slug}`),
+      datePublished: post.publishedAt?.toISOString(),
+      dateModified: (post.updatedAt ?? post.publishedAt)?.toISOString(),
     })),
   }
 }

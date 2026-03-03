@@ -18,6 +18,6 @@ export const metadataConfig: Metadata = {
   },
   alternates: {
     canonical: "/",
-    types: { "application/rss+xml": linksConfig.feed },
+    types: { "application/rss+xml": linksConfig.feeds },
   },
 }

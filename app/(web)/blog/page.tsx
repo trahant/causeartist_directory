@@ -1,4 +1,3 @@
-import { allPosts } from "content-collections"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { cache } from "react"
@@ -9,13 +8,14 @@ import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { siteConfig } from "~/config/site"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateBlog } from "~/lib/structured-data"
+import { findPosts } from "~/server/web/posts/queries"
 
 // I18n page namespace
 const namespace = "pages.blog"
 
 // Get page data
 const getData = cache(async () => {
-  const posts = allPosts.toSorted((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+  const posts = await findPosts({})
 
   const t = await getTranslations()
   const url = "/blog"

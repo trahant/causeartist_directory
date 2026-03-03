@@ -1,7 +1,96 @@
-import type { ComponentProps } from "react"
+import { slugify } from "@primoui/utils"
+import type { ComponentProps, ReactNode } from "react"
+import { Children } from "react"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { Link } from "~/components/common/link"
 import { Prose } from "~/components/common/prose"
-import { MDXComponents } from "~/components/web/mdx-components"
+import { ExternalLink } from "~/components/web/external-link"
+import { cx } from "~/lib/utils"
+
+type Heading = {
+  id: string
+  text: string
+  level: number
+}
+
+export const extractHeadingsFromMarkdown = (md: string): Heading[] => {
+  const headings: Heading[] = []
+  const regex = /^(#{1,6})\s+(.+)$/gm
+  let match
+
+  while ((match = regex.exec(md)) !== null) {
+    const level = match[1].length
+    const text = match[2].trim()
+    const stripped = text
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1") // images: ![alt](url) → alt
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links: [text](url) → text
+      .replace(/\*\*([^*]*)\*\*/g, "$1")         // bold: **text** → text
+      .replace(/\*([^*]*)\*/g, "$1")              // italic: *text* → text
+      .replace(/_([^_]*)_/g, "$1")                // italic: _text_ → text
+      .replace(/`([^`]*)`/g, "$1")                // code: `text` → text
+      .trim()
+    const id = slugify(stripped)
+    headings.push({ id, text, level })
+  }
+
+  return headings
+}
+
+const extractTextFromChildren = (children: ReactNode): string => {
+  const childArray = Children.toArray(children)
+  return childArray
+    .map(child => {
+      if (typeof child === "string") return child
+      if (typeof child === "number") return String(child)
+      if (typeof child === "object" && child !== null && "props" in child) {
+        return extractTextFromChildren((child as { props: { children?: ReactNode } }).props.children)
+      }
+      return ""
+    })
+    .join("")
+}
+
+const createHeadingComponent = (Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
+  return ({ children }: ComponentProps<"h1">) => {
+    const text = extractTextFromChildren(children)
+    const id = slugify(text)
+    return <Tag id={id}>{children}</Tag>
+  }
+}
+
+const components = {
+  a: ({ href, ...props }: ComponentProps<"a">) => {
+    if (href && (href.startsWith("/") || href.startsWith("#"))) {
+      return <Link href={href} {...props} />
+    }
+
+    return <ExternalLink href={href} doTrack doFollow {...props} />
+  },
+
+  img: ({ src, alt, className, ...props }: ComponentProps<"img">) => (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      className={cx("w-full rounded-lg", className)}
+      {...props}
+    />
+  ),
+
+  table: (props: ComponentProps<"table">) => (
+    <div className="overflow-x-auto">
+      <table {...props} />
+    </div>
+  ),
+
+  h1: createHeadingComponent("h1"),
+  h2: createHeadingComponent("h2"),
+  h3: createHeadingComponent("h3"),
+  h4: createHeadingComponent("h4"),
+  h5: createHeadingComponent("h5"),
+  h6: createHeadingComponent("h6"),
+}
 
 type MarkdownProps = ComponentProps<typeof Prose> & {
   code: string
@@ -10,7 +99,9 @@ type MarkdownProps = ComponentProps<typeof Prose> & {
 export const Markdown = ({ code, ...props }: MarkdownProps) => {
   return (
     <Prose {...props}>
-      <ReactMarkdown components={MDXComponents}>{code}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {code}
+      </ReactMarkdown>
     </Prose>
   )
 }

@@ -4,6 +4,12 @@ import { formatNumber } from "@primoui/utils"
 import { AtSignIcon, RssIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import type { ComponentProps } from "react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/common/dropdown-menu"
 import { H5, H6 } from "~/components/common/heading"
 import { BrandGitHubIcon } from "~/components/common/icons/brand-github"
 import { Note } from "~/components/common/note"
@@ -49,11 +55,21 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
               <ThemeSwitcher />
             </Tooltip>
 
-            <Tooltip tooltip={t("navigation.rss_feed")}>
-              <ExternalLink href={linksConfig.feed} className={navLinkVariants()}>
-                <RssIcon />
-              </ExternalLink>
-            </Tooltip>
+            <DropdownMenu>
+              <Tooltip tooltip={t("navigation.rss_feed")}>
+                <DropdownMenuTrigger className={navLinkVariants()}>
+                  <RssIcon />
+                </DropdownMenuTrigger>
+              </Tooltip>
+
+              <DropdownMenuContent align="start">
+                {linksConfig.feeds.map(({ title, url }) => (
+                  <DropdownMenuItem key={url} asChild>
+                    <ExternalLink href={url}>{title}</ExternalLink>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Tooltip tooltip={t("navigation.contact_us")}>
               <ExternalLink href={`mailto:${siteConfig.email}`} className={navLinkVariants()}>

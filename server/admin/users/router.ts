@@ -2,7 +2,7 @@ import { after } from "next/server"
 import { removeS3Directories } from "~/lib/media"
 import { adminProcedure } from "~/lib/orpc"
 import { idsSchema } from "~/server/admin/shared/schema"
-import { findUsers } from "~/server/admin/users/queries"
+import { findUserList, findUsers } from "~/server/admin/users/queries"
 import { userListSchema, userSchema } from "~/server/admin/users/schema"
 
 const list = adminProcedure.input(userListSchema).handler(async ({ input }) => {
@@ -41,8 +41,13 @@ const remove = adminProcedure
     return true
   })
 
+const lookup = adminProcedure.handler(async () => {
+  return findUserList()
+})
+
 export const userRouter = {
   list,
+  lookup,
   update,
   updateRole,
   remove,

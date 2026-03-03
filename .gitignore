@@ -41,9 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Content collections
-.content-collections
-
 # IDE Rules
 .agent
 .cursor

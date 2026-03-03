@@ -4,5 +4,8 @@
   "read_time": "{count} min read",
   "written_by": "Written by",
   "last_updated": "Last updated",
-  "tools_mentioned": "Mentioned in this post"
+  "preview_alert": {
+    "draft": "This post is a draft and is not publicly visible.",
+    "scheduled": "This post is scheduled and not yet published."
+  }
 }

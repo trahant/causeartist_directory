@@ -110,7 +110,8 @@ export const Nav = ({ className, title, ...props }: NavProps) => {
         {...props}
       >
         <button type="button" className={navItemVariants()} onClick={handleCopyLink}>
-          {t("copy_link")} <Kbd className="ml-0.5" keys={[clipboard.copied ? "✔︎" : "C"]} />
+          {t("copy_link")}{" "}
+          <Kbd className="ml-0.5 max-md:hidden" keys={[clipboard.copied ? "✔︎" : "C"]} />
         </button>
 
         <div className="w-px h-4 mx-1.5 bg-ring" />

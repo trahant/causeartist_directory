@@ -1,4 +1,3 @@
-import { withContentCollections } from "@content-collections/next"
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
@@ -21,15 +20,6 @@ const nextConfig: NextConfig = {
     useCache: true,
     turbopackFileSystemCacheForDev: true,
     turbopackFileSystemCacheForBuild: true,
-
-    optimizePackageImports: [
-      "@content-collections/core",
-      "@content-collections/mdx",
-      "@content-collections/next",
-      "lucide-react",
-      "date-fns",
-      "motion",
-    ],
   },
 
   images: {
@@ -55,8 +45,16 @@ const nextConfig: NextConfig = {
         source: "/sitemap/:id.xml",
         destination: "/sitemap/:id",
       },
+      {
+        source: "/rss.xml",
+        destination: "/rss/tools.xml",
+      },
+      {
+        source: "/api/cron/publish-tools",
+        destination: "/api/cron/publish",
+      },
     ]
   },
 }
 
-export default withContentCollections(withNextIntl(withPlausible(nextConfig)))
+export default withNextIntl(withPlausible(nextConfig))

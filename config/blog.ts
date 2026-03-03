@@ -3,9 +3,4 @@ export const blogConfig = {
   tableOfContents: {
     enabled: true,
   },
-
-  // Determines if tools mentioned are enabled
-  toolsMentioned: {
-    enabled: true,
-  },
 }

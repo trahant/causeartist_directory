@@ -5,6 +5,7 @@ import { cx } from "cva"
 import {
   DockIcon,
   ExternalLinkIcon,
+  FileTextIcon,
   GalleryHorizontalEndIcon,
   GemIcon,
   LogOutIcon,
@@ -84,6 +85,14 @@ export const Sidebar = () => {
           href: "/admin/tags",
           prefix: <TagIcon />,
         },
+        {
+          title: "Blog Posts",
+          href: "/admin/posts",
+          prefix: <FileTextIcon />,
+        },
+
+        undefined, // Separator
+
         {
           title: "Users",
           href: "/admin/users",

@@ -127,6 +127,11 @@ export const Search = () => {
           shortcut: { keys: ["meta", "3"] },
           onSelect: () => navigateTo("/admin/tags/new"),
         },
+        {
+          label: t("navigation.new_post"),
+          shortcut: { keys: ["meta", "4"] },
+          onSelect: () => navigateTo("/admin/posts/new"),
+        },
       ],
     })
 

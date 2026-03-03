@@ -19,11 +19,13 @@ const createPathSchema = (t: TFunction) => {
   })
 }
 
-export const createFileSchema = (t: TFunction) => {
+export const createFileSchema = (t: TFunction, options?: { maxSize?: number }) => {
+  const maxSize = options?.maxSize ?? 1024 * 1024
+
   return z
     .instanceof(File)
     .refine(({ size }) => size > 0, { error: t("fileCannotBeEmpty") })
-    .refine(({ size }) => size < 1024 * 512, { error: t("fileSizeTooLarge") })
+    .refine(({ size }) => size < maxSize, { error: t("fileSizeTooLarge") })
     .refine(({ type }) => isMimeTypeMatch(type, ALLOWED_MIMETYPES), { error: t("fileTypeInvalid") })
 }
 

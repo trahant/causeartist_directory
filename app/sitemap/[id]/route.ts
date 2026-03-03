@@ -1,7 +1,7 @@
-import { allPosts } from "content-collections"
 import { NextResponse } from "next/server"
 import { siteConfig } from "~/config/site"
 import { findCategorySlugs } from "~/server/web/categories/queries"
+import { findPostSlugs } from "~/server/web/posts/queries"
 import { findTagSlugs } from "~/server/web/tags/queries"
 import { findToolSlugs } from "~/server/web/tools/queries"
 
@@ -105,9 +105,11 @@ export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">)
     }
 
     case "posts": {
-      entries = allPosts.map(post => ({
-        url: `${siteUrl}/blog/${post._meta.path}`,
-        lastModified: new Date(post.updatedAt ?? post.publishedAt),
+      const posts = await findPostSlugs({})
+
+      entries = posts.map(post => ({
+        url: `${siteUrl}/blog/${post.slug}`,
+        lastModified: post.updatedAt,
         changeFrequency: "monthly",
         priority: 0.7,
       }))

@@ -26,6 +26,7 @@
   "new_tool": "New Tool",
   "new_category": "New Category",
   "new_tag": "New Tag",
+  "new_post": "New Blog Post",
   "toggle_theme": "Toggle theme",
   "admin_panel": "Admin panel",
   "switch_theme": "Switch to {theme} Mode"
