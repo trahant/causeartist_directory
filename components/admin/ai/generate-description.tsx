@@ -52,7 +52,7 @@ export const AIGenerateDescription = <T extends z.ZodSchema>({
     },
   })
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Handle streaming updates from AI SDK
   useEffect(() => object && onStream(object), [object])
 
   const handleGenerate = () => {

@@ -23,7 +23,7 @@ const getData = cache(async () => {
   const description = t(`${namespace}.description`, { siteName: siteConfig.name })
 
   const data = getPageData(url, title, description, {
-    breadcrumbs: [{ url, title }],
+    breadcrumbs: [{ url, title: t("navigation.blog") }],
     structuredData: [generateBlog(url, title, description, posts)],
   })
 

@@ -19,7 +19,6 @@ import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateArticle } from "~/lib/structured-data"
 import { findPost, findPostSlugs } from "~/server/web/posts/queries"
 
-
 type Props = PageProps<"/blog/[slug]">
 
 // Get page data
