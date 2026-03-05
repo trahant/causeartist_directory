@@ -25,10 +25,10 @@ export const extractHeadingsFromMarkdown = (md: string): Heading[] => {
     const stripped = text
       .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1") // images: ![alt](url) → alt
       .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links: [text](url) → text
-      .replace(/\*\*([^*]*)\*\*/g, "$1")         // bold: **text** → text
-      .replace(/\*([^*]*)\*/g, "$1")              // italic: *text* → text
-      .replace(/_([^_]*)_/g, "$1")                // italic: _text_ → text
-      .replace(/`([^`]*)`/g, "$1")                // code: `text` → text
+      .replace(/\*\*([^*]*)\*\*/g, "$1") // bold: **text** → text
+      .replace(/\*([^*]*)\*/g, "$1") // italic: *text* → text
+      .replace(/_([^_]*)_/g, "$1") // italic: _text_ → text
+      .replace(/`([^`]*)`/g, "$1") // code: `text` → text
       .trim()
     const id = slugify(stripped)
     headings.push({ id, text, level })
@@ -44,7 +44,9 @@ const extractTextFromChildren = (children: ReactNode): string => {
       if (typeof child === "string") return child
       if (typeof child === "number") return String(child)
       if (typeof child === "object" && child !== null && "props" in child) {
-        return extractTextFromChildren((child as { props: { children?: ReactNode } }).props.children)
+        return extractTextFromChildren(
+          (child as { props: { children?: ReactNode } }).props.children,
+        )
       }
       return ""
     })

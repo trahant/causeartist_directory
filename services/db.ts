@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg"
-import { PHASE_PRODUCTION_BUILD } from "next/dist/shared/lib/constants"
+import { PHASE_PRODUCTION_BUILD } from "next/constants"
 import { PrismaClient } from "~/.generated/prisma/client"
 import { env } from "~/env"
 

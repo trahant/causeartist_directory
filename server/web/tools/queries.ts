@@ -29,7 +29,6 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
     ]
   }
 
-  // Query Premium tools first, then others by createdAt (Standard and Free equal)
   const [tools, total] = await db.$transaction([
     db.tool.findMany({
       orderBy: sortBy

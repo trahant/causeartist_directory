@@ -55,7 +55,7 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
               <ThemeSwitcher />
             </Tooltip>
 
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <Tooltip tooltip={t("navigation.rss_feed")}>
                 <DropdownMenuTrigger className={navLinkVariants()}>
                   <RssIcon />
