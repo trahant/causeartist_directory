@@ -61,7 +61,7 @@ export async function GET() {
     headers: {
       "Content-Type": "application/xml",
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": "public, max-age=14400",
+      "Cache-Control": "public, max-age=14400, s-maxage=14400, stale-while-revalidate=14400",
     },
   })
 }
