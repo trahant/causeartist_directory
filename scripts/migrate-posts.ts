@@ -130,7 +130,9 @@ function isLocalPath(path: string): boolean {
  * Upload a local image file to S3 and return the URL.
  */
 async function uploadLocalImage(imagePath: string, s3Key: string): Promise<string> {
-  const absolutePath = resolve(POSTS_DIR, imagePath)
+  // Resolve paths starting with "/" relative to the public directory, others relative to POSTS_DIR
+  const base = imagePath.startsWith("/") ? join(import.meta.dirname, "../public") : POSTS_DIR
+  const absolutePath = resolve(base, imagePath.startsWith("/") ? imagePath.slice(1) : imagePath)
   const buffer = await readFile(absolutePath)
   return uploadToS3Storage(Buffer.from(buffer), s3Key)
 }
