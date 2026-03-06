@@ -179,6 +179,7 @@ export const TiptapToolbar = ({ editor }: TiptapToolbarProps) => {
         blockquote: e.isActive("blockquote"),
         codeBlock: e.isActive("codeBlock"),
         link: e.isActive("link"),
+        image: e.isActive("image"),
         canUndo: e.can().undo(),
         canRedo: e.can().redo(),
       }

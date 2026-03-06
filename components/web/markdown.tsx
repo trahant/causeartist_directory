@@ -6,7 +6,6 @@ import remarkGfm from "remark-gfm"
 import { Link } from "~/components/common/link"
 import { Prose } from "~/components/common/prose"
 import { ExternalLink } from "~/components/web/external-link"
-import { cx } from "~/lib/utils"
 
 type Heading = {
   id: string
@@ -74,29 +73,29 @@ const createComponents = () => {
   const nextIndex = () => headingIndex++
 
   return {
-    a: ({ href, ...props }: ComponentProps<"a">) => {
+    a: ({ children, href }: ComponentProps<"a">) => {
       if (href && (href.startsWith("/") || href.startsWith("#"))) {
-        return <Link href={href} {...props} />
+        return <Link href={href}>{children}</Link>
       }
 
-      return <ExternalLink href={href} doTrack doFollow {...props} />
+      return (
+        <ExternalLink href={href} doTrack doFollow>
+          {children}
+        </ExternalLink>
+      )
     },
 
-    img: ({ src, alt, className, ...props }: ComponentProps<"img">) => (
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className={cx("w-full rounded-lg", className)}
-        {...props}
-      />
-    ),
+    img: ({ src, alt }: ComponentProps<"img">) => {
+      return <img src={src} alt={alt} loading="lazy" className="w-full rounded-lg" />
+    },
 
-    table: (props: ComponentProps<"table">) => (
-      <div className="overflow-x-auto">
-        <table {...props} />
-      </div>
-    ),
+    table: ({ ...props }: ComponentProps<"table">) => {
+      return (
+        <div className="overflow-x-auto">
+          <table {...props} />
+        </div>
+      )
+    },
 
     h1: createHeadingComponent("h1", nextIndex),
     h2: createHeadingComponent("h2", nextIndex),
