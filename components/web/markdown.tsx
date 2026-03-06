@@ -17,6 +17,7 @@ type Heading = {
 export const extractHeadingsFromMarkdown = (md: string): Heading[] => {
   const headings: Heading[] = []
   const regex = /^(#{1,6})\s+(.+)$/gm
+  let headingIndex = 0
   let match
 
   while ((match = regex.exec(md)) !== null) {
@@ -30,8 +31,12 @@ export const extractHeadingsFromMarkdown = (md: string): Heading[] => {
       .replace(/_([^_]*)_/g, "$1") // italic: _text_ → text
       .replace(/`([^`]*)`/g, "$1") // code: `text` → text
       .trim()
-    const id = slugify(stripped)
-    headings.push({ id, text, level })
+    const id = `${slugify(stripped)}-${headingIndex++}`
+
+    // Only include h1-h3 in TOC
+    if (level <= 3) {
+      headings.push({ id, text, level })
+    }
   }
 
   return headings
@@ -53,45 +58,53 @@ const extractTextFromChildren = (children: ReactNode): string => {
     .join("")
 }
 
-const createHeadingComponent = (Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => {
+const createHeadingComponent = (
+  Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
+  nextIndex: () => number,
+) => {
   return ({ children }: ComponentProps<"h1">) => {
     const text = extractTextFromChildren(children)
-    const id = slugify(text)
+    const id = `${slugify(text)}-${nextIndex()}`
     return <Tag id={id}>{children}</Tag>
   }
 }
 
-const components = {
-  a: ({ href, ...props }: ComponentProps<"a">) => {
-    if (href && (href.startsWith("/") || href.startsWith("#"))) {
-      return <Link href={href} {...props} />
-    }
+const createComponents = () => {
+  let headingIndex = 0
+  const nextIndex = () => headingIndex++
 
-    return <ExternalLink href={href} doTrack doFollow {...props} />
-  },
+  return {
+    a: ({ href, ...props }: ComponentProps<"a">) => {
+      if (href && (href.startsWith("/") || href.startsWith("#"))) {
+        return <Link href={href} {...props} />
+      }
 
-  img: ({ src, alt, className, ...props }: ComponentProps<"img">) => (
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      className={cx("w-full rounded-lg", className)}
-      {...props}
-    />
-  ),
+      return <ExternalLink href={href} doTrack doFollow {...props} />
+    },
 
-  table: (props: ComponentProps<"table">) => (
-    <div className="overflow-x-auto">
-      <table {...props} />
-    </div>
-  ),
+    img: ({ src, alt, className, ...props }: ComponentProps<"img">) => (
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className={cx("w-full rounded-lg", className)}
+        {...props}
+      />
+    ),
 
-  h1: createHeadingComponent("h1"),
-  h2: createHeadingComponent("h2"),
-  h3: createHeadingComponent("h3"),
-  h4: createHeadingComponent("h4"),
-  h5: createHeadingComponent("h5"),
-  h6: createHeadingComponent("h6"),
+    table: (props: ComponentProps<"table">) => (
+      <div className="overflow-x-auto">
+        <table {...props} />
+      </div>
+    ),
+
+    h1: createHeadingComponent("h1", nextIndex),
+    h2: createHeadingComponent("h2", nextIndex),
+    h3: createHeadingComponent("h3", nextIndex),
+    h4: createHeadingComponent("h4", nextIndex),
+    h5: createHeadingComponent("h5", nextIndex),
+    h6: createHeadingComponent("h6", nextIndex),
+  }
 }
 
 type MarkdownProps = ComponentProps<typeof Prose> & {
@@ -99,6 +112,8 @@ type MarkdownProps = ComponentProps<typeof Prose> & {
 }
 
 export const Markdown = ({ code, ...props }: MarkdownProps) => {
+  const components = createComponents()
+
   return (
     <Prose {...props}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
