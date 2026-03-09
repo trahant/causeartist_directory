@@ -1,19 +1,21 @@
-import { z } from "zod"
-import { fetchAndUploadMedia } from "~/lib/media"
+import { fetchAndUploadMedia, uploadToS3Storage } from "~/lib/media"
 import { baseProcedure } from "~/lib/orpc"
+import { fetchMediaSchema, uploadMediaSchema } from "~/server/web/media/schema"
 
 const fetch = baseProcedure
-  .input(
-    z.object({
-      url: z.url({ protocol: /^https?$/, normalize: true }),
-      path: z.string().regex(/^[a-z0-9/_-]+$/i),
-      type: z.enum(["favicon", "screenshot"]).default("favicon"),
-    }),
-  )
+  .input(fetchMediaSchema)
   .handler(async ({ input: { url, path, type } }) => {
     return fetchAndUploadMedia(url, path, type)
   })
 
+const upload = baseProcedure
+  .input(uploadMediaSchema)
+  .handler(async ({ input: { path, base64 } }) => {
+    const buffer = Buffer.from(base64, "base64")
+    return uploadToS3Storage(buffer, path)
+  })
+
 export const mediaRouter = {
   fetch,
+  upload,
 }

@@ -47,10 +47,10 @@ export function ReportForm({ className, title, report, ...props }: ReportFormPro
   })
 
   const mutation = useMutation(
-    orpc.reports.update.mutationOptions({
+    orpc.admin.reports.update.mutationOptions({
       onSuccess: () => {
         toast.success("Report successfully updated")
-        queryClient.invalidateQueries({ queryKey: orpc.reports.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.reports.key() })
       },
 
       onError: error => {

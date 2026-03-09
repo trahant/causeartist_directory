@@ -110,7 +110,7 @@ export function ReportTable() {
   const [params, setParams] = useQueryStates(reportListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.reports.list.queryOptions({
+    orpc.admin.reports.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

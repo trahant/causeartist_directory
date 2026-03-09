@@ -36,9 +36,9 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
   const isSinglePage = pathname === singlePath
 
   const duplicateMutation = useMutation(
-    orpc.ads.duplicate.mutationOptions({
+    orpc.admin.ads.duplicate.mutationOptions({
       onSuccess: data => {
-        queryClient.invalidateQueries({ queryKey: orpc.ads.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.ads.key() })
 
         if (isSinglePage) {
           router.push(`${indexPath}/${data.id}`)
@@ -97,8 +97,8 @@ export const AdActions = ({ ad, className, ...props }: AdActionsProps) => {
       <DeleteDialog
         ids={[ad.id]}
         label="ad"
-        mutationOptions={orpc.ads.remove.mutationOptions}
-        queryKey={orpc.ads.key()}
+        mutationOptions={orpc.admin.ads.remove.mutationOptions}
+        queryKey={orpc.admin.ads.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button

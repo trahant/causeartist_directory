@@ -22,8 +22,8 @@ export function ToolTableToolbarActions({ table }: ToolTableToolbarActionsProps)
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="tool"
-      mutationOptions={orpc.tools.remove.mutationOptions}
-      queryKey={orpc.tools.key()}
+      mutationOptions={orpc.admin.tools.remove.mutationOptions}
+      queryKey={orpc.admin.tools.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

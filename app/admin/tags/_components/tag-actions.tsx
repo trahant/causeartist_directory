@@ -34,9 +34,9 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
   const isSinglePage = pathname === singlePath
 
   const duplicateMutation = useMutation(
-    orpc.tags.duplicate.mutationOptions({
+    orpc.admin.tags.duplicate.mutationOptions({
       onSuccess: data => {
-        queryClient.invalidateQueries({ queryKey: orpc.tags.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.tags.key() })
 
         if (isSinglePage) {
           router.push(`${indexPath}/${data.id}`)
@@ -92,8 +92,8 @@ export const TagActions = ({ tag, className, ...props }: TagActionsProps) => {
       <DeleteDialog
         ids={[tag.id]}
         label="tag"
-        mutationOptions={orpc.tags.remove.mutationOptions}
-        queryKey={orpc.tags.key()}
+        mutationOptions={orpc.admin.tags.remove.mutationOptions}
+        queryKey={orpc.admin.tags.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button

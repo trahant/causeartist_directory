@@ -46,7 +46,7 @@ type PostFormProps = ComponentProps<"form"> & {
 export const PostForm = ({ className, title, post, currentUserId, ...props }: PostFormProps) => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { data: users = [] } = useQuery(orpc.users.lookup.queryOptions())
+  const { data: users = [] } = useQuery(orpc.admin.users.lookup.queryOptions())
   const [isStatusPending, setIsStatusPending] = useState(false)
   const originalStatus = useRef(post?.status ?? PostStatus.Draft)
   const id = useMemo(() => post?.id ?? createId(), [post?.id])
@@ -68,7 +68,7 @@ export const PostForm = ({ className, title, post, currentUserId, ...props }: Po
   })
 
   const mutation = useMutation(
-    orpc.posts.upsert.mutationOptions({
+    orpc.admin.posts.upsert.mutationOptions({
       onSuccess: data => {
         if (data.status !== originalStatus.current) {
           toast.success(
@@ -84,7 +84,7 @@ export const PostForm = ({ className, title, post, currentUserId, ...props }: Po
           toast.success(`Post successfully ${post ? "updated" : "created"}`)
         }
 
-        queryClient.invalidateQueries({ queryKey: orpc.posts.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.posts.key() })
         router.push(`/admin/posts/${data.id}`)
       },
 

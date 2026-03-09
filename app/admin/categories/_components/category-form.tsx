@@ -34,7 +34,7 @@ type CategoryFormProps = ComponentProps<"form"> & {
 export function CategoryForm({ className, title, category, ...props }: CategoryFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
+  const { data: tools = [] } = useQuery(orpc.admin.tools.lookup.queryOptions())
 
   const id = useMemo(() => category?.id ?? createId(), [category?.id])
 
@@ -51,10 +51,10 @@ export function CategoryForm({ className, title, category, ...props }: CategoryF
   })
 
   const mutation = useMutation(
-    orpc.categories.upsert.mutationOptions({
+    orpc.admin.categories.upsert.mutationOptions({
       onSuccess: data => {
         toast.success(`Category successfully ${category ? "updated" : "created"}`)
-        queryClient.invalidateQueries({ queryKey: orpc.categories.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.categories.key() })
         router.push(`/admin/categories/${data.id}`)
       },
 

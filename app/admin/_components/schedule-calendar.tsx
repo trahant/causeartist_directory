@@ -90,7 +90,7 @@ export const Calendar = ({ className, ...props }: ComponentProps<"div">) => {
   const calendarEnd = endOfWeek(endOfMonth(currentMonth), { weekStartsOn: 1 })
 
   const { data: tools = [] } = useQuery(
-    orpc.tools.scheduled.queryOptions({
+    orpc.admin.tools.scheduled.queryOptions({
       input: {
         start: calendarStart,
         end: calendarEnd,

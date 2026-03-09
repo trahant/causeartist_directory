@@ -19,7 +19,4 @@ const link = new RPCLink({
   },
 })
 
-const appClient: RouterClient<AppRouter> = createORPCClient(link)
-
-export const client = appClient.admin
-export const webClient = appClient.web
+export const client: RouterClient<AppRouter> = createORPCClient(link)

@@ -88,7 +88,7 @@ export function TagTable() {
   const [params, setParams] = useQueryStates(tagListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.tags.list.queryOptions({
+    orpc.admin.tags.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

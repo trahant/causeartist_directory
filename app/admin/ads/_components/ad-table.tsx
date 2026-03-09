@@ -122,7 +122,7 @@ export function AdTable() {
   const [params, setParams] = useQueryStates(adListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.ads.list.queryOptions({
+    orpc.admin.ads.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

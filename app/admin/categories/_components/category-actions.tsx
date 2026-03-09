@@ -34,9 +34,9 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
   const isSinglePage = pathname === singlePath
 
   const duplicateMutation = useMutation(
-    orpc.categories.duplicate.mutationOptions({
+    orpc.admin.categories.duplicate.mutationOptions({
       onSuccess: data => {
-        queryClient.invalidateQueries({ queryKey: orpc.categories.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.categories.key() })
 
         if (isSinglePage) {
           router.push(`${indexPath}/${data.id}`)
@@ -92,8 +92,8 @@ export const CategoryActions = ({ category, className, ...props }: CategoryActio
       <DeleteDialog
         ids={[category.id]}
         label="category"
-        mutationOptions={orpc.categories.remove.mutationOptions}
-        queryKey={orpc.categories.key()}
+        mutationOptions={orpc.admin.categories.remove.mutationOptions}
+        queryKey={orpc.admin.categories.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button

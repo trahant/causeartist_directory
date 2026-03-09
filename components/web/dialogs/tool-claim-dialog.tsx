@@ -23,7 +23,7 @@ import { LoginDialog } from "~/components/web/auth/login-dialog"
 import { claimsConfig } from "~/config/claims"
 import { siteConfig } from "~/config/site"
 import { useSession } from "~/lib/auth-client"
-import { webOrpc } from "~/lib/orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import { createClaimToolEmailSchema, createClaimToolOtpSchema } from "~/server/web/shared/schema"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -64,7 +64,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
   })
 
   const sendOtpMutation = useMutation(
-    webOrpc.tools.sendClaimOtp.mutationOptions({
+    orpc.web.tools.sendClaimOtp.mutationOptions({
       onSuccess: () => {
         toast.success(t("otp_sent"))
         setVerificationEmail(emailForm.getValues().email)
@@ -79,7 +79,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
   )
 
   const verifyOtpMutation = useMutation(
-    webOrpc.tools.verifyClaimOtp.mutationOptions({
+    orpc.web.tools.verifyClaimOtp.mutationOptions({
       onSuccess: () => {
         toast.success(t("success_message", { toolName: tool.name }))
         router.push(`/${tool.slug}`)
@@ -194,11 +194,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                   {t("cancel_button")}
                 </Button>
 
-                <Button
-                  type="submit"
-                  className="min-w-28"
-                  isPending={sendOtpMutation.isPending}
-                >
+                <Button type="submit" className="min-w-28" isPending={sendOtpMutation.isPending}>
                   {t("send_code_button")}
                 </Button>
               </DialogFooter>
@@ -265,11 +261,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                   {t("cancel_button")}
                 </Button>
 
-                <Button
-                  type="submit"
-                  className="min-w-28"
-                  isPending={verifyOtpMutation.isPending}
-                >
+                <Button type="submit" className="min-w-28" isPending={verifyOtpMutation.isPending}>
                   {t("claim_button", { toolName: tool.name })}
                 </Button>
               </DialogFooter>

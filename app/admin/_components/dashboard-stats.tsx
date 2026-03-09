@@ -7,7 +7,7 @@ import { orpc } from "~/lib/orpc-query"
 const staleTime = 60 * 60 * 1000 // 1 hour
 
 export function DashboardStats() {
-  const { data: stats } = useQuery(orpc.metrics.stats.queryOptions({ staleTime }))
+  const { data: stats } = useQuery(orpc.admin.metrics.stats.queryOptions({ staleTime }))
 
   if (!stats) {
     return (

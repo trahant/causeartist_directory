@@ -93,7 +93,7 @@ export function CategoryTable() {
   const [params, setParams] = useQueryStates(categoryListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.categories.list.queryOptions({
+    orpc.admin.categories.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

@@ -10,7 +10,7 @@ import { Button } from "~/components/common/button"
 import { Hint } from "~/components/common/hint"
 import { Input } from "~/components/common/input"
 import { useTrackEvent } from "~/hooks/use-track-event"
-import { webOrpc } from "~/lib/orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import { createNewsletterSchema } from "~/server/web/shared/schema"
 
@@ -46,7 +46,7 @@ export const CTAForm = ({
   })
 
   const mutation = useMutation(
-    webOrpc.subscribe.subscribe.mutationOptions({
+    orpc.web.subscribe.subscribe.mutationOptions({
       onSuccess: () => {
         trackEvent("subscribe_newsletter", { email: form.getValues("email") })
       },

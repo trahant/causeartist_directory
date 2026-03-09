@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import type { ComponentProps, ReactNode } from "react"
 import { toast } from "sonner"
 import type Stripe from "stripe"
+import type { z } from "zod"
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { Card, CardBadges, CardBg } from "~/components/common/card"
@@ -19,11 +20,10 @@ import { ProductFeatures } from "~/components/web/products/product-features"
 import { ProductIntervalSwitch } from "~/components/web/products/product-interval-switch"
 import { siteConfig } from "~/config/site"
 import { useProductPrices } from "~/hooks/use-product-prices"
+import { orpc } from "~/lib/orpc-query"
 import { getProductFeatures, type ProductInterval } from "~/lib/products"
 import { cx } from "~/lib/utils"
-import { webOrpc } from "~/lib/web-orpc-query"
 import type { checkoutSchema } from "~/server/web/products/schema"
-import type { z } from "zod"
 
 const productClassName = "items-stretch gap-8 basis-72 grow max-w-80 bg-transparent"
 
@@ -33,10 +33,7 @@ type ProductData = {
   coupon?: Stripe.Coupon
 }
 
-type ProductCheckoutData = Omit<
-  z.infer<typeof checkoutSchema>,
-  "lineItems" | "mode" | "coupon"
->
+type ProductCheckoutData = Omit<z.infer<typeof checkoutSchema>, "lineItems" | "mode" | "coupon">
 
 type ProductProps = ComponentProps<typeof Card> & {
   data: ProductData
@@ -66,12 +63,11 @@ const Product = ({
   })
 
   const { mutate, isPending } = useMutation({
-    ...webOrpc.products.createCheckout.mutationOptions(),
+    ...orpc.web.products.createCheckout.mutationOptions(),
     onSuccess: data => {
       window.location.href = data.url
     },
     onError: error => {
-      console.error("Checkout error:", error)
       toast.error(error.message)
     },
   })

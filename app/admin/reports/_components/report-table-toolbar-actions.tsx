@@ -22,8 +22,8 @@ export const ReportTableToolbarActions = ({ table }: ReportTableToolbarActionsPr
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="report"
-      mutationOptions={orpc.reports.remove.mutationOptions}
-      queryKey={orpc.reports.key()}
+      mutationOptions={orpc.admin.reports.remove.mutationOptions}
+      queryKey={orpc.admin.reports.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

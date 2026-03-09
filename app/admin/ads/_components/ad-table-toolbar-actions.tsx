@@ -22,8 +22,8 @@ export function AdTableToolbarActions({ table }: AdTableToolbarActionsProps) {
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="ad"
-      mutationOptions={orpc.ads.remove.mutationOptions}
-      queryKey={orpc.ads.key()}
+      mutationOptions={orpc.admin.ads.remove.mutationOptions}
+      queryKey={orpc.admin.ads.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

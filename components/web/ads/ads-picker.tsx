@@ -21,7 +21,7 @@ import { adsConfig } from "~/config/ads"
 import { siteConfig } from "~/config/site"
 import { type AdSpot, useAds } from "~/hooks/use-ads"
 import { toUTCMidnight } from "~/lib/ads"
-import { webOrpc } from "~/lib/web-orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import type { AdMany } from "~/server/web/ads/payloads"
 import { checkoutSchema } from "~/server/web/products/schema"
 
@@ -63,7 +63,7 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
     useAds(spots)
 
   const { mutate, isPending } = useMutation({
-    ...webOrpc.products.createCheckout.mutationOptions(),
+    ...orpc.web.products.createCheckout.mutationOptions(),
     onSuccess: data => {
       window.location.href = data.url
     },

@@ -1,9 +1,6 @@
 import { z } from "zod"
 import { authedProcedure } from "~/lib/orpc"
-
-const bookmarkInputSchema = z.object({
-  toolId: z.string().min(1),
-})
+import { bookmarkInputSchema } from "~/server/web/bookmarks/schema"
 
 const check = authedProcedure
   .input(bookmarkInputSchema)

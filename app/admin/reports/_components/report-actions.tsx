@@ -55,8 +55,8 @@ export const ReportActions = ({ report, className, ...props }: ReportActionsProp
       <DeleteDialog
         ids={[report.id]}
         label="report"
-        mutationOptions={orpc.reports.remove.mutationOptions}
-        queryKey={orpc.reports.key()}
+        mutationOptions={orpc.admin.reports.remove.mutationOptions}
+        queryKey={orpc.admin.reports.key()}
         onExecute={() => isSinglePage && router.push(indexPath)}
       >
         <Button

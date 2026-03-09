@@ -12,13 +12,13 @@ import {
   SelectValue,
 } from "~/components/common/select"
 import { useFilters } from "~/contexts/filter-context"
-import { webOrpc } from "~/lib/web-orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import type { ToolFilterSchema } from "~/server/web/tools/schema"
 
 export const ToolFilters = ({ ...props }: ComponentProps<typeof Select>) => {
   const t = useTranslations("tools.filters")
   const { filters, updateFilters } = useFilters<ToolFilterSchema>()
-  const { data } = useQuery(webOrpc.filters.findFilterOptions.queryOptions())
+  const { data } = useQuery(orpc.web.filters.findFilterOptions.queryOptions())
 
   return (
     <>

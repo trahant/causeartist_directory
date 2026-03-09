@@ -1,6 +1,7 @@
 "use client"
 
 import { type HotkeyItem, useDebouncedState, useHotkeys } from "@mantine/hooks"
+import type { InferRouterOutputs } from "@orpc/server"
 import { getDomain } from "@primoui/utils"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { LoaderIcon, MoonIcon, SunIcon } from "lucide-react"
@@ -9,6 +10,7 @@ import { useTheme } from "next-themes"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react"
+import type { AppRouter } from "~/app/api/rpc/[[...rest]]/route"
 import {
   CommandDialog,
   CommandEmpty,
@@ -20,13 +22,9 @@ import {
 } from "~/components/common/command"
 import { useSearch } from "~/contexts/search-context"
 import { useSession } from "~/lib/auth-client"
-import { webOrpc } from "~/lib/web-orpc-query"
+import { orpc } from "~/lib/orpc-query"
 
-type SearchResults = {
-  tools: { id: string; slug: string; name: string; faviconUrl: string | null; websiteUrl: string }[]
-  categories: { id: string; slug: string; name: string }[]
-  tags: { id: string; slug: string; name: string }[]
-}
+type SearchResults = InferRouterOutputs<AppRouter>["web"]["search"]["searchItems"]
 
 type SearchResultsProps<T> = {
   name: string
@@ -88,7 +86,7 @@ export const Search = () => {
   const hasQuery = !!q.length
 
   const { data: featuredTools } = useQuery({
-    ...webOrpc.search.findFeaturedTools.queryOptions(),
+    ...orpc.web.search.findFeaturedTools.queryOptions(),
     enabled: search.isOpen && !hasQuery,
   })
 
@@ -194,8 +192,8 @@ export const Search = () => {
 
   useHotkeys(hotkeys, [], true)
 
-  const { mutate: executeSearch, isPending } = useMutation(
-    webOrpc.search.searchItems.mutationOptions({
+  const { mutate, isPending } = useMutation(
+    orpc.web.search.searchItems.mutationOptions({
       onSuccess: data => {
         setResults(data)
       },
@@ -210,14 +208,14 @@ export const Search = () => {
     if (hasQuery) {
       const query = q.toLowerCase().trim()
 
-      executeSearch({ query })
+      mutate({ query })
       listRef.current?.scrollTo({ top: 0, behavior: "smooth" })
     } else {
       if (!search.isOpen) {
         setResults(undefined)
       }
     }
-  }, [q, search.isOpen, executeSearch, hasQuery])
+  }, [q, search.isOpen, mutate, hasQuery])
 
   return (
     <CommandDialog open={search.isOpen} onOpenChange={handleOpenChange} shouldFilter={false}>

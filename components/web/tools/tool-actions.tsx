@@ -1,7 +1,7 @@
 "use client"
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useWindowScroll } from "@mantine/hooks"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   BadgeCheckIcon,
   BookmarkIcon,
@@ -36,7 +36,7 @@ import { ToolReportDialog } from "~/components/web/dialogs/tool-report-dialog"
 import { ToolButton } from "~/components/web/tools/tool-button"
 import { reportsConfig } from "~/config/reports"
 import { useSession } from "~/lib/auth-client"
-import { webOrpc } from "~/lib/orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import { isToolApproved, isToolPremiumTier, isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import type { ToolOne } from "~/server/web/tools/payloads"
@@ -63,7 +63,7 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
 
   // Bookmark query
   const { data: bookmarkData } = useQuery(
-    webOrpc.bookmarks.check.queryOptions({
+    orpc.web.bookmarks.check.queryOptions({
       input: { toolId: tool.id },
       enabled: !!session?.user,
     }),
@@ -72,10 +72,10 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
   const isBookmarked = bookmarkData?.bookmarked ?? false
 
   // Bookmark mutation
-  const { mutate: executeBookmark, isPending: isBookmarkPending } = useMutation(
-    webOrpc.bookmarks.set.mutationOptions({
+  const { mutate: toggleBookmark, isPending: isBookmarkPending } = useMutation(
+    orpc.web.bookmarks.set.mutationOptions({
       onSuccess: data => {
-        queryClient.invalidateQueries({ queryKey: webOrpc.bookmarks.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.web.bookmarks.key() })
 
         toast.success(data.bookmarked ? t("bookmark_added") : t("bookmark_removed"), {
           action: {
@@ -102,7 +102,7 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
       return
     }
 
-    executeBookmark({ toolId: tool.id, bookmarked: !isBookmarked })
+    toggleBookmark({ toolId: tool.id, bookmarked: !isBookmarked })
   }
 
   const handleClose = (isOpen: SetStateAction<boolean>) => {

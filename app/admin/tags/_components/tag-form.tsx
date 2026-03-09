@@ -31,7 +31,7 @@ type TagFormProps = ComponentProps<"form"> & {
 export function TagForm({ className, title, tag, ...props }: TagFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { data: tools = [] } = useQuery(orpc.tools.lookup.queryOptions())
+  const { data: tools = [] } = useQuery(orpc.admin.tools.lookup.queryOptions())
 
   const id = useMemo(() => tag?.id ?? createId(), [tag?.id])
 
@@ -46,10 +46,10 @@ export function TagForm({ className, title, tag, ...props }: TagFormProps) {
   })
 
   const mutation = useMutation(
-    orpc.tags.upsert.mutationOptions({
+    orpc.admin.tags.upsert.mutationOptions({
       onSuccess: data => {
         toast.success(`Tag successfully ${tag ? "updated" : "created"}`)
-        queryClient.invalidateQueries({ queryKey: orpc.tags.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.tags.key() })
         router.push(`/admin/tags/${data.id}`)
       },
 

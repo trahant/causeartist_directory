@@ -24,7 +24,7 @@ import { TextArea } from "~/components/common/textarea"
 import { LoginDialog } from "~/components/web/auth/login-dialog"
 import { reportsConfig } from "~/config/reports"
 import { useSession } from "~/lib/auth-client"
-import { webOrpc } from "~/lib/orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import { createReportToolSchema } from "~/server/web/shared/schema"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -52,7 +52,7 @@ export const ToolReportDialog = ({ tool, isOpen, setIsOpen }: ToolReportDialogPr
   })
 
   const mutation = useMutation(
-    webOrpc.reports.report.mutationOptions({
+    orpc.web.reports.report.mutationOptions({
       onSuccess: () => {
         toast.success(t("success_message"))
         setIsOpen(false)

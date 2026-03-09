@@ -22,8 +22,8 @@ export function UserTableToolbarActions({ table }: UserTableToolbarActionsProps)
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="user"
-      mutationOptions={orpc.users.remove.mutationOptions}
-      queryKey={orpc.users.key()}
+      mutationOptions={orpc.admin.users.remove.mutationOptions}
+      queryKey={orpc.admin.users.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

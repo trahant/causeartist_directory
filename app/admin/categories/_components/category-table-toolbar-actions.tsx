@@ -22,8 +22,8 @@ export function CategoryTableToolbarActions({ table }: CategoryTableToolbarActio
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="category"
-      mutationOptions={orpc.categories.remove.mutationOptions}
-      queryKey={orpc.categories.key()}
+      mutationOptions={orpc.admin.categories.remove.mutationOptions}
+      queryKey={orpc.admin.categories.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

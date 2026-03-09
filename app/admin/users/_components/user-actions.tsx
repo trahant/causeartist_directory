@@ -42,9 +42,9 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
   const isSinglePage = pathname === singlePath
 
   const updateRoleMutation = useMutation(
-    orpc.users.updateRole.mutationOptions({
+    orpc.admin.users.updateRole.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.users.key() })
         router.refresh()
       },
     }),
@@ -114,7 +114,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
                   toast.promise(
                     async () => {
                       await admin.unbanUser({ userId: user.id })
-                      queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+                      queryClient.invalidateQueries({ queryKey: orpc.admin.users.key() })
                       router.refresh()
                     },
                     { loading: "Unbanning...", success: "User successfully unbanned" },
@@ -129,7 +129,7 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
                   toast.promise(
                     async () => {
                       await admin.banUser({ userId: user.id })
-                      queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+                      queryClient.invalidateQueries({ queryKey: orpc.admin.users.key() })
                       router.refresh()
                     },
                     { loading: "Banning...", success: "User successfully banned" },
@@ -157,8 +157,8 @@ export const UserActions = ({ user, className, ...props }: UserActionsProps) => 
         <DeleteDialog
           ids={[user.id]}
           label="user"
-          mutationOptions={orpc.users.remove.mutationOptions}
-          queryKey={orpc.users.key()}
+          mutationOptions={orpc.admin.users.remove.mutationOptions}
+          queryKey={orpc.admin.users.key()}
           onExecute={() => isSinglePage && router.push(indexPath)}
         >
           <Button

@@ -15,7 +15,7 @@ import { Input } from "~/components/common/input"
 import { TextArea } from "~/components/common/textarea"
 import { FeatureNudge } from "~/components/web/feature-nudge"
 import { useTrackEvent } from "~/hooks/use-track-event"
-import { webOrpc } from "~/lib/orpc-query"
+import { orpc } from "~/lib/orpc-query"
 import { isToolPremiumTier, isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
 import { createSubmitToolSchema } from "~/server/web/shared/schema"
@@ -39,7 +39,7 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
   })
 
   const mutation = useMutation(
-    webOrpc.tools.submit.mutationOptions({
+    orpc.web.tools.submit.mutationOptions({
       onSuccess: data => {
         form.reset()
 

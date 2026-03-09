@@ -137,7 +137,7 @@ export function ToolTable() {
   const [params, setParams] = useQueryStates(toolListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.tools.list.queryOptions({
+    orpc.admin.tools.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

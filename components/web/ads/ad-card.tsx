@@ -2,6 +2,7 @@ import { ArrowUpRightIcon } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import Image from "next/image"
 import type { ComponentProps } from "react"
+import type { AdType } from "~/.generated/prisma/client"
 import { Button } from "~/components/common/button"
 import {
   Card,
@@ -18,7 +19,6 @@ import { Favicon } from "~/components/web/ui/favicon"
 import { cx } from "~/lib/utils"
 import type { AdOne } from "~/server/web/ads/payloads"
 import { findAdWithFallback } from "~/server/web/ads/queries"
-import type { AdType } from "~/.generated/prisma/client"
 
 type AdCardProps = CardProps & {
   type: AdType

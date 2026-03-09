@@ -7,7 +7,7 @@ import { orpc } from "~/lib/orpc-query"
 const staleTime = 60 * 60 * 1000 // 1 hour
 
 export function VisitorMetric() {
-  const { data } = useQuery(orpc.metrics.visitors.queryOptions({ staleTime }))
+  const { data } = useQuery(orpc.admin.metrics.visitors.queryOptions({ staleTime }))
 
   if (!data) {
     return <MetricChartSkeleton />

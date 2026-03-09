@@ -40,10 +40,10 @@ export function UserForm({ className, title, user, ...props }: UserFormProps) {
   })
 
   const mutation = useMutation(
-    orpc.users.update.mutationOptions({
+    orpc.admin.users.update.mutationOptions({
       onSuccess: () => {
         toast.success("User successfully updated")
-        queryClient.invalidateQueries({ queryKey: orpc.users.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.users.key() })
       },
 
       onError: error => {

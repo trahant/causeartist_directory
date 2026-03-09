@@ -118,7 +118,7 @@ export const PostTable = () => {
   const [params, setParams] = useQueryStates(postListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.posts.list.queryOptions({
+    orpc.admin.posts.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

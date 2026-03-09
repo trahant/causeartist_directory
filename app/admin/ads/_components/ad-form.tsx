@@ -69,10 +69,10 @@ export function AdForm({ className, title, ad, ...props }: AdFormProps) {
   })
 
   const mutation = useMutation(
-    orpc.ads.upsert.mutationOptions({
+    orpc.admin.ads.upsert.mutationOptions({
       onSuccess: data => {
         toast.success(`Ad successfully ${ad ? "updated" : "created"}`)
-        queryClient.invalidateQueries({ queryKey: orpc.ads.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.ads.key() })
         router.push(`/admin/ads/${data.id}`)
       },
 

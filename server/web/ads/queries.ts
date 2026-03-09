@@ -1,5 +1,5 @@
-import { cacheLife, cacheTag } from "next/cache"
 import { getTranslations } from "next-intl/server"
+import { cacheLife, cacheTag } from "next/cache"
 import type { Prisma } from "~/.generated/prisma/client"
 import { AdType } from "~/.generated/prisma/client"
 import { adsConfig } from "~/config/ads"

@@ -22,8 +22,8 @@ export const TagTableToolbarActions = ({ table }: TagTableToolbarActionsProps) =
     <DeleteDialog
       ids={rows.map(row => row.original.id)}
       label="tag"
-      mutationOptions={orpc.tags.remove.mutationOptions}
-      queryKey={orpc.tags.key()}
+      mutationOptions={orpc.admin.tags.remove.mutationOptions}
+      queryKey={orpc.admin.tags.key()}
     >
       <Button variant="secondary" size="md" prefix={<TrashIcon />}>
         Delete ({rows.length})

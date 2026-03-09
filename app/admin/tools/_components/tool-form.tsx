@@ -67,8 +67,8 @@ type ToolFormProps = ComponentProps<"form"> & {
 export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { data: categories = [] } = useQuery(orpc.categories.lookup.queryOptions())
-  const { data: tags = [] } = useQuery(orpc.tags.lookup.queryOptions())
+  const { data: categories = [] } = useQuery(orpc.admin.categories.lookup.queryOptions())
+  const { data: tags = [] } = useQuery(orpc.admin.tags.lookup.queryOptions())
   const [isPreviewing, setIsPreviewing] = useState(false)
   const [isStatusPending, setIsStatusPending] = useState(false)
   const [isGenerationComplete, setIsGenerationComplete] = useState(true)
@@ -102,7 +102,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   })
 
   const mutation = useMutation(
-    orpc.tools.upsert.mutationOptions({
+    orpc.admin.tools.upsert.mutationOptions({
       onSuccess: data => {
         if (data.status !== originalStatus.current) {
           toast.success(<ToolStatusChange tool={data} />)
@@ -111,7 +111,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
           toast.success(`Tool successfully ${tool ? "updated" : "created"}`)
         }
 
-        queryClient.invalidateQueries({ queryKey: orpc.tools.key() })
+        queryClient.invalidateQueries({ queryKey: orpc.admin.tools.key() })
         router.push(`/admin/tools/${data.id}`)
       },
 

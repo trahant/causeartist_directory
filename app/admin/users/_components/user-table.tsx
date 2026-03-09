@@ -115,7 +115,7 @@ export function UserTable() {
   const [params, setParams] = useQueryStates(userListParams)
 
   const { data, isLoading, isFetching } = useQuery(
-    orpc.users.list.queryOptions({
+    orpc.admin.users.list.queryOptions({
       input: params,
       placeholderData: keepPreviousData,
     }),

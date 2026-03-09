@@ -12,8 +12,8 @@ import { Input } from "~/components/common/input"
 import { Note } from "~/components/common/note"
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
+import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { webOrpc } from "~/lib/web-orpc-query"
 import type { AdOne } from "~/server/web/ads/payloads"
 import { createAdDetailsSchema } from "~/server/web/shared/schema"
 
@@ -40,7 +40,7 @@ export const AdForm = ({ className, sessionId, ad, ...props }: AdFormProps) => {
   })
 
   const { mutate, isPending } = useMutation({
-    ...webOrpc.ads.createFromCheckout.mutationOptions(),
+    ...orpc.web.ads.createFromCheckout.mutationOptions(),
     onSuccess: () => {
       toast.success(t(`${ad ? "update" : "create"}.success_message`))
     },

@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react"
 import { toast } from "sonner"
+import { client } from "~/lib/orpc-client"
 
 type UploadedFile = {
   key: string
@@ -33,30 +34,16 @@ export const useMediaUpload = (mediaPath: string) => {
       setError(null)
 
       try {
-        const formData = new FormData()
-        formData.append("path", s3Key)
-        formData.append("file", file)
-
-        const response = await globalThis.fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        })
-
-        const result = await response.json()
-
-        if (!response.ok || result.error) {
-          throw new Error(result.error ?? "Upload failed")
-        }
+        const base64 = Buffer.from(await file.arrayBuffer()).toString("base64")
+        const url = await client.web.media.upload({ path: s3Key, base64, mimeType: file.type })
 
         setProgress(100)
 
-        if (!result.data) throw new Error("Upload failed: no URL returned")
-        const url = result.data as string
+        if (!url) throw new Error("Upload failed: no URL returned")
 
         const uploaded: UploadedFile = {
           key: s3Key,
-          url: url,
+          url,
           name: file.name,
           size: file.size,
           type: file.type,
