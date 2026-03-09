@@ -2,7 +2,7 @@ import { getRandomElement } from "@primoui/utils"
 import { cacheLife, cacheTag } from "next/cache"
 import { type Prisma, ToolStatus } from "~/.generated/prisma/client"
 import { toolManyPayload, toolOnePayload } from "~/server/web/tools/payloads"
-import type { ToolFilterParams } from "~/server/web/tools/schema"
+import { toolSort, type ToolFilterParams } from "~/server/web/tools/schema"
 import { db } from "~/services/db"
 
 export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolWhereInput) => {
@@ -14,7 +14,6 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
   const { q, category, sort, page, perPage } = search
   const skip = (page - 1) * perPage
   const take = perPage
-  const [sortBy, sortOrder] = sort.split(".")
 
   const whereQuery: Prisma.ToolWhereInput = {
     status: ToolStatus.Published,
@@ -31,9 +30,7 @@ export const searchTools = async (search: ToolFilterParams, where?: Prisma.ToolW
 
   const [tools, total] = await db.$transaction([
     db.tool.findMany({
-      orderBy: sortBy
-        ? { [sortBy]: sortOrder }
-        : [{ tierPriority: "asc" }, { publishedAt: "desc" }],
+      orderBy: toolSort.resolve(sort) ?? [{ tierPriority: "asc" }, { publishedAt: "desc" }],
       where: { ...whereQuery, ...where },
       select: toolManyPayload,
       take,

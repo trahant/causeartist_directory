@@ -1,7 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache"
 import { type Prisma, ToolStatus } from "~/.generated/prisma/client"
 import { tagManyPayload, tagOnePayload } from "~/server/web/tags/payloads"
-import type { TagsFilterParams } from "~/server/web/tags/schema"
+import { tagSort, type TagsFilterParams } from "~/server/web/tags/schema"
 import { db } from "~/services/db"
 
 export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhereInput) => {
@@ -13,7 +13,6 @@ export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhe
   const { q, letter, sort, page, perPage } = search
   const skip = (page - 1) * perPage
   const take = perPage
-  const [sortBy, sortOrder] = sort.split(".")
 
   const whereQuery: Prisma.TagWhereInput = {
     tools: { some: { status: ToolStatus.Published } },
@@ -40,7 +39,7 @@ export const searchTags = async (search: TagsFilterParams, where?: Prisma.TagWhe
 
   const [tags, total] = await db.$transaction([
     db.tag.findMany({
-      orderBy: sortBy ? { [sortBy]: sortOrder } : [{ tools: { _count: "desc" } }, { name: "asc" }],
+      orderBy: tagSort.resolve(sort) ?? [{ tools: { _count: "desc" } }, { name: "asc" }],
       where: { ...whereQuery, ...where },
       select: tagManyPayload,
       take,

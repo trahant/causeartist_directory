@@ -7,7 +7,7 @@ import { Filters } from "~/components/web/filters/filters"
 import { Sort } from "~/components/web/filters/sort"
 import { TagFilters } from "~/components/web/tags/tag-filters"
 import { useFilters } from "~/contexts/filter-context"
-import type { TagsFilterSchema } from "~/server/web/tags/schema"
+import { tagSort, type TagsFilterSchema } from "~/server/web/tags/schema"
 
 export type TagSearchProps = ComponentProps<typeof Stack> & {
   placeholder?: string
@@ -16,11 +16,12 @@ export type TagSearchProps = ComponentProps<typeof Stack> & {
 export const TagSearch = ({ placeholder, ...props }: TagSearchProps) => {
   const { enableSort, enableFilters } = useFilters<TagsFilterSchema>()
   const t = useTranslations("tags.filters")
+  const tagSortOptions = Object.entries(tagSort.options)
 
-  const sortOptions = [
-    { value: "name.asc", label: t("sort_name_asc") },
-    { value: "name.desc", label: t("sort_name_desc") },
-  ]
+  const sortOptions = tagSortOptions.map(([value, { label }]) => ({
+    value,
+    label: t(label),
+  }))
 
   return (
     <Filters placeholder={placeholder || t("search_placeholder")} {...props}>

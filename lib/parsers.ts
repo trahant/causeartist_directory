@@ -1,8 +1,26 @@
 import type { Row } from "@tanstack/react-table"
 import type { inferParserType, ParserMap } from "nuqs"
-import { createParser } from "nuqs/server"
+import { createParser, parseAsString } from "nuqs/server"
 import { z } from "zod"
 import type { ExtendedSortingState } from "~/types"
+
+type SortDefinition<TOrderBy> = {
+  label: string
+  orderBy: TOrderBy | TOrderBy[]
+}
+
+type SortMap<TOrderBy> = Record<string, SortDefinition<TOrderBy>>
+
+/**
+ * Creates a sort parser with a typed map of sort options.
+ * Uses `parseAsString` to accept any string, with server-side resolution
+ * through the map. Unknown keys resolve to `undefined` (use default sort).
+ */
+export const createSortParser = <TOrderBy>(sortMap: SortMap<TOrderBy>) => ({
+  parser: parseAsString.withDefault(""),
+  resolve: (key: string): TOrderBy | TOrderBy[] | undefined => sortMap[key]?.orderBy,
+  options: sortMap,
+})
 
 const sortingItemSchema = z.object({
   id: z.string(),
