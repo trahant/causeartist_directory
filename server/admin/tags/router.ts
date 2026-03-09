@@ -1,18 +1,18 @@
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 import { findTagList, findTags } from "~/server/admin/tags/queries"
 import { tagListSchema, tagSchema } from "~/server/admin/tags/schema"
 
-const list = adminProcedure.input(tagListSchema).handler(async ({ input }) => {
+const list = withAdmin.input(tagListSchema).handler(async ({ input }) => {
   return findTags(input)
 })
 
-const lookup = adminProcedure.handler(async () => {
+const lookup = withAdmin.handler(async () => {
   return findTagList()
 })
 
-const upsert = adminProcedure
+const upsert = withAdmin
   .input(tagSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, tools, ...data } = input
@@ -47,7 +47,7 @@ const upsert = adminProcedure
     return tag
   })
 
-const duplicate = adminProcedure
+const duplicate = withAdmin
   .input(idSchema)
   .handler(async ({ input: { id }, context: { db, revalidate } }) => {
     const tag = await db.tag.findUnique({
@@ -80,7 +80,7 @@ const duplicate = adminProcedure
     return newTag
   })
 
-const remove = adminProcedure
+const remove = withAdmin
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.tag.deleteMany({

@@ -1,33 +1,31 @@
 import { after } from "next/server"
 import { removeS3Directories } from "~/lib/media"
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { findAds } from "~/server/admin/ads/queries"
 import { adListSchema, adSchema } from "~/server/admin/ads/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 
-const list = adminProcedure.input(adListSchema).handler(async ({ input }) => {
+const list = withAdmin.input(adListSchema).handler(async ({ input }) => {
   return findAds(input)
 })
 
-const upsert = adminProcedure
-  .input(adSchema)
-  .handler(async ({ input, context: { db, revalidate } }) => {
-    const { id, ...data } = input
+const upsert = withAdmin.input(adSchema).handler(async ({ input, context: { db, revalidate } }) => {
+  const { id, ...data } = input
 
-    const ad = await db.ad.upsert({
-      where: { id },
-      create: { id, ...data },
-      update: data,
-    })
-
-    revalidate({
-      tags: ["ads"],
-    })
-
-    return ad
+  const ad = await db.ad.upsert({
+    where: { id },
+    create: { id, ...data },
+    update: data,
   })
 
-const duplicate = adminProcedure
+  revalidate({
+    tags: ["ads"],
+  })
+
+  return ad
+})
+
+const duplicate = withAdmin
   .input(idSchema)
   .handler(async ({ input: { id }, context: { db, revalidate } }) => {
     const ad = await db.ad.findUnique({
@@ -60,7 +58,7 @@ const duplicate = adminProcedure
     return newAd
   })
 
-const remove = adminProcedure
+const remove = withAdmin
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.ad.deleteMany({

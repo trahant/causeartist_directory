@@ -1,12 +1,10 @@
-"use server"
-
 import { tryCatch } from "@primoui/utils"
 import { headers } from "next/headers"
 import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible"
 import { rateLimitConfig } from "~/config/rate-limit"
 import { redis } from "~/services/redis"
 
-type RateLimitAction = keyof typeof rateLimitConfig.actions
+export type RateLimitAction = keyof typeof rateLimitConfig.actions
 
 const createLimiter = (action: RateLimitAction) => {
   const config = { keyPrefix: `rl:${action}`, ...rateLimitConfig.actions[action] }
@@ -28,6 +26,7 @@ const limiters = {
   report: createLimiter("report"),
   newsletter: createLimiter("newsletter"),
   claim: createLimiter("claim"),
+  media: createLimiter("media"),
 }
 
 /**

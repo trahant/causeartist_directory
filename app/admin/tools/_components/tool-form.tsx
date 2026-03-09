@@ -142,7 +142,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
   const path = `tools/${id}`
 
   // Handle form submission
-  const handleSubmit = form.handleSubmit((data, event) => {
+  const onSubmit = form.handleSubmit((data, event) => {
     const submitter = (event?.nativeEvent as SubmitEvent)?.submitter
     const isStatusChange = submitter?.getAttribute("name") !== "submit"
 
@@ -160,7 +160,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
     form.setValue("publishedAt", publishedAt)
 
     // Submit the form with updated values
-    handleSubmit()
+    onSubmit()
   }
 
   return (
@@ -204,7 +204,7 @@ export function ToolForm({ className, title, tool, ...props }: ToolFormProps) {
       </Stack>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}

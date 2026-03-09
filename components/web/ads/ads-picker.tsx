@@ -62,15 +62,16 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
   const { price, selections, hasSelections, findAdSpot, clearSelection, updateSelection } =
     useAds(spots)
 
-  const { mutate, isPending } = useMutation({
-    ...orpc.web.products.createCheckout.mutationOptions(),
-    onSuccess: data => {
-      window.location.href = data.url
-    },
-    onError: error => {
-      toast.error(error.message)
-    },
-  })
+  const { mutate, isPending } = useMutation(
+    orpc.web.products.createCheckout.mutationOptions({
+      onSuccess: data => {
+        window.location.href = data.url
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
   const handleCheckout = () => {
     type LineItem = z.infer<typeof checkoutSchema>["lineItems"][number]

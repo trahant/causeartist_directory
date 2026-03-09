@@ -1,18 +1,18 @@
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { findCategories, findCategoryList } from "~/server/admin/categories/queries"
 import { categoryListSchema, categorySchema } from "~/server/admin/categories/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 
-const list = adminProcedure.input(categoryListSchema).handler(async ({ input }) => {
+const list = withAdmin.input(categoryListSchema).handler(async ({ input }) => {
   return findCategories(input)
 })
 
-const lookup = adminProcedure.handler(async () => {
+const lookup = withAdmin.handler(async () => {
   return findCategoryList()
 })
 
-const upsert = adminProcedure
+const upsert = withAdmin
   .input(categorySchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, tools, ...data } = input
@@ -47,7 +47,7 @@ const upsert = adminProcedure
     return category
   })
 
-const duplicate = adminProcedure
+const duplicate = withAdmin
   .input(idSchema)
   .handler(async ({ input: { id }, context: { db, revalidate } }) => {
     const category = await db.category.findUnique({
@@ -82,7 +82,7 @@ const duplicate = adminProcedure
     return newCategory
   })
 
-const remove = adminProcedure
+const remove = withAdmin
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.category.deleteMany({

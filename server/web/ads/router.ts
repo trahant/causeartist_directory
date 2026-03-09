@@ -3,11 +3,11 @@ import { getDomain } from "@primoui/utils"
 import z from "zod"
 import { AdType, type Prisma } from "~/.generated/prisma/client"
 import { fetchAndUploadMedia } from "~/lib/media"
-import { baseProcedure } from "~/lib/orpc"
+import { withBase } from "~/lib/orpc"
 import { adDetailsSchema } from "~/server/web/ads/schema"
 import { stripe } from "~/services/stripe"
 
-const createFromCheckout = baseProcedure
+const createFromCheckout = withBase
   .input(adDetailsSchema)
   .handler(async ({ input: { sessionId, ...adDetails }, context: { db, revalidate } }) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId)

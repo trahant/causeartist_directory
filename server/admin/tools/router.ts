@@ -2,21 +2,21 @@ import { after } from "next/server"
 import { z } from "zod"
 import { removeS3Directories } from "~/lib/media"
 import { notifySubmitterOfToolPublished, notifySubmitterOfToolScheduled } from "~/lib/notifications"
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 import { findScheduledTools, findToolList, findTools } from "~/server/admin/tools/queries"
 import { toolListSchema, toolSchema } from "~/server/admin/tools/schema"
 
-const list = adminProcedure.input(toolListSchema).handler(async ({ input }) => {
+const list = withAdmin.input(toolListSchema).handler(async ({ input }) => {
   return findTools(input)
 })
 
-const lookup = adminProcedure.handler(async () => {
+const lookup = withAdmin.handler(async () => {
   return findToolList()
 })
 
-const scheduled = adminProcedure
+const scheduled = withAdmin
   .input(z.object({ start: z.coerce.date(), end: z.coerce.date() }))
   .handler(async ({ input: { start, end } }) => {
     return findScheduledTools({
@@ -24,7 +24,7 @@ const scheduled = adminProcedure
     })
   })
 
-const upsert = adminProcedure
+const upsert = withAdmin
   .input(toolSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, categories, tags, notifySubmitter, ...data } = input
@@ -69,7 +69,7 @@ const upsert = adminProcedure
     return tool
   })
 
-const duplicate = adminProcedure
+const duplicate = withAdmin
   .input(idSchema)
   .handler(async ({ input: { id }, context: { db, revalidate } }) => {
     const tool = await db.tool.findUnique({
@@ -113,7 +113,7 @@ const duplicate = adminProcedure
     return newTool
   })
 
-const remove = adminProcedure
+const remove = withAdmin
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.tool.deleteMany({

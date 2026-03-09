@@ -122,7 +122,7 @@ export const PostForm = ({ className, title, post, currentUserId, ...props }: Po
   )
 
   // Handle form submission
-  const handleSubmit = form.handleSubmit((data, event) => {
+  const onSubmit = form.handleSubmit((data, event) => {
     const submitter = (event?.nativeEvent as SubmitEvent)?.submitter
     const isStatusChange = submitter?.getAttribute("name") !== "submit"
 
@@ -137,7 +137,7 @@ export const PostForm = ({ className, title, post, currentUserId, ...props }: Po
   const handleStatusSubmit = (status: PostStatus, publishedAt: Date | null) => {
     form.setValue("status", status)
     form.setValue("publishedAt", publishedAt)
-    handleSubmit()
+    onSubmit()
   }
 
   return (
@@ -175,7 +175,7 @@ export const PostForm = ({ className, title, post, currentUserId, ...props }: Po
       </Stack>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         className={cx("grid gap-4 @lg:grid-cols-2", className)}
         noValidate
         {...props}

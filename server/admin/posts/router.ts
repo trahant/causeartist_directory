@@ -1,20 +1,20 @@
 import { after } from "next/server"
 import { removeS3Directories } from "~/lib/media"
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { findPostById, findPostList, findPosts } from "~/server/admin/posts/queries"
 import { postListSchema, postSchema } from "~/server/admin/posts/schema"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
 
-const list = adminProcedure.input(postListSchema).handler(async ({ input }) => {
+const list = withAdmin.input(postListSchema).handler(async ({ input }) => {
   return findPosts(input)
 })
 
-const lookup = adminProcedure.handler(async () => {
+const lookup = withAdmin.handler(async () => {
   return findPostList()
 })
 
-const upsert = adminProcedure
+const upsert = withAdmin
   .input(postSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
     const { id, ...data } = input
@@ -45,7 +45,7 @@ const upsert = adminProcedure
     return post
   })
 
-const duplicate = adminProcedure
+const duplicate = withAdmin
   .input(idSchema)
   .handler(async ({ input: { id }, context: { db, revalidate, user } }) => {
     const post = await findPostById(id)
@@ -79,7 +79,7 @@ const duplicate = adminProcedure
     return newPost
   })
 
-const remove = adminProcedure
+const remove = withAdmin
   .input(idsSchema)
   .handler(async ({ input: { ids }, context: { db, revalidate } }) => {
     await db.post.deleteMany({

@@ -62,15 +62,16 @@ const Product = ({
     defaultValue: "month",
   })
 
-  const { mutate, isPending } = useMutation({
-    ...orpc.web.products.createCheckout.mutationOptions(),
-    onSuccess: data => {
-      window.location.href = data.url
-    },
-    onError: error => {
-      toast.error(error.message)
-    },
-  })
+  const { mutate, isPending } = useMutation(
+    orpc.web.products.createCheckout.mutationOptions({
+      onSuccess: data => {
+        window.location.href = data.url
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
   const onSubmit = () => {
     if (currentPrice?.id && currentPrice.unit_amount) {

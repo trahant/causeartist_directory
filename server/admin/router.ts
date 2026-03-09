@@ -1,4 +1,4 @@
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { adRouter } from "~/server/admin/ads/router"
 import { categoryRouter } from "~/server/admin/categories/router"
 import { metricRouter } from "~/server/admin/metrics/router"
@@ -11,7 +11,7 @@ import { userRouter } from "~/server/admin/users/router"
 // -----------------------------------------------------------------------------
 // Health-check procedure to verify oRPC infrastructure
 // -----------------------------------------------------------------------------
-const ping = adminProcedure.handler(async () => {
+const ping = withAdmin.handler(async () => {
   return { status: "ok" as const, timestamp: new Date().toISOString() }
 })
 

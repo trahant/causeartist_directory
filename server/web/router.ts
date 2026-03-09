@@ -1,4 +1,4 @@
-import { baseProcedure } from "~/lib/orpc"
+import { withBase } from "~/lib/orpc"
 import { webAdRouter } from "~/server/web/ads/router"
 import { bookmarkRouter } from "~/server/web/bookmarks/router"
 import { filterRouter } from "~/server/web/filters/router"
@@ -12,7 +12,7 @@ import { webToolRouter } from "~/server/web/tools/router"
 // -----------------------------------------------------------------------------
 // Health-check procedure to verify oRPC infrastructure
 // -----------------------------------------------------------------------------
-const ping = baseProcedure.handler(async () => {
+const ping = withBase.handler(async () => {
   return { status: "ok" as const, timestamp: new Date().toISOString() }
 })
 

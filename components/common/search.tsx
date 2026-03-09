@@ -85,10 +85,11 @@ export const Search = () => {
   const isAdminPath = pathname.startsWith("/admin")
   const hasQuery = !!q.length
 
-  const { data: featuredTools } = useQuery({
-    ...orpc.web.search.findFeaturedTools.queryOptions(),
-    enabled: search.isOpen && !hasQuery,
-  })
+  const { data: featuredTools } = useQuery(
+    orpc.web.search.findFeaturedTools.queryOptions({
+      enabled: search.isOpen && !hasQuery,
+    }),
+  )
 
   // Set featured tools as results when available and no query
   useEffect(() => {

@@ -1,20 +1,17 @@
 import { z } from "zod"
 import { ToolStatus, ToolTier } from "~/.generated/prisma/client"
-import { getServerSession } from "~/lib/auth"
-import { baseProcedure } from "~/lib/orpc"
+import { withOptionalAuth } from "~/lib/orpc"
 import { findCategories } from "~/server/web/categories/queries"
 import { findTags } from "~/server/web/tags/queries"
 import { findTools } from "~/server/web/tools/queries"
 
-const searchItems = baseProcedure
+const searchItems = withOptionalAuth
   .input(z.object({ query: z.string() }))
-  .handler(async ({ input: { query } }) => {
-    const session = await getServerSession()
-
+  .handler(async ({ input: { query }, context: { user } }) => {
     const [tools, categories, tags] = await Promise.all([
       findTools({
         where: {
-          status: session?.user.role === "admin" ? undefined : ToolStatus.Published,
+          status: user?.role === "admin" ? undefined : ToolStatus.Published,
           OR: [
             { name: { contains: query, mode: "insensitive" } },
             { tagline: { contains: query, mode: "insensitive" } },
@@ -38,7 +35,7 @@ const searchItems = baseProcedure
     return { tools, categories, tags }
   })
 
-const findFeaturedTools = baseProcedure.handler(async () => {
+const findFeaturedTools = withOptionalAuth.handler(async () => {
   return findTools({ where: { tier: ToolTier.Premium } })
 })
 

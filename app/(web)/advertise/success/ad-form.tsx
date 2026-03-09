@@ -39,24 +39,25 @@ export const AdForm = ({ className, sessionId, ad, ...props }: AdFormProps) => {
     },
   })
 
-  const { mutate, isPending } = useMutation({
-    ...orpc.web.ads.createFromCheckout.mutationOptions(),
-    onSuccess: () => {
-      toast.success(t(`${ad ? "update" : "create"}.success_message`))
-    },
-    onError: error => {
-      toast.error(error.message)
-    },
-  })
+  const { mutate, isPending } = useMutation(
+    orpc.web.ads.createFromCheckout.mutationOptions({
+      onSuccess: () => {
+        toast.success(t(`${ad ? "update" : "create"}.success_message`))
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
-  const handleSubmit = form.handleSubmit(data => {
+  const onSubmit = form.handleSubmit(data => {
     mutate(data)
   })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         className={cx("grid w-full gap-5 @md:grid-cols-2", className)}
         noValidate
         {...props}

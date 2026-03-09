@@ -1,8 +1,8 @@
 import { z } from "zod"
-import { authedProcedure } from "~/lib/orpc"
+import { withAuth } from "~/lib/orpc"
 import { bookmarkInputSchema } from "~/server/web/bookmarks/schema"
 
-const check = authedProcedure
+const check = withAuth
   .input(bookmarkInputSchema)
   .handler(async ({ input: { toolId }, context: { db, user } }) => {
     const bookmark = await db.bookmark.findUnique({
@@ -13,7 +13,7 @@ const check = authedProcedure
     return { bookmarked: Boolean(bookmark) }
   })
 
-const set = authedProcedure
+const set = withAuth
   .input(bookmarkInputSchema.extend({ bookmarked: z.boolean() }))
   .handler(async ({ input: { toolId, bookmarked }, context: { db, user, revalidate } }) => {
     if (bookmarked) {
@@ -36,7 +36,7 @@ const set = authedProcedure
     return { bookmarked }
   })
 
-const remove = authedProcedure
+const remove = withAuth
   .input(bookmarkInputSchema)
   .handler(async ({ input: { toolId }, context: { db, user, revalidate } }) => {
     await db.bookmark.deleteMany({

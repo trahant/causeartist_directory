@@ -1,14 +1,12 @@
 import { fetchAndUploadMedia, uploadToS3Storage } from "~/lib/media"
-import { baseProcedure } from "~/lib/orpc"
+import { withAuth, withAuthRateLimit } from "~/lib/orpc"
 import { fetchMediaSchema, uploadMediaSchema } from "~/server/web/media/schema"
 
-const fetch = baseProcedure
-  .input(fetchMediaSchema)
-  .handler(async ({ input: { url, path, type } }) => {
-    return fetchAndUploadMedia(url, path, type)
-  })
+const fetch = withAuth.input(fetchMediaSchema).handler(async ({ input: { url, path, type } }) => {
+  return fetchAndUploadMedia(url, path, type)
+})
 
-const upload = baseProcedure
+const upload = withAuthRateLimit("media")
   .input(uploadMediaSchema)
   .handler(async ({ input: { path, base64 } }) => {
     const buffer = Buffer.from(base64, "base64")

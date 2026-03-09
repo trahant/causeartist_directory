@@ -1,13 +1,13 @@
 import { format } from "date-fns"
 import { getPlausibleVisitors } from "~/lib/analytics"
 import { calculateMetricStats, fillMissingDates, getMetricDateRange } from "~/lib/metrics"
-import { adminProcedure } from "~/lib/orpc"
+import { withAdmin } from "~/lib/orpc"
 import { stripe } from "~/services/stripe"
 
 // -----------------------------------------------------------------------------
 // Dashboard stats: resource counts
 // -----------------------------------------------------------------------------
-const stats = adminProcedure.handler(async ({ context: { db } }) => {
+const stats = withAdmin.handler(async ({ context: { db } }) => {
   const [toolCount, categoryCount, userCount] = await db.$transaction([
     db.tool.count(),
     db.category.count(),
@@ -20,7 +20,7 @@ const stats = adminProcedure.handler(async ({ context: { db } }) => {
 // -----------------------------------------------------------------------------
 // Revenue metric: Stripe payment intents for last 30 days
 // -----------------------------------------------------------------------------
-const revenue = adminProcedure.handler(async () => {
+const revenue = withAdmin.handler(async () => {
   try {
     const { today, startDate } = getMetricDateRange()
 
@@ -51,7 +51,7 @@ const revenue = adminProcedure.handler(async () => {
 // -----------------------------------------------------------------------------
 // Visitor metric: Plausible analytics for last 30 days
 // -----------------------------------------------------------------------------
-const visitors = adminProcedure.handler(async () => {
+const visitors = withAdmin.handler(async () => {
   const { today, startDate, dateRange } = getMetricDateRange()
   const visitorData = await getPlausibleVisitors(dateRange)
   const results = fillMissingDates(visitorData, startDate, today)
@@ -63,7 +63,7 @@ const visitors = adminProcedure.handler(async () => {
 // -----------------------------------------------------------------------------
 // User signups metric for last 30 days
 // -----------------------------------------------------------------------------
-const userMetric = adminProcedure.handler(async ({ context: { db } }) => {
+const userMetric = withAdmin.handler(async ({ context: { db } }) => {
   const { today, startDate } = getMetricDateRange()
 
   const users = await db.user.findMany({

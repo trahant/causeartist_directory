@@ -1,4 +1,4 @@
-import { baseProcedure } from "~/lib/orpc"
+import { withBase } from "~/lib/orpc"
 import { findCategories } from "~/server/web/categories/queries"
 import type { ToolFilterParams } from "~/server/web/tools/schema"
 
@@ -13,7 +13,7 @@ type FilterOptions = Array<{
   options: FilterOption[]
 }>
 
-const findFilterOptions = baseProcedure.handler(async () => {
+const findFilterOptions = withBase.handler(async () => {
   const [categories] = await Promise.all([findCategories({})])
 
   const filterOptions: FilterOptions = [

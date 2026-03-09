@@ -1,4 +1,3 @@
-import { ORPCError } from "@orpc/server"
 import { getDomain, tryCatch } from "@primoui/utils"
 import { getTranslations } from "next-intl/server"
 import { after } from "next/server"
@@ -7,8 +6,7 @@ import { ToolStatus } from "~/.generated/prisma/client"
 import { isDev } from "~/env"
 import { auth } from "~/lib/auth"
 import { notifySubmitterOfToolSubmitted } from "~/lib/notifications"
-import { authedProcedure } from "~/lib/orpc"
-import { isRateLimited } from "~/lib/rate-limiter"
+import { withAuthRateLimit } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { getClaimableTool, generateAndSendOtp, verifyEmailDomain } from "~/server/web/tools/utils"
 import { createResendContact } from "~/services/resend"
@@ -16,7 +14,7 @@ import { createResendContact } from "~/services/resend"
 // -----------------------------------------------------------------------------
 // Submit tool
 // -----------------------------------------------------------------------------
-const submit = authedProcedure
+const submit = withAuthRateLimit("submission")
   .input(
     z.object({
       name: z.string().min(1),
@@ -27,11 +25,6 @@ const submit = authedProcedure
   )
   .handler(async ({ input: { newsletterOptIn, ...data }, context: { user, db } }) => {
     const t = await getTranslations("forms.submit")
-    const domain = getDomain(data.websiteUrl)
-
-    if (user.role !== "admin" && (await isRateLimited("submission"))) {
-      throw new ORPCError("TOO_MANY_REQUESTS", { message: t("errors.rate_limited") })
-    }
 
     if (newsletterOptIn) {
       const [firstName, ...restOfName] = user.name.trim().split(/\s+/)
@@ -44,6 +37,7 @@ const submit = authedProcedure
       })
     }
 
+    const domain = getDomain(data.websiteUrl)
     const owner = user.email.includes(domain) ? { connect: { id: user.id } } : undefined
 
     const existingTool = await db.tool.findFirst({
@@ -90,20 +84,14 @@ const submit = authedProcedure
 // -----------------------------------------------------------------------------
 // Send OTP to verify domain ownership
 // -----------------------------------------------------------------------------
-const sendClaimOtp = authedProcedure
+const sendClaimOtp = withAuthRateLimit("claim", "claim-otp")
   .input(
     z.object({
       toolId: z.string(),
       email: z.email(),
     }),
   )
-  .handler(async ({ input: { toolId, email }, context: { user, db } }) => {
-    if (await isRateLimited("claim", "claim-otp", user.id)) {
-      throw new ORPCError("TOO_MANY_REQUESTS", {
-        message: "Too many requests. Please try again later",
-      })
-    }
-
+  .handler(async ({ input: { toolId, email }, context: { db } }) => {
     const tool = await getClaimableTool(db, toolId)
     verifyEmailDomain(email, tool.websiteUrl)
     await generateAndSendOtp(email)
@@ -114,7 +102,7 @@ const sendClaimOtp = authedProcedure
 // -----------------------------------------------------------------------------
 // Verify OTP and claim tool
 // -----------------------------------------------------------------------------
-const verifyClaimOtp = authedProcedure
+const verifyClaimOtp = withAuthRateLimit("claim", "claim-verify")
   .input(
     z.object({
       toolId: z.string(),
@@ -122,12 +110,6 @@ const verifyClaimOtp = authedProcedure
     }),
   )
   .handler(async ({ input: { toolId, otp }, context: { user, db, revalidate } }) => {
-    if (await isRateLimited("claim", "claim-verify", user.id)) {
-      throw new ORPCError("TOO_MANY_REQUESTS", {
-        message: "Too many requests. Please try again later",
-      })
-    }
-
     const tool = await getClaimableTool(db, toolId)
     await auth.api.verifyOneTimeToken({ body: { token: otp } })
 
