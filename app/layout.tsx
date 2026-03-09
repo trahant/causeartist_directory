@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages, getTimeZone, getTranslations } from "next-intl/server"
 import { ThemeProvider } from "next-themes"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { QueryProvider } from "~/components/common/providers/query-provider"
 import { Search } from "~/components/common/search"
 import { Toaster } from "~/components/common/toaster"
 import { TooltipProvider } from "~/components/common/tooltip"
@@ -46,9 +47,11 @@ export default async function ({ children }: LayoutProps<"/">) {
             <TooltipProvider delayDuration={250} skipDelayDuration={250}>
               <SearchProvider>
                 <ThemeProvider attribute="class" disableTransitionOnChange>
-                  <MotionConfig reducedMotion="user">{children}</MotionConfig>
-                  <Toaster />
-                  <Search />
+                  <QueryProvider>
+                    <MotionConfig reducedMotion="user">{children}</MotionConfig>
+                    <Toaster />
+                    <Search />
+                  </QueryProvider>
                 </ThemeProvider>
               </SearchProvider>
             </TooltipProvider>

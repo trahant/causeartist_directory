@@ -1,9 +1,9 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
-import { useAction } from "next-safe-action/hooks"
 import plur from "plur"
-import { type ComponentProps, useEffect } from "react"
+import type { ComponentProps } from "react"
 import {
   Select,
   SelectContent,
@@ -12,19 +12,17 @@ import {
   SelectValue,
 } from "~/components/common/select"
 import { useFilters } from "~/contexts/filter-context"
-import { findFilterOptions } from "~/server/web/actions/filters"
+import { webOrpc } from "~/lib/web-orpc-query"
 import type { ToolFilterSchema } from "~/server/web/tools/schema"
 
 export const ToolFilters = ({ ...props }: ComponentProps<typeof Select>) => {
   const t = useTranslations("tools.filters")
   const { filters, updateFilters } = useFilters<ToolFilterSchema>()
-  const { result, execute } = useAction(findFilterOptions)
-
-  useEffect(execute, [execute])
+  const { data } = useQuery(webOrpc.filters.findFilterOptions.queryOptions())
 
   return (
     <>
-      {result.data?.map(({ type, options }) => (
+      {data?.map(({ type, options }) => (
         <Select
           key={type}
           value={filters[type]}

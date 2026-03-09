@@ -1,19 +1,14 @@
-"use server"
-
 import { getDomain } from "@primoui/utils"
 import { getTranslations } from "next-intl/server"
 import z from "zod"
 import { AdType, type Prisma } from "~/.generated/prisma/client"
-import { adsConfig } from "~/config/ads"
-import { siteConfig } from "~/config/site"
 import { fetchAndUploadMedia } from "~/lib/media"
-import { actionClient } from "~/lib/safe-actions"
-import type { AdOne } from "~/server/web/ads/payloads"
-import { findActiveAds } from "~/server/web/ads/queries"
+import { baseProcedure } from "~/lib/orpc"
+import { findAdWithFallback } from "~/server/web/ads/queries"
 import { createAdDetailsSchema } from "~/server/web/shared/schema"
 import { stripe } from "~/services/stripe"
 
-const findAdWithFallbackSchema = z.object({
+const findWithFallbackSchema = z.object({
   type: z.enum(AdType),
   explicitAd: z
     .object({
@@ -29,71 +24,18 @@ const findAdWithFallbackSchema = z.object({
   fallback: z.array(z.enum(["all", "default"])).default(["all", "default"]),
 })
 
-/**
- * Finds an ad based on the provided parameters.
- * @param input - The ad data to find.
- * @returns The ad that was found or null if not found.
- */
-export const findAdWithFallback = actionClient
-  .inputSchema(findAdWithFallbackSchema)
-  .action(async ({ parsedInput: { type, explicitAd, fallback } }) => {
-    const t = await getTranslations("ads")
-    let ads: AdOne[] = []
-
-    const defaultAd = {
-      id: siteConfig.slug,
-      type: AdType.All,
-      websiteUrl: `${siteConfig.url}/advertise`,
-      name: t("default_ad.name"),
-      description: t("default_ad.description"),
-      buttonLabel: t("default_ad.button_label", { siteName: siteConfig.name }),
-      faviconUrl: "/favicon.png",
-      bannerUrl: null,
-    } satisfies AdOne
-
-    if (!adsConfig.enabled) {
-      return null
-    }
-
-    if (explicitAd !== undefined) {
-      // If ad is explicitly provided, use it directly
-      return explicitAd as AdOne | null
-    }
-
-    if (type) {
-      // Try to find ad for specific type
-      ads = await findActiveAds({ where: { type } })
-    }
-
-    if (!ads.length && fallback.includes("all")) {
-      // Try fallback to "All" type if enabled and specific type not found
-      ads = await findActiveAds({ where: { type: "All" } })
-    }
-
-    if (!ads.length && fallback.includes("default")) {
-      // Try fallback to default ad if enabled and no ad found
-      return defaultAd
-    }
-
-    if (!ads.length) {
-      // Return null if no ads found
-      return null
-    }
-
-    if (ads.length === 1) {
-      return ads[0]
-    }
-
-    // Return a random ad from the matching ones
-    return ads[Math.floor(Math.random() * ads.length)]
+const findWithFallback = baseProcedure
+  .input(findWithFallbackSchema)
+  .handler(async ({ input: { type, explicitAd, fallback } }) => {
+    return findAdWithFallback({ type, explicitAd, fallback })
   })
 
-export const createAdFromCheckout = actionClient
-  .inputSchema(async () => {
+const createFromCheckout = baseProcedure
+  .input(async () => {
     const t = await getTranslations("schema")
     return createAdDetailsSchema(t)
   })
-  .action(async ({ parsedInput: { sessionId, ...adDetails }, ctx: { db, revalidate } }) => {
+  .handler(async ({ input: { sessionId, ...adDetails }, context: { db, revalidate } }) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId)
     const email = session.customer_details?.email ?? ""
     const ads: Omit<Omit<Prisma.AdCreateInput, "email">, keyof typeof adDetails>[] = []
@@ -165,3 +107,8 @@ export const createAdFromCheckout = actionClient
 
     return { success: true }
   })
+
+export const webAdRouter = {
+  findWithFallback,
+  createFromCheckout,
+}

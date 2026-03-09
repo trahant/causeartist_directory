@@ -1,16 +1,14 @@
-"use server"
-
 import { z } from "zod"
 import { ToolStatus, ToolTier } from "~/.generated/prisma/client"
 import { getServerSession } from "~/lib/auth"
-import { actionClient } from "~/lib/safe-actions"
+import { baseProcedure } from "~/lib/orpc"
 import { findCategories } from "~/server/web/categories/queries"
 import { findTags } from "~/server/web/tags/queries"
 import { findTools } from "~/server/web/tools/queries"
 
-export const searchItems = actionClient
-  .inputSchema(z.object({ query: z.string() }))
-  .action(async ({ parsedInput: { query } }) => {
+const searchItems = baseProcedure
+  .input(z.object({ query: z.string() }))
+  .handler(async ({ input: { query } }) => {
     const session = await getServerSession()
 
     const [tools, categories, tags] = await Promise.all([
@@ -40,6 +38,11 @@ export const searchItems = actionClient
     return { tools, categories, tags }
   })
 
-export const findFeaturedTools = actionClient.action(async () => {
+const findFeaturedTools = baseProcedure.handler(async () => {
   return findTools({ where: { tier: ToolTier.Premium } })
 })
+
+export const searchRouter = {
+  searchItems,
+  findFeaturedTools,
+}

@@ -1,16 +1,13 @@
-"use server"
-
 import { z } from "zod"
-import { userActionClient } from "~/lib/safe-actions"
-import { db } from "~/services/db"
+import { authedProcedure } from "~/lib/orpc"
 
 const bookmarkInputSchema = z.object({
   toolId: z.string().min(1),
 })
 
-export const checkBookmark = userActionClient
-  .inputSchema(async () => bookmarkInputSchema)
-  .action(async ({ parsedInput: { toolId }, ctx: { user } }) => {
+const check = authedProcedure
+  .input(bookmarkInputSchema)
+  .handler(async ({ input: { toolId }, context: { db, user } }) => {
     const bookmark = await db.bookmark.findUnique({
       where: { userId_toolId: { userId: user.id, toolId } },
       select: { id: true },
@@ -19,9 +16,9 @@ export const checkBookmark = userActionClient
     return { bookmarked: Boolean(bookmark) }
   })
 
-export const setBookmark = userActionClient
-  .inputSchema(async () => bookmarkInputSchema.extend({ bookmarked: z.boolean() }))
-  .action(async ({ parsedInput: { toolId, bookmarked }, ctx: { user, revalidate } }) => {
+const set = authedProcedure
+  .input(bookmarkInputSchema.extend({ bookmarked: z.boolean() }))
+  .handler(async ({ input: { toolId, bookmarked }, context: { db, user, revalidate } }) => {
     if (bookmarked) {
       await db.bookmark.upsert({
         where: { userId_toolId: { userId: user.id, toolId } },
@@ -42,9 +39,9 @@ export const setBookmark = userActionClient
     return { bookmarked }
   })
 
-export const removeBookmark = userActionClient
-  .inputSchema(async () => bookmarkInputSchema)
-  .action(async ({ parsedInput: { toolId }, ctx: { user, revalidate } }) => {
+const remove = authedProcedure
+  .input(bookmarkInputSchema)
+  .handler(async ({ input: { toolId }, context: { db, user, revalidate } }) => {
     await db.bookmark.deleteMany({
       where: { userId: user.id, toolId },
     })
@@ -56,3 +53,9 @@ export const removeBookmark = userActionClient
 
     return { removed: true }
   })
+
+export const bookmarkRouter = {
+  check,
+  set,
+  remove,
+}

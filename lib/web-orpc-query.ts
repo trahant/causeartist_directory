@@ -1,5 +1,4 @@
 import { createRouterUtils } from "@orpc/tanstack-query"
-import { client, webClient } from "~/lib/orpc-client"
+import { webClient } from "~/lib/web-orpc-client"
 
-export const orpc = createRouterUtils(client)
 export const webOrpc = createRouterUtils(webClient)

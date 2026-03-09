@@ -1,6 +1,5 @@
 import { ArrowUpRightIcon } from "lucide-react"
 import { getTranslations } from "next-intl/server"
-import type { InferSafeActionFnInput } from "next-safe-action"
 import Image from "next/image"
 import type { ComponentProps } from "react"
 import { Button } from "~/components/common/button"
@@ -17,13 +16,19 @@ import { Skeleton } from "~/components/common/skeleton"
 import { AdBadge, AdLink } from "~/components/web/ads/ad-base"
 import { Favicon } from "~/components/web/ui/favicon"
 import { cx } from "~/lib/utils"
-import { findAdWithFallback } from "~/server/web/ads/actions"
+import type { AdOne } from "~/server/web/ads/payloads"
+import { findAdWithFallback } from "~/server/web/ads/queries"
+import type { AdType } from "~/.generated/prisma/client"
 
-type AdCardProps = CardProps & InferSafeActionFnInput<typeof findAdWithFallback>["clientInput"]
+type AdCardProps = CardProps & {
+  type: AdType
+  explicitAd?: AdOne | null
+  fallback?: ("all" | "default")[]
+}
 
 const AdCard = async ({ className, type, explicitAd, fallback, ...props }: AdCardProps) => {
   const t = await getTranslations()
-  const { data: ad } = await findAdWithFallback({ type, explicitAd, fallback })
+  const ad = await findAdWithFallback({ type, explicitAd, fallback })
 
   if (!ad) {
     return null

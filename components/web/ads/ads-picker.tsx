@@ -1,10 +1,10 @@
 "use client"
 
+import { useMutation } from "@tanstack/react-query"
 import { cx } from "cva"
 import { endOfDay, startOfDay } from "date-fns"
 import { XIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
-import { useAction } from "next-safe-action/hooks"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -21,8 +21,8 @@ import { adsConfig } from "~/config/ads"
 import { siteConfig } from "~/config/site"
 import { type AdSpot, useAds } from "~/hooks/use-ads"
 import { toUTCMidnight } from "~/lib/ads"
+import { webOrpc } from "~/lib/web-orpc-query"
 import type { AdMany } from "~/server/web/ads/payloads"
-import { createStripeCheckout } from "~/server/web/products/actions"
 import { checkoutSchema } from "~/server/web/products/schema"
 
 type AdsCalendarProps = ComponentProps<"div"> & {
@@ -62,9 +62,13 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
   const { price, selections, hasSelections, findAdSpot, clearSelection, updateSelection } =
     useAds(spots)
 
-  const { execute, isPending } = useAction(createStripeCheckout, {
-    onError: ({ error }) => {
-      toast.error(error.serverError)
+  const { mutate, isPending } = useMutation({
+    ...webOrpc.products.createCheckout.mutationOptions(),
+    onSuccess: data => {
+      window.location.href = data.url
+    },
+    onError: error => {
+      toast.error(error.message)
     },
   })
 
@@ -98,7 +102,7 @@ export const AdsPicker = ({ className, ads, type, ...props }: AdsCalendarProps) 
       endsAt: selection.dateRange?.to ? toUTCMidnight(selection.dateRange.to) : 0,
     }))
 
-    execute({
+    mutate({
       lineItems,
       mode: "payment",
       metadata: { ads: JSON.stringify(adData) },

@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
 import { getDomain } from "@primoui/utils"
+import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import type { z } from "zod"
 import { Button } from "~/components/common/button"
@@ -23,7 +23,7 @@ import { LoginDialog } from "~/components/web/auth/login-dialog"
 import { claimsConfig } from "~/config/claims"
 import { siteConfig } from "~/config/site"
 import { useSession } from "~/lib/auth-client"
-import { sendToolClaimOtp, verifyToolClaimOtp } from "~/server/web/actions/claim"
+import { webOrpc } from "~/lib/orpc-query"
 import { createClaimToolEmailSchema, createClaimToolOtpSchema } from "~/server/web/shared/schema"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -47,58 +47,60 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
 
   const toolDomain = getDomain(tool.websiteUrl)
 
-  const sendOtpAction = useHookFormAction(sendToolClaimOtp, zodResolver(emailSchema), {
-    formProps: {
-      defaultValues: {
-        toolId: tool.id,
-        email: "",
-      },
+  const emailForm = useForm({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      toolId: tool.id,
+      email: "",
     },
+  })
 
-    actionProps: {
+  const otpForm = useForm({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      toolId: tool.id,
+      otp: "",
+    },
+  })
+
+  const sendOtpMutation = useMutation(
+    webOrpc.tools.sendClaimOtp.mutationOptions({
       onSuccess: () => {
         toast.success(t("otp_sent"))
-        setVerificationEmail(sendOtpAction.form.getValues().email)
+        setVerificationEmail(emailForm.getValues().email)
         setStep("otp")
         setCooldownRemaining(claimsConfig.resendCooldown)
       },
 
-      onError: ({ error }) => {
-        toast.error(error.serverError)
+      onError: error => {
+        toast.error(error.message)
       },
-    },
-  })
+    }),
+  )
 
-  const verifyOtpAction = useHookFormAction(verifyToolClaimOtp, zodResolver(otpSchema), {
-    formProps: {
-      defaultValues: {
-        toolId: tool.id,
-        otp: "",
-      },
-    },
-
-    actionProps: {
+  const verifyOtpMutation = useMutation(
+    webOrpc.tools.verifyClaimOtp.mutationOptions({
       onSuccess: () => {
         toast.success(t("success_message", { toolName: tool.name }))
         router.push(`/${tool.slug}`)
       },
 
-      onError: ({ error }) => {
-        toast.error(error.serverError)
+      onError: error => {
+        toast.error(error.message)
       },
-    },
-  })
+    }),
+  )
 
   // Reset forms and state when dialog closes
   useEffect(() => {
     if (!isOpen) {
       setStep("email")
-      sendOtpAction.form.reset()
-      verifyOtpAction.form.reset()
+      emailForm.reset()
+      otpForm.reset()
       setVerificationEmail("")
       setCooldownRemaining(0)
     }
-  }, [isOpen, sendOtpAction.form, verifyOtpAction.form])
+  }, [isOpen, emailForm, otpForm])
 
   // Cooldown timer effect
   useEffect(() => {
@@ -113,7 +115,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
 
   const handleEmailSubmit = ({ email }: z.infer<typeof emailSchema>) => {
     if (toolDomain !== email.split("@")[1]) {
-      sendOtpAction.form.setError("email", {
+      emailForm.setError("email", {
         type: "manual",
         message: t("email_domain_error", { domain: toolDomain }),
       })
@@ -121,14 +123,14 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
       return
     }
 
-    sendOtpAction.handleSubmitWithAction()
+    sendOtpMutation.mutate(emailForm.getValues())
   }
 
   const handleResendOtp = () => {
-    if (cooldownRemaining > 0 || sendOtpAction.action.isPending) return
+    if (cooldownRemaining > 0 || sendOtpMutation.isPending) return
 
-    sendOtpAction.form.setValue("email", verificationEmail)
-    sendOtpAction.handleSubmitWithAction()
+    emailForm.setValue("email", verificationEmail)
+    sendOtpMutation.mutate(emailForm.getValues())
   }
 
   const getResendButtonText = () => {
@@ -151,9 +153,9 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
         </DialogHeader>
 
         {step === "email" ? (
-          <Form {...sendOtpAction.form}>
+          <Form {...emailForm}>
             <form
-              onSubmit={sendOtpAction.form.handleSubmit(handleEmailSubmit)}
+              onSubmit={emailForm.handleSubmit(handleEmailSubmit)}
               className="space-y-6"
               noValidate
             >
@@ -170,7 +172,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
               </DialogDescription>
 
               <Controller
-                control={sendOtpAction.form.control}
+                control={emailForm.control}
                 name="email"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
@@ -195,7 +197,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                 <Button
                   type="submit"
                   className="min-w-28"
-                  isPending={sendOtpAction.action.isPending}
+                  isPending={sendOtpMutation.isPending}
                 >
                   {t("send_code_button")}
                 </Button>
@@ -203,9 +205,9 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
             </form>
           </Form>
         ) : (
-          <Form {...verifyOtpAction.form}>
+          <Form {...otpForm}>
             <form
-              onSubmit={verifyOtpAction.handleSubmitWithAction}
+              onSubmit={otpForm.handleSubmit(data => verifyOtpMutation.mutate(data))}
               className="space-y-6"
               noValidate
             >
@@ -215,7 +217,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
 
               <Stack direction="column">
                 <Controller
-                  control={verifyOtpAction.form.control}
+                  control={otpForm.control}
                   name="otp"
                   render={({ field, fieldState }) => (
                     <Field className="w-full" data-invalid={fieldState.invalid}>
@@ -239,7 +241,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                     type="button"
                     onClick={() => {
                       setStep("email")
-                      verifyOtpAction.form.reset()
+                      otpForm.reset()
                     }}
                   >
                     {t("change_email_button")}
@@ -250,7 +252,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                     variant="secondary"
                     type="button"
                     onClick={handleResendOtp}
-                    isPending={sendOtpAction.action.isPending}
+                    isPending={sendOtpMutation.isPending}
                     disabled={cooldownRemaining > 0}
                   >
                     {getResendButtonText()}
@@ -266,7 +268,7 @@ export const ToolClaimDialog = ({ tool, isOpen, setIsOpen }: ToolClaimDialogProp
                 <Button
                   type="submit"
                   className="min-w-28"
-                  isPending={verifyOtpAction.action.isPending}
+                  isPending={verifyOtpMutation.isPending}
                 >
                   {t("claim_button", { toolName: tool.name })}
                 </Button>

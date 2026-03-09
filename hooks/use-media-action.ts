@@ -1,9 +1,9 @@
+import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
-import { useAction } from "next-safe-action/hooks"
-import { type ChangeEvent, useTransition } from "react"
+import type { ChangeEvent } from "react"
 import type { FieldPath, FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
-import { fetchMedia, uploadMedia } from "~/server/web/actions/media"
+import { webOrpc } from "~/lib/orpc-query"
 import { createFileSchema } from "~/server/web/shared/schema"
 
 type MediaActionConfig<T extends FieldValues> = {
@@ -23,64 +23,77 @@ export const useMediaAction = <T extends FieldValues>({
   successMessage = "Media successfully uploaded. Please save to update.",
   errorMessage = "Failed to upload media. Please try again.",
 }: MediaActionConfig<T>) => {
-  const [isUploading, startUpload] = useTransition()
   const t = useTranslations("schema")
   const fileSchema = createFileSchema(t)
 
-  const fetch = useAction(fetchMedia, {
-    onSuccess: ({ data }) => {
-      toast.success(successMessage)
-      form.setValue(fieldName, data as PathValue<T, Path<T>>)
+  const fetchMutation = useMutation(
+    webOrpc.media.fetch.mutationOptions({
+      onSuccess: data => {
+        toast.success(successMessage)
+        form.setValue(fieldName, data as PathValue<T, Path<T>>)
+      },
+
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData()
+      formData.append("path", path)
+      formData.append("file", file)
+
+      const response = await globalThis.fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || result.error) {
+        throw new Error(result.error ?? errorMessage)
+      }
+
+      return result.data as string
     },
 
-    onError: ({ error: { serverError } }) => {
-      if (serverError) {
-        toast.error(serverError)
-      }
+    onSuccess: data => {
+      form.resetField(fieldName)
+      form.setValue(fieldName, data as PathValue<T, Path<T>>)
+      toast.success(successMessage)
+    },
+
+    onError: error => {
+      form.setError(fieldName, { message: error.message })
     },
   })
 
-  const handleFetch = async (url: string) => {
-    fetch.execute({ url, type: fetchType, path })
+  const handleFetch = (url: string) => {
+    fetchMutation.mutate({ url, type: fetchType, path })
   }
 
-  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
 
-    startUpload(async () => {
-      const { data, error } = await fileSchema.safeParseAsync(file)
+    const { data, error } = await fileSchema.safeParseAsync(file)
 
-      if (error) {
-        const message = error.issues[0]?.message ?? errorMessage
-        form.setError(fieldName, { message })
-        return
-      }
+    if (error) {
+      const message = error.issues[0]?.message ?? errorMessage
+      form.setError(fieldName, { message })
+      return
+    }
 
-      form.clearErrors(fieldName)
-
-      const formData = new FormData()
-      formData.append("path", path)
-      formData.append("file", data)
-
-      const response = await uploadMedia(formData)
-
-      if (response.error) {
-        form.setError(fieldName, { message: response.error })
-        return
-      }
-
-      if (response.data) {
-        form.resetField(fieldName)
-        form.setValue(fieldName, response.data as PathValue<T, Path<T>>)
-        toast.success(successMessage)
-      }
-    })
+    form.clearErrors(fieldName)
+    uploadMutation.mutate(data)
   }
 
   return {
     handleUpload,
     handleFetch,
-    isUploading,
-    isFetching: fetch.isPending,
+    isUploading: uploadMutation.isPending,
+    isFetching: fetchMutation.isPending,
   }
 }

@@ -1,9 +1,9 @@
 "use client"
 
 import type { ColumnDef } from "@tanstack/react-table"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { BookmarkXIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useAction } from "next-safe-action/hooks"
 import { useRouter } from "next/navigation"
 import { useQueryStates } from "nuqs"
 import { useMemo } from "react"
@@ -16,9 +16,9 @@ import { DataTableColumnHeader } from "~/components/data-table/data-table-column
 import { DataTableLink } from "~/components/data-table/data-table-link"
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar"
 import { useDataTable } from "~/hooks/use-data-table"
+import { webOrpc } from "~/lib/orpc-query"
 import type { findTools } from "~/server/shared/tools/queries"
 import { toolListParams } from "~/server/shared/tools/schema"
-import { removeBookmark } from "~/server/web/actions/bookmark"
 import type { DataTableFilterField } from "~/types"
 
 type BookmarkRemoveButtonProps = {
@@ -28,13 +28,17 @@ type BookmarkRemoveButtonProps = {
 const BookmarkRemoveButton = ({ toolId }: BookmarkRemoveButtonProps) => {
   const t = useTranslations("pages.dashboard.table")
   const router = useRouter()
+  const queryClient = useQueryClient()
 
-  const { execute, isPending } = useAction(removeBookmark, {
-    onSuccess: () => {
-      toast.success(t("bookmarks.success_message"))
-      router.refresh()
-    },
-  })
+  const { mutate: execute, isPending } = useMutation(
+    webOrpc.bookmarks.remove.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: webOrpc.bookmarks.key() })
+        toast.success(t("bookmarks.success_message"))
+        router.refresh()
+      },
+    }),
+  )
 
   return (
     <Button

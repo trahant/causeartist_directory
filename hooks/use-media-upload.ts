@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useState } from "react"
 import { toast } from "sonner"
-import { uploadMedia } from "~/server/web/actions/media"
 
 type UploadedFile = {
   key: string
@@ -38,16 +37,22 @@ export const useMediaUpload = (mediaPath: string) => {
         formData.append("path", s3Key)
         formData.append("file", file)
 
-        const response = await uploadMedia(formData)
+        const response = await globalThis.fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        })
 
-        if (response.error) {
-          throw new Error(response.error)
+        const result = await response.json()
+
+        if (!response.ok || result.error) {
+          throw new Error(result.error ?? "Upload failed")
         }
 
         setProgress(100)
 
-        if (!response.data) throw new Error("Upload failed: no URL returned")
-        const url = response.data
+        if (!result.data) throw new Error("Upload failed: no URL returned")
+        const url = result.data as string
 
         const uploaded: UploadedFile = {
           key: s3Key,

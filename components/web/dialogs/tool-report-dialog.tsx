@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { useMutation } from "@tanstack/react-query"
 import { capitalCase } from "change-case"
 import { useTranslations } from "next-intl"
 import type { Dispatch, SetStateAction } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { ReportType } from "~/.generated/prisma/browser"
 import { Button } from "~/components/common/button"
@@ -24,7 +24,7 @@ import { TextArea } from "~/components/common/textarea"
 import { LoginDialog } from "~/components/web/auth/login-dialog"
 import { reportsConfig } from "~/config/reports"
 import { useSession } from "~/lib/auth-client"
-import { reportTool } from "~/server/web/actions/report"
+import { webOrpc } from "~/lib/orpc-query"
 import { createReportToolSchema } from "~/server/web/shared/schema"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
@@ -40,33 +40,34 @@ export const ToolReportDialog = ({ tool, isOpen, setIsOpen }: ToolReportDialogPr
   const tSchema = useTranslations("schema")
 
   const schema = createReportToolSchema(tSchema)
-  const resolver = zodResolver(schema)
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(reportTool, resolver, {
-    formProps: {
-      values: {
-        type: "" as unknown as ReportType,
-        message: "",
-        toolId: tool.id,
-        email: session?.user.email || "",
-      },
+  const form = useForm({
+    resolver: zodResolver(schema),
+    values: {
+      type: "" as unknown as ReportType,
+      message: "",
+      toolId: tool.id,
+      email: session?.user.email || "",
     },
+  })
 
-    actionProps: {
+  const mutation = useMutation(
+    webOrpc.reports.report.mutationOptions({
       onSuccess: () => {
         toast.success(t("success_message"))
         setIsOpen(false)
         form.reset()
       },
-
-      onError: ({ error }) => {
-        toast.error(error.serverError)
+      onError: error => {
+        toast.error(error.message)
       },
-    },
-  })
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   // A hotkey to submit the form
-  useHotkeys([["mod+enter", () => handleSubmitWithAction()]], [], true)
+  useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
   if (!reportsConfig.enabled) {
     return null
@@ -85,7 +86,7 @@ export const ToolReportDialog = ({ tool, isOpen, setIsOpen }: ToolReportDialogPr
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={handleSubmitWithAction} className="grid gap-4" noValidate>
+          <form onSubmit={onSubmit} className="grid gap-4" noValidate>
             {!session?.user && (
               <Controller
                 control={form.control}
@@ -163,7 +164,7 @@ export const ToolReportDialog = ({ tool, isOpen, setIsOpen }: ToolReportDialogPr
                 {t("cancel_button")}
               </Button>
 
-              <Button type="submit" className="min-w-28" isPending={action.isPending}>
+              <Button type="submit" className="min-w-28" isPending={mutation.isPending}>
                 {t("send_button")}
               </Button>
             </DialogFooter>

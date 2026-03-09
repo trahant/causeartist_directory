@@ -1,17 +1,17 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import type { ComponentProps } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { Box } from "~/components/common/box"
 import { Button } from "~/components/common/button"
 import { Hint } from "~/components/common/hint"
 import { Input } from "~/components/common/input"
 import { useTrackEvent } from "~/hooks/use-track-event"
+import { webOrpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
-import { subscribeToNewsletter as subscribe } from "~/server/web/actions/subscribe"
 import { createNewsletterSchema } from "~/server/web/shared/schema"
 
 type ButtonProps = ComponentProps<typeof Button>
@@ -36,34 +36,35 @@ export const CTAForm = ({
   const trackEvent = useTrackEvent()
 
   const schema = createNewsletterSchema(tSchema)
-  const resolver = zodResolver(schema)
+
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      captcha: "" as const,
+      email: "",
+    },
+  })
+
+  const mutation = useMutation(
+    webOrpc.subscribe.subscribe.mutationOptions({
+      onSuccess: () => {
+        trackEvent("subscribe_newsletter", { email: form.getValues("email") })
+      },
+      onSettled: () => {
+        form.reset()
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   const defaultPlaceholder = placeholder || t("email_placeholder")
   const defaultButtonProps = buttonProps || { size: "sm" }
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(subscribe, resolver, {
-    formProps: {
-      defaultValues: {
-        captcha: "",
-        email: "",
-      },
-    },
-
-    actionProps: {
-      onSuccess: () => {
-        trackEvent("subscribe_newsletter", { email: form.getValues("email") })
-      },
-
-      onSettled: () => {
-        form.reset()
-      },
-    },
-  })
-
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("flex flex-col gap-3 w-full", className)}
         noValidate
         {...props}
@@ -92,7 +93,7 @@ export const CTAForm = ({
             />
 
             <Button
-              isPending={action.isPending}
+              isPending={mutation.isPending}
               className={cx(
                 "shrink-0",
                 size === "lg" ? "text-sm/tight px-4 py-2 m-1" : "px-3 py-1.5 m-0.5",
@@ -104,13 +105,13 @@ export const CTAForm = ({
           </div>
         </Box>
 
-        {(action.result.serverError || form.formState.errors.email) && (
+        {(mutation.error || form.formState.errors.email) && (
           <Hint className="-mt-1">
-            {action.result.serverError || form.formState.errors.email?.message}
+            {mutation.error?.message || form.formState.errors.email?.message}
           </Hint>
         )}
 
-        {action.result.data && <p className="text-sm text-green-600">{action.result.data}</p>}
+        {mutation.isSuccess && <p className="text-sm text-green-600">{t("success_message")}</p>}
 
         {children}
       </form>

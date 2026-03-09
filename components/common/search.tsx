@@ -2,10 +2,9 @@
 
 import { type HotkeyItem, useDebouncedState, useHotkeys } from "@mantine/hooks"
 import { getDomain } from "@primoui/utils"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { LoaderIcon, MoonIcon, SunIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
-import type { InferSafeActionFnResult } from "next-safe-action"
-import { useAction } from "next-safe-action/hooks"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
@@ -21,7 +20,13 @@ import {
 } from "~/components/common/command"
 import { useSearch } from "~/contexts/search-context"
 import { useSession } from "~/lib/auth-client"
-import { findFeaturedTools, searchItems } from "~/server/web/actions/search"
+import { webOrpc } from "~/lib/web-orpc-query"
+
+type SearchResults = {
+  tools: { id: string; slug: string; name: string; faviconUrl: string | null; websiteUrl: string }[]
+  categories: { id: string; slug: string; name: string }[]
+  tags: { id: string; slug: string; name: string }[]
+}
 
 type SearchResultsProps<T> = {
   name: string
@@ -73,7 +78,7 @@ export const Search = () => {
   const router = useRouter()
   const pathname = usePathname()
   const search = useSearch()
-  const [results, setResults] = useState<InferSafeActionFnResult<typeof searchItems>["data"]>()
+  const [results, setResults] = useState<SearchResults>()
   const { resolvedTheme, setTheme, forcedTheme } = useTheme()
   const [q, setQuery] = useDebouncedState("", 250)
   const listRef = useRef<HTMLDivElement>(null)
@@ -82,9 +87,17 @@ export const Search = () => {
   const isAdminPath = pathname.startsWith("/admin")
   const hasQuery = !!q.length
 
-  const { execute: executeFeaturedTools } = useAction(findFeaturedTools, {
-    onSuccess: ({ data }) => setResults({ tools: data, categories: [], tags: [] }),
+  const { data: featuredTools } = useQuery({
+    ...webOrpc.search.findFeaturedTools.queryOptions(),
+    enabled: search.isOpen && !hasQuery,
   })
+
+  // Set featured tools as results when available and no query
+  useEffect(() => {
+    if (search.isOpen && !hasQuery && featuredTools) {
+      setResults({ tools: featuredTools, categories: [], tags: [] })
+    }
+  }, [search.isOpen, hasQuery, featuredTools])
 
   const handleOpenChange = (open: boolean) => {
     if (open) {
@@ -181,35 +194,30 @@ export const Search = () => {
 
   useHotkeys(hotkeys, [], true)
 
-  const { execute, isPending } = useAction(searchItems, {
-    onSuccess: ({ data }) => {
-      setResults(data)
-    },
-
-    onError: ({ error }) => {
-      console.error(error)
-      setResults(undefined)
-    },
-  })
+  const { mutate: executeSearch, isPending } = useMutation(
+    webOrpc.search.searchItems.mutationOptions({
+      onSuccess: data => {
+        setResults(data)
+      },
+      onError: error => {
+        console.error(error)
+        setResults(undefined)
+      },
+    }),
+  )
 
   useEffect(() => {
-    const performSearch = async () => {
-      if (hasQuery) {
-        const query = q.toLowerCase().trim()
+    if (hasQuery) {
+      const query = q.toLowerCase().trim()
 
-        execute({ query })
-        listRef.current?.scrollTo({ top: 0, behavior: "smooth" })
-      } else {
-        if (search.isOpen) {
-          executeFeaturedTools()
-        } else {
-          setResults(undefined)
-        }
+      executeSearch({ query })
+      listRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+    } else {
+      if (!search.isOpen) {
+        setResults(undefined)
       }
     }
-
-    performSearch()
-  }, [q, search.isOpen, execute, hasQuery])
+  }, [q, search.isOpen, executeSearch, hasQuery])
 
   return (
     <CommandDialog open={search.isOpen} onOpenChange={handleOpenChange} shouldFilter={false}>

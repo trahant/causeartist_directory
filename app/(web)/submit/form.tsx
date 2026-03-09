@@ -1,11 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks"
+import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
-import { Controller, FormProvider as Form } from "react-hook-form"
+import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from "~/components/common/button"
 import { Checkbox } from "~/components/common/checkbox"
@@ -15,9 +15,9 @@ import { Input } from "~/components/common/input"
 import { TextArea } from "~/components/common/textarea"
 import { FeatureNudge } from "~/components/web/feature-nudge"
 import { useTrackEvent } from "~/hooks/use-track-event"
+import { webOrpc } from "~/lib/orpc-query"
 import { isToolPremiumTier, isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
-import { submitTool } from "~/server/web/actions/submit"
 import { createSubmitToolSchema } from "~/server/web/shared/schema"
 
 export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
@@ -27,23 +27,21 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
   const tSchema = useTranslations("schema")
 
   const schema = createSubmitToolSchema(tSchema)
-  const resolver = zodResolver(schema)
 
-  const { form, action, handleSubmitWithAction } = useHookFormAction(submitTool, resolver, {
-    formProps: {
-      values: {
-        name: "",
-        websiteUrl: "",
-        submitterNote: "",
-        newsletterOptIn: true,
-      },
+  const form = useForm({
+    resolver: zodResolver(schema),
+    values: {
+      name: "",
+      websiteUrl: "",
+      submitterNote: "",
+      newsletterOptIn: true,
     },
+  })
 
-    actionProps: {
-      onSuccess: ({ data }) => {
+  const mutation = useMutation(
+    webOrpc.tools.submit.mutationOptions({
+      onSuccess: data => {
         form.reset()
-
-        if (!data) return
 
         // Track event
         trackEvent("submit_tool", { slug: data.slug })
@@ -62,15 +60,19 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
           router.push(`/submit/${data.slug}`)
         }
       },
-    },
-  })
 
-  const { serverError } = action.result
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  const onSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmitWithAction}
+        onSubmit={onSubmit}
         className={cx("grid w-full gap-5 @md:grid-cols-2", className)}
         noValidate
         {...props}
@@ -145,10 +147,10 @@ export const SubmitForm = ({ className, ...props }: ComponentProps<"form">) => {
           )}
         />
 
-        {serverError && <Hint className="col-span-full">{serverError}</Hint>}
+        {mutation.error && <Hint className="col-span-full">{mutation.error.message}</Hint>}
 
         <div className="col-span-full">
-          <Button variant="primary" isPending={action.isPending} className="flex min-w-32">
+          <Button variant="primary" isPending={mutation.isPending} className="flex min-w-32">
             {t("submit_button")}
           </Button>
         </div>

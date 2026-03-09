@@ -1,5 +1,6 @@
 "use client"
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useWindowScroll } from "@mantine/hooks"
 import {
   BadgeCheckIcon,
@@ -12,7 +13,6 @@ import {
 } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from "next-intl"
-import { useAction } from "next-safe-action/hooks"
 import { useRouter } from "next/navigation"
 import { parseAsStringEnum, useQueryState } from "nuqs"
 import { type ComponentProps, type SetStateAction, useEffect, useState } from "react"
@@ -36,9 +36,9 @@ import { ToolReportDialog } from "~/components/web/dialogs/tool-report-dialog"
 import { ToolButton } from "~/components/web/tools/tool-button"
 import { reportsConfig } from "~/config/reports"
 import { useSession } from "~/lib/auth-client"
+import { webOrpc } from "~/lib/orpc-query"
 import { isToolApproved, isToolPremiumTier, isToolPublished } from "~/lib/tools"
 import { cx } from "~/lib/utils"
-import { checkBookmark, setBookmark } from "~/server/web/actions/bookmark"
 import type { ToolOne } from "~/server/web/tools/payloads"
 
 type ToolActionsProps = ComponentProps<typeof Stack> & {
@@ -55,26 +55,27 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
   const t = useTranslations("tools.actions")
   const { data: session } = useSession()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [scroll] = useWindowScroll()
   const [dialog, setDialog] = useQueryState("dialog", parseAsStringEnum(Object.values(Dialog)))
   const [isStickyButtonVisible, setIsStickyButtonVisible] = useState(false)
-
-  // Bookmark state
-  const [isBookmarked, setIsBookmarked] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
 
-  const { execute: checkBookmarkStatus } = useAction(checkBookmark, {
-    onSuccess: ({ data }) => {
-      if (data) {
-        setIsBookmarked(data.bookmarked)
-      }
-    },
-  })
+  // Bookmark query
+  const { data: bookmarkData } = useQuery(
+    webOrpc.bookmarks.check.queryOptions({
+      input: { toolId: tool.id },
+      enabled: !!session?.user,
+    }),
+  )
 
-  const { execute: executeBookmark, isPending: isBookmarkPending } = useAction(setBookmark, {
-    onSuccess: ({ data }) => {
-      if (data) {
-        setIsBookmarked(data.bookmarked)
+  const isBookmarked = bookmarkData?.bookmarked ?? false
+
+  // Bookmark mutation
+  const { mutate: executeBookmark, isPending: isBookmarkPending } = useMutation(
+    webOrpc.bookmarks.set.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({ queryKey: webOrpc.bookmarks.key() })
 
         toast.success(data.bookmarked ? t("bookmark_added") : t("bookmark_removed"), {
           action: {
@@ -82,24 +83,18 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
             onClick: () => router.push("/dashboard/bookmarks"),
           },
         })
-      }
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError)
-    },
-  })
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
   useEffect(() => {
     if (isToolPublished(tool)) {
       setIsStickyButtonVisible(scroll.y > 250)
     }
   }, [scroll, tool])
-
-  useEffect(() => {
-    if (session?.user) {
-      checkBookmarkStatus({ toolId: tool.id })
-    }
-  }, [session?.user, tool.id])
 
   const handleBookmarkClick = () => {
     if (!session?.user) {

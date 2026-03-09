@@ -1,7 +1,7 @@
 import { createORPCClient } from "@orpc/client"
 import { RPCLink } from "@orpc/client/fetch"
 import type { RouterClient } from "@orpc/server"
-import type { AppRouter } from "~/app/api/rpc/[[...rest]]/route"
+import type { WebRouter } from "~/server/web/router"
 
 const link = new RPCLink({
   url: () => {
@@ -9,7 +9,7 @@ const link = new RPCLink({
       throw new Error("RPCLink should only be used on the client side.")
     }
 
-    return `${window.location.origin}/api/rpc`
+    return `${window.location.origin}/api/web-rpc`
   },
   fetch: (request, init) => {
     return globalThis.fetch(request, {
@@ -19,7 +19,4 @@ const link = new RPCLink({
   },
 })
 
-const appClient: RouterClient<AppRouter> = createORPCClient(link)
-
-export const client = appClient.admin
-export const webClient = appClient.web
+export const webClient: RouterClient<WebRouter> = createORPCClient(link)

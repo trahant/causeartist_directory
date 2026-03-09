@@ -1,10 +1,9 @@
 "use client"
 
 import { useLocalStorage } from "@mantine/hooks"
+import { useMutation } from "@tanstack/react-query"
 import { ArrowUpRightIcon, TicketPercentIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
-import type { InferSafeActionFnInput } from "next-safe-action"
-import { useAction } from "next-safe-action/hooks"
 import { useRouter } from "next/navigation"
 import type { ComponentProps, ReactNode } from "react"
 import { toast } from "sonner"
@@ -22,7 +21,9 @@ import { siteConfig } from "~/config/site"
 import { useProductPrices } from "~/hooks/use-product-prices"
 import { getProductFeatures, type ProductInterval } from "~/lib/products"
 import { cx } from "~/lib/utils"
-import { createStripeCheckout } from "~/server/web/products/actions"
+import { webOrpc } from "~/lib/web-orpc-query"
+import type { checkoutSchema } from "~/server/web/products/schema"
+import type { z } from "zod"
 
 const productClassName = "items-stretch gap-8 basis-72 grow max-w-80 bg-transparent"
 
@@ -33,7 +34,7 @@ type ProductData = {
 }
 
 type ProductCheckoutData = Omit<
-  InferSafeActionFnInput<typeof createStripeCheckout>["parsedInput"],
+  z.infer<typeof checkoutSchema>,
   "lineItems" | "mode" | "coupon"
 >
 
@@ -64,16 +65,20 @@ const Product = ({
     defaultValue: "month",
   })
 
-  const { execute, isPending } = useAction(createStripeCheckout, {
-    onError: ({ error }) => {
+  const { mutate, isPending } = useMutation({
+    ...webOrpc.products.createCheckout.mutationOptions(),
+    onSuccess: data => {
+      window.location.href = data.url
+    },
+    onError: error => {
       console.error("Checkout error:", error)
-      toast.error(error.serverError)
+      toast.error(error.message)
     },
   })
 
   const onSubmit = () => {
     if (currentPrice?.id && currentPrice.unit_amount) {
-      return execute({
+      return mutate({
         lineItems: [{ price: currentPrice.id }],
         mode: isSubscription ? "subscription" : "payment",
         coupon: coupon?.id,
