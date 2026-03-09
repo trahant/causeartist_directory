@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server"
 import { after } from "next/server"
 import { removeS3Directories } from "~/lib/media"
 import { withAdmin } from "~/lib/orpc"
@@ -51,7 +52,7 @@ const duplicate = withAdmin
     const post = await findPostById(id)
 
     if (!post) {
-      throw new Error("Post not found")
+      throw new ORPCError("NOT_FOUND", { message: "Post not found" })
     }
 
     const title = `${post.title} (Copy)`

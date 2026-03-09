@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server"
 import { after } from "next/server"
 import { z } from "zod"
 import { removeS3Directories } from "~/lib/media"
@@ -81,7 +82,7 @@ const duplicate = withAdmin
     })
 
     if (!tool) {
-      throw new Error("Tool not found")
+      throw new ORPCError("NOT_FOUND", { message: "Tool not found" })
     }
 
     const name = `${tool.name} (Copy)`

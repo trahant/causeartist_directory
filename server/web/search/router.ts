@@ -6,7 +6,7 @@ import { findTags } from "~/server/web/tags/queries"
 import { findTools } from "~/server/web/tools/queries"
 
 const searchItems = withOptionalAuth
-  .input(z.object({ query: z.string() }))
+  .input(z.object({ query: z.string().max(255) }))
   .handler(async ({ input: { query }, context: { user } }) => {
     const [tools, categories, tags] = await Promise.all([
       findTools({

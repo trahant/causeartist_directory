@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server"
 import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { idSchema, idsSchema } from "~/server/admin/shared/schema"
@@ -56,7 +57,7 @@ const duplicate = withAdmin
     })
 
     if (!tag) {
-      throw new Error("Tag not found")
+      throw new ORPCError("NOT_FOUND", { message: "Tag not found" })
     }
 
     const name = `${tag.name} (Copy)`

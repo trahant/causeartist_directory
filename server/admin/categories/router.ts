@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server"
 import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { findCategories, findCategoryList } from "~/server/admin/categories/queries"
@@ -56,7 +57,7 @@ const duplicate = withAdmin
     })
 
     if (!category) {
-      throw new Error("Category not found")
+      throw new ORPCError("NOT_FOUND", { message: "Category not found" })
     }
 
     const name = `${category.name} (Copy)`

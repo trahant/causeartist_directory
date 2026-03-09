@@ -50,7 +50,7 @@ export const generateAndSendOtp = async (email: string) => {
   })
 
   if (!otp) {
-    throw new Error("Failed to generate OTP")
+    throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "Failed to generate OTP" })
   }
 
   after(async () => {

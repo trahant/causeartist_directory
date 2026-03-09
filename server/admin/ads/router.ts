@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server"
 import { after } from "next/server"
 import { removeS3Directories } from "~/lib/media"
 import { withAdmin } from "~/lib/orpc"
@@ -33,7 +34,7 @@ const duplicate = withAdmin
     })
 
     if (!ad) {
-      throw new Error("Ad not found")
+      throw new ORPCError("NOT_FOUND", { message: "Ad not found" })
     }
 
     const newAd = await db.ad.create({
