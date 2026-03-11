@@ -25,15 +25,10 @@ export const loadGoogleFont = async (font: string, weight: FontWeight) => {
   return response.arrayBuffer()
 }
 
-export const fonts: Font[] = [
-  {
-    name: "Geist",
-    weight: 400,
-    data: await loadGoogleFont("Geist", 400),
-  },
-  {
-    name: "Geist",
-    weight: 600,
-    data: await loadGoogleFont("Geist", 600),
-  },
-]
+export const fonts: Font[] = await Promise.all(
+  ([400, 600] as const).map(weight =>
+    loadGoogleFont("Geist", weight)
+      .then(data => ({ name: "Geist", weight, data }) as Font)
+      .catch(() => null),
+  ),
+).then(results => results.filter((f): f is Font => f !== null))
