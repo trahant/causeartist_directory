@@ -4,9 +4,8 @@ import { type HotkeyItem, useDebouncedState, useHotkeys } from "@mantine/hooks"
 import type { InferRouterOutputs } from "@orpc/server"
 import { getDomain } from "@primoui/utils"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { LoaderIcon, MoonIcon, SunIcon } from "lucide-react"
+import { LoaderIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useTheme } from "next-themes"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react"
@@ -19,6 +18,7 @@ import {
   CommandList,
   CommandShortcut,
 } from "~/components/common/command"
+import { Kbd } from "~/components/common/kbd"
 import { useSearch } from "~/contexts/search-context"
 import { useSession } from "~/lib/auth-client"
 import { orpc } from "~/lib/orpc-query"
@@ -77,7 +77,6 @@ export const Search = () => {
   const pathname = usePathname()
   const search = useSearch()
   const [results, setResults] = useState<SearchResults>()
-  const { resolvedTheme, setTheme, forcedTheme } = useTheme()
   const [q, setQuery] = useDebouncedState("", 250)
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -150,23 +149,6 @@ export const Search = () => {
     })
   }
 
-  if (!forcedTheme) {
-    const nextTheme = resolvedTheme === "dark" ? "light" : "dark"
-
-    commandSections.push({
-      name: t("navigation.appearance"),
-      items: [
-        {
-          value: "theme",
-          label: t("navigation.switch_theme", { theme: t(`common.themes.${nextTheme}`) }),
-          icon: nextTheme === "dark" ? <MoonIcon /> : <SunIcon />,
-          shortcut: { keys: ["meta", "shift", "L"] },
-          onSelect: () => setTheme(nextTheme),
-        },
-      ],
-    })
-  }
-
   for (const [_, { shortcut, onSelect }] of commandSections
     .flatMap(({ items }) => items)
     .entries()) {
@@ -214,6 +196,7 @@ export const Search = () => {
         onValueChange={setQuery}
         className="pr-10"
         prefix={isPending && <LoaderIcon className="animate-spin" />}
+        suffix={<Kbd keys={["meta", "K"]} />}
       />
 
       {hasQuery && !isPending && <CommandEmpty>{t("components.search.no_results")}</CommandEmpty>}
