@@ -16,7 +16,9 @@
     "bookmark_remove": "Remove from bookmarks",
     "bookmark_save": "Save",
     "bookmark_saved": "Saved",
+    "bookmark_adding": "Saving bookmark...",
     "bookmark_added": "Bookmark added",
+    "bookmark_removing": "Removing bookmark...",
     "bookmark_removed": "Bookmark removed",
     "bookmark_view": "View bookmarks"
   },

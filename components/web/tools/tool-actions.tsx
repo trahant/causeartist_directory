@@ -1,14 +1,13 @@
 "use client"
 
 import { useWindowScroll } from "@mantine/hooks"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
   BadgeCheckIcon,
   BookmarkIcon,
   CodeXmlIcon,
   EllipsisIcon,
   FlagIcon,
-  LoaderIcon,
   SparklesIcon,
 } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
@@ -55,37 +54,45 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
   const t = useTranslations("tools.actions")
   const { data: session } = useSession()
   const router = useRouter()
-  const queryClient = useQueryClient()
   const [scroll] = useWindowScroll()
   const [dialog, setDialog] = useQueryState("dialog", parseAsStringEnum(Object.values(Dialog)))
   const [isStickyButtonVisible, setIsStickyButtonVisible] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
 
-  // Bookmark query
-  const { data: bookmarkData } = useQuery(
-    orpc.web.bookmarks.check.queryOptions({
-      input: { toolId: tool.id },
-      enabled: !!session?.user,
-    }),
-  )
+  const bookmarkQuery = orpc.web.bookmarks.check.queryOptions({
+    input: { toolId: tool.id },
+    enabled: !!session?.user,
+    initialData: { bookmarked: false },
+  })
 
-  const isBookmarked = bookmarkData?.bookmarked ?? false
+  // Bookmark query
+  const { data: bookmarkData } = useQuery(bookmarkQuery)
 
   // Bookmark mutation
-  const { mutate: toggleBookmark, isPending: isBookmarkPending } = useMutation(
+  const { mutateAsync: toggleBookmark } = useMutation(
     orpc.web.bookmarks.set.mutationOptions({
-      onSuccess: data => {
-        queryClient.invalidateQueries({ queryKey: orpc.web.bookmarks.key() })
+      onMutate: async ({ bookmarked }, { client }) => {
+        const queryKey = bookmarkQuery.queryKey
 
-        toast.success(data.bookmarked ? t("bookmark_added") : t("bookmark_removed"), {
-          action: {
-            label: t("bookmark_view"),
-            onClick: () => router.push("/dashboard/bookmarks"),
-          },
-        })
+        // Cancel outgoing refetches
+        await client.cancelQueries({ queryKey })
+
+        // Snapshot the previous value
+        const previousData = client.getQueryData(queryKey)
+
+        // Optimistically update to the new value
+        client.setQueryData(queryKey, old => (old ? { ...old, bookmarked } : old))
+
+        return { previousData, queryKey }
       },
-      onError: error => {
-        toast.error(error.message)
+      onError: (_error, _variables, onMutateResult, { client }) => {
+        // Roll back to the previous value
+        if (onMutateResult) {
+          client.setQueryData(onMutateResult.queryKey, onMutateResult.previousData)
+        }
+      },
+      onSettled: (_data, _error, _variables, _onMutateResult, { client }) => {
+        client.invalidateQueries({ queryKey: orpc.web.bookmarks.key() })
       },
     }),
   )
@@ -102,7 +109,17 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
       return
     }
 
-    toggleBookmark({ toolId: tool.id, bookmarked: !isBookmarked })
+    toast.promise(toggleBookmark({ toolId: tool.id, bookmarked: !bookmarkData.bookmarked }), {
+      loading: !bookmarkData.bookmarked ? t("bookmark_adding") : t("bookmark_removing"),
+      success: {
+        message: !bookmarkData.bookmarked ? t("bookmark_added") : t("bookmark_removed"),
+        action: {
+          label: t("bookmark_view"),
+          onClick: () => router.push("/dashboard/bookmarks"),
+        },
+      },
+      error: err => err.message,
+    })
   }
 
   const handleClose = (isOpen: SetStateAction<boolean>) => {
@@ -149,14 +166,9 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
               }
               handleBookmarkClick()
             }}
-            disabled={isBookmarkPending}
           >
-            {isBookmarkPending ? (
-              <LoaderIcon className="animate-spin" />
-            ) : (
-              <BookmarkIcon className={cx(isBookmarked && "fill-current")} />
-            )}
-            {isBookmarked ? t("bookmark_saved") : t("bookmark_save")}
+            <BookmarkIcon className={cx(bookmarkData.bookmarked && "fill-current")} />
+            {bookmarkData.bookmarked ? t("bookmark_saved") : t("bookmark_save")}
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
@@ -223,16 +235,15 @@ export const ToolActions = ({ tool, children, className, ...props }: ToolActions
       )}
 
       <ButtonGroup className="@max-2xl:hidden">
-        <Tooltip tooltip={isBookmarked ? t("bookmark_remove") : t("bookmark_add")}>
+        <Tooltip tooltip={bookmarkData.bookmarked ? t("bookmark_remove") : t("bookmark_add")}>
           <Button
             size="md"
             variant="secondary"
             prefix={<BookmarkIcon />}
-            className={cx(isBookmarked && "text-primary")}
+            className={cx(bookmarkData.bookmarked && "text-primary")}
             onClick={handleBookmarkClick}
-            isPending={isBookmarkPending}
           >
-            {isBookmarked ? t("bookmark_saved") : t("bookmark_save")}
+            {bookmarkData.bookmarked ? t("bookmark_saved") : t("bookmark_save")}
           </Button>
         </Tooltip>
 
