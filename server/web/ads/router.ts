@@ -10,6 +10,7 @@ import { stripe } from "~/services/stripe"
 const createFromCheckout = withBase
   .input(adDetailsSchema)
   .handler(async ({ input: { sessionId, ...adDetails }, context: { db, revalidate } }) => {
+    if (!stripe) throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "Stripe is not configured." })
     const session = await stripe.checkout.sessions.retrieve(sessionId)
     const email = session.customer_details?.email ?? ""
     const ads: Omit<Omit<Prisma.AdCreateInput, "email">, keyof typeof adDetails>[] = []

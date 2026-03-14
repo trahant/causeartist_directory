@@ -11,6 +11,7 @@ const createCheckout = withOptionalAuth
       input: { lineItems, successUrl, cancelUrl, mode, metadata, coupon },
       context: { user },
     }) => {
+      if (!stripe) throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "Stripe is not configured." })
       const customerEmail = user?.email
 
       const checkout = await stripe.checkout.sessions.create({

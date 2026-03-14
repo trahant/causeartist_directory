@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    if (!signature || !webhookSecret) {
+    if (!stripe || !signature || !webhookSecret) {
       return new Response("Webhook secret not found.", { status: 400 })
     }
 

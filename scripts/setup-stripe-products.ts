@@ -72,6 +72,10 @@ const products: (Stripe.ProductCreateParams & { price_data?: Stripe.PriceCreateP
 
 async function main() {
   try {
+    if (!stripe) {
+      console.error("Stripe is not configured. Set STRIPE_SECRET_KEY.")
+      process.exit(1)
+    }
     // Create products
     for (const { price_data, ...productData } of products) {
       const product = await stripe.products.create(productData)

@@ -10,6 +10,7 @@ export const findStripeProducts = async () => {
   cacheLife("hours")
 
   try {
+    if (!stripe) return []
     const { data: products } = await stripe.products.list({
       active: true,
       limit: 100,
@@ -31,6 +32,7 @@ export const findStripePricesByProduct = async (productId: string) => {
   cacheLife("days")
 
   try {
+    if (!stripe) return []
     const { data: prices } = await stripe.prices.list({
       product: productId,
       active: true,
@@ -54,6 +56,7 @@ export const findStripeCoupon = async (code?: string) => {
   if (!code?.trim()) return undefined
 
   try {
+    if (!stripe) return undefined
     const promoCodes = await stripe.promotionCodes.list({
       code,
       limit: 1,

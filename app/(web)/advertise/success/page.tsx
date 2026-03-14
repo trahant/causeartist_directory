@@ -24,6 +24,7 @@ const namespace = "pages.advertise.success"
 const getData = cache(async ({ searchParams }: Props) => {
   const searchParamsLoader = createLoader({ sessionId: parseAsString.withDefault("") })
   const { sessionId } = await searchParamsLoader(searchParams)
+  if (!stripe) notFound()
   const { data: session, error } = await tryCatch(stripe.checkout.sessions.retrieve(sessionId))
 
   if (error || session.status !== "complete") {

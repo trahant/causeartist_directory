@@ -22,6 +22,7 @@ const stats = withAdmin.handler(async ({ context: { db } }) => {
 // -----------------------------------------------------------------------------
 const revenue = withAdmin.handler(async () => {
   try {
+    if (!stripe) return { results: [], totalRevenue: 0, averageRevenue: 0 }
     const { today, startDate } = getMetricDateRange()
 
     const { data: paymentIntents } = await stripe.paymentIntents.list({
