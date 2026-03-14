@@ -7,7 +7,6 @@ import { ToolQuery } from "~/components/web/tools/tool-query"
 import { siteConfig } from "~/config/site"
 import { getPageData } from "~/lib/pages"
 
-// Get page data
 const getData = cache(async () => {
   const t = await getTranslations()
   const title = `${siteConfig.name} - ${t("brand.tagline")}`
@@ -16,7 +15,7 @@ const getData = cache(async () => {
   return getPageData(siteConfig.url, title, description)
 })
 
-export default async function (props: PageProps<"/">) {
+export async function HomeContent(props: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { structuredData } = await getData()
 
   return (
