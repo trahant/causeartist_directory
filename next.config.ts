@@ -3,7 +3,10 @@ import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n.ts")
-const withPlausible = withPlausibleProxy({ customDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_URL })
+const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_URL
+const withPlausible = plausibleDomain
+  ? withPlausibleProxy({ customDomain: plausibleDomain })
+  : (config: NextConfig) => config
 
 const nextConfig: NextConfig = {
   typedRoutes: true,

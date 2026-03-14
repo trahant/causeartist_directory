@@ -9,10 +9,14 @@ import { getPlausibleApi } from "~/services/plausible"
  * @returns The number of pageviews for the given page and period
  */
 export const getPlausiblePageviews = async (page: string, period: string | string[] = "30d") => {
+  const api = getPlausibleApi()
+  const siteId = env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+  if (!api || !siteId) return 0
+
   const { data, error } = await tryCatch(
-    getPlausibleApi()
+    api
       .post({
-        site_id: env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
+        site_id: siteId,
         metrics: ["pageviews"],
         date_range: period,
         filters: [["is", "event:page", [page]]],
@@ -34,10 +38,14 @@ export const getPlausiblePageviews = async (page: string, period: string | strin
  * @returns The number of total visitors for the given period grouped by day
  */
 export const getPlausibleVisitors = async (period: string | string[] = "30d") => {
+  const api = getPlausibleApi()
+  const siteId = env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+  if (!api || !siteId) return {}
+
   const { data, error } = await tryCatch(
-    getPlausibleApi()
+    api
       .post({
-        site_id: env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN,
+        site_id: siteId,
         metrics: ["visitors"],
         date_range: period,
         dimensions: ["time:day"],

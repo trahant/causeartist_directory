@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "prisma migrate deploy && next build",
+    "build": "node scripts/check-db-url.cjs && prisma migrate deploy && next build",
     "lint": "oxlint . --fix",
     "format": "oxfmt --write .",
     "email": "SKIP_ENV_VALIDATION=1 email dev",
@@ -17,7 +17,7 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
     "db:seed:causeartist": "bun prisma/seed-causeartist.ts",
-    "postinstall": "bun run db:generate"
+    "postinstall": "node -e \"if(process.env.DATABASE_URL){require('child_process').execSync('npx prisma generate --no-hints',{stdio:'inherit'})}\""
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.118",
