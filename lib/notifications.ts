@@ -101,6 +101,8 @@ export const notifySubmitterOfPremiumTool = async (tool: Tool) => {
  */
 export const notifyAdminOfPremiumTool = async (tool: Tool) => {
   const to = siteConfig.email
+  if (!to) return
+
   const subject = `New ${tool.tier.toLowerCase()} tool: ${tool.name}`
 
   return await sendEmail({
