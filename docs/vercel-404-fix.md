@@ -29,3 +29,21 @@ If the deployment is **green** in Vercel but **causeartist-directory.vercel.app*
 
 - **Settings** → **Git** → **Production Branch**.
 - Set it to **main** (or the branch you deploy from) so the production domain serves the latest deployment from that branch.
+
+## 5. If the deployment URL also returns 404 (root path)
+
+If **both** the deployment URL (e.g. `causeartist-directory-xxxxx-trahants-projects.vercel.app`) and the production domain return **404 NOT_FOUND** for `/`:
+
+1. **Check that the app is running**  
+   Open:  
+   `https://<your-deployment-url>/api/health`  
+   You should see `{"ok":true,"ts":"..."}`. If this works but `/` does not, the 404 is coming from the root page/layout (e.g. a runtime error during render).
+
+2. **Check runtime logs**  
+   In Vercel: **Deployments** → open the deployment → **Functions** or **Logs**. Visit `/` and look for errors (e.g. from `getLocale`, `getMessages`, Prisma, or env). Fix any missing env vars or code that throws.
+
+3. **Check build settings**  
+   **Settings** → **Build & Development** → **Output Directory**. For Next.js it should be **empty** (default). If it’s set to something else, clear it so Vercel uses the Next.js output.
+
+4. **Redeploy**  
+   After changing env or settings, trigger a new deployment (e.g. push a commit or **Redeploy** in the deployment menu).

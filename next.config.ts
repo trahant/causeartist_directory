@@ -30,13 +30,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       (function () {
         const { S3_PUBLIC_URL, S3_BUCKET, S3_REGION } = process.env
-        const url = new URL(S3_PUBLIC_URL ?? `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`)
-
-        return {
-          protocol: "https",
-          hostname: url.hostname,
-          port: "",
-          pathname: "/**",
+        if (!S3_BUCKET || !S3_REGION) {
+          return { protocol: "https" as const, hostname: "localhost", port: "", pathname: "/**" }
+        }
+        try {
+          const url = new URL(S3_PUBLIC_URL ?? `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com`)
+          return { protocol: "https" as const, hostname: url.hostname, port: "", pathname: "/**" }
+        } catch {
+          return { protocol: "https" as const, hostname: "localhost", port: "", pathname: "/**" }
         }
       })(),
     ],
