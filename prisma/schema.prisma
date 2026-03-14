@@ -258,3 +258,230 @@ model Post {
   @@index([authorId])
   @@index([publishedAt])
 }
+
+// --- Causeartist models ---
+
+model Company {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  status          String    @default("draft")
+  tagline         String?
+  description     String?   @db.Text
+  logoUrl         String?
+  website         String?
+  foundedYear     Int?
+  totalFunding    String?
+  linkedin        String?
+  twitter         String?
+  founderName     String?
+  impactModel     String?   @db.Text
+  impactMetrics   String?   @db.Text
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  sectors         CompanySector[]
+  locations       CompanyLocation[]
+  funders         CompanyFunder[]
+  caseStudies     CaseStudy[]
+  podcastEpisodes CompanyEpisode[]
+}
+
+model Funder {
+  id               String    @id @default(cuid())
+  name             String
+  slug             String    @unique
+  status           String    @default("draft")
+  type             String?
+  description      String?   @db.Text
+  logoUrl          String?
+  website          String?
+  foundedYear      Int?
+  aum              String?
+  checkSizeMin     Int?
+  checkSizeMax     Int?
+  investmentThesis String?   @db.Text
+  applicationUrl   String?
+  linkedin         String?
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  sectors          FunderSector[]
+  stages           FunderStage[]
+  locations        FunderLocation[]
+  portfolio        CompanyFunder[]
+  podcastEpisodes  FunderEpisode[]
+}
+
+model Sector {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  heroText  String?  @db.Text
+  createdAt DateTime @default(now())
+  companies CompanySector[]
+  funders   FunderSector[]
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  companies CompanyLocation[]
+  funders   FunderLocation[]
+}
+
+model FundingStage {
+  id      String        @id @default(cuid())
+  name    String
+  slug    String        @unique
+  funders FunderStage[]
+}
+
+model CompanySector {
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+  sector    Sector  @relation(fields: [sectorId], references: [id])
+  sectorId  String
+  @@id([companyId, sectorId])
+}
+
+model CompanyLocation {
+  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  String
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String
+  @@id([companyId, locationId])
+}
+
+model CompanyFunder {
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+  funder    Funder  @relation(fields: [funderId], references: [id])
+  funderId  String
+  @@id([companyId, funderId])
+}
+
+model FunderSector {
+  funder   Funder @relation(fields: [funderId], references: [id])
+  funderId String
+  sector   Sector @relation(fields: [sectorId], references: [id])
+  sectorId String
+  @@id([funderId, sectorId])
+}
+
+model FunderStage {
+  funder       Funder       @relation(fields: [funderId], references: [id])
+  funderId     String
+  fundingStage FundingStage @relation(fields: [stageId], references: [id])
+  stageId      String
+  @@id([funderId, stageId])
+}
+
+model FunderLocation {
+  funder     Funder   @relation(fields: [funderId], references: [id])
+  funderId   String
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String
+  @@id([funderId, locationId])
+}
+
+model PodcastEpisode {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  status          String   @default("draft")
+  episodeNumber   Int?
+  description     String?  @db.Text
+  content         String?  @db.Text
+  heroImageUrl    String?
+  spotifyUrl      String?
+  appleUrl        String?
+  youtubeUrl      String?
+  excerpt         String?
+  seoTitle        String?
+  seoDescription  String?
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  companies       CompanyEpisode[]
+  funders         FunderEpisode[]
+}
+
+model CompanyEpisode {
+  company   Company        @relation(fields: [companyId], references: [id])
+  companyId String
+  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
+  episodeId String
+  @@id([companyId, episodeId])
+}
+
+model FunderEpisode {
+  funder   Funder         @relation(fields: [funderId], references: [id])
+  funderId String
+  episode  PodcastEpisode @relation(fields: [episodeId], references: [id])
+  episodeId String
+  @@id([funderId, episodeId])
+}
+
+model CaseStudy {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  status          String    @default("draft")
+  excerpt         String?
+  content         String?   @db.Text
+  heroImageUrl    String?
+  seoTitle        String?
+  seoDescription  String?
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  company         Company?  @relation(fields: [companyId], references: [id])
+  companyId       String?
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  status          String    @default("draft")
+  excerpt         String?
+  content         String?   @db.Text
+  heroImageUrl    String?
+  seoTitle        String?
+  seoDescription  String?
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  author          Author?   @relation(fields: [authorId], references: [id])
+  authorId        String?
+}
+
+model GlossaryTerm {
+  id               String   @id @default(cuid())
+  term            String
+  slug            String   @unique
+  status          String   @default("draft")
+  definition      String?  @db.Text
+  extendedContent String?  @db.Text
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Author {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  bio       String?    @db.Text
+  avatarUrl String?
+  twitter   String?
+  linkedin  String?
+  createdAt DateTime  @default(now())
+  posts     BlogPost[]
+}

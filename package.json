@@ -16,6 +16,7 @@
     "db:push": "prisma db push --skip-generate",
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
+    "db:seed:causeartist": "bun prisma/seed-causeartist.ts",
     "postinstall": "bun run db:generate"
   },
   "dependencies": {

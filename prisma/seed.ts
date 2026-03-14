@@ -450,6 +450,26 @@ A disciplined content strategy turns your blog into a reliable acquisition chann
   })
 
   console.log("Created blog posts")
+
+  // Companies (required: name, slug, status, tagline)
+  await db.company.createMany({
+    data: [
+      { name: "Acme Impact", slug: "acme-impact", status: "published", tagline: "Building a better world through sustainable innovation." },
+      { name: "Green Future Co", slug: "green-future-co", status: "published", tagline: "Climate solutions for the next decade." },
+      { name: "Social Good Labs", slug: "social-good-labs", status: "published", tagline: "Technology that serves people and planet." },
+    ],
+  })
+  console.log("Created companies")
+
+  // Funders (required: name, slug, status; plus type: vc or foundation)
+  await db.funder.createMany({
+    data: [
+      { name: "Impact Ventures", slug: "impact-ventures", status: "published", type: "vc" },
+      { name: "Cause Foundation", slug: "cause-foundation", status: "published", type: "foundation" },
+    ],
+  })
+  console.log("Created funders")
+
   console.log("Seeding completed!")
 }
 
