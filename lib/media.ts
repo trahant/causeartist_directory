@@ -13,6 +13,7 @@ import { s3Client } from "~/services/s3"
  * @returns The S3 location of the uploaded file.
  */
 export const uploadToS3Storage = async (file: Buffer, key: string) => {
+  if (!s3Client) throw new Error("S3 is not configured")
   const endpoint = env.S3_PUBLIC_URL ?? `https://${env.S3_BUCKET}.s3.${env.S3_REGION}.amazonaws.com`
   const fileType = await fileTypeFromBuffer(file)
   const s3Key = `${key}.${fileType?.ext ?? "png"}`
@@ -58,6 +59,7 @@ export const removeS3Directories = async (directories: string[]) => {
  * @param directory - The directory to remove.
  */
 export const removeS3Directory = async (directory: string) => {
+  if (!s3Client) return
   // Safety flag to prevent accidental deletion of S3 files
   if (!isProd) return
 
@@ -85,6 +87,7 @@ export const removeS3Directory = async (directory: string) => {
  * @param key - The S3 key of the file to remove.
  */
 export const removeS3File = async (key: string) => {
+  if (!s3Client) return
   const deleteCommand = new DeleteObjectCommand({
     Bucket: env.S3_BUCKET,
     Key: key,
