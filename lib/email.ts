@@ -34,6 +34,7 @@ const prepareEmail = async (email: EmailParams): Promise<CreateEmailOptions> => 
  * @returns The response from Resend, or undefined in development
  */
 export const sendEmail = async (email: EmailParams): Promise<CreateEmailResponse | undefined> => {
+  if (!resend) return
   const payload = await prepareEmail(email)
 
   if (!isProd) {
