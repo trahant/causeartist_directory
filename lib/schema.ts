@@ -154,3 +154,20 @@ export function generatePodcastSchema(episode: {
     }),
   }
 }
+
+/**
+ * Glossary term JSON-LD (DefinedTerm)
+ */
+export function generateGlossarySchema(term: {
+  term: string
+  definition?: string | null
+  slug: string
+}): { "@context": string; "@type": string; [key: string]: unknown } {
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    name: term.term,
+    description: term.definition ?? undefined,
+    url: toAbsoluteUrl(`/glossary/${term.slug}`),
+  }
+}

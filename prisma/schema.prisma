@@ -1,76 +1,39 @@
 generator client {
   provider        = "prisma-client"
+  output          = "../.generated/prisma"
   previewFeatures = ["postgresqlExtensions"]
   engineType      = "client"
-  output          = "../.generated/prisma"
 }
 
 datasource db {
   provider   = "postgresql"
-  extensions = [citext]
-}
-
-enum AdType {
-  Banner
-  Tools
-  ToolPage
-  BlogPost
-  Bottom
-  All
-}
-
-enum ToolStatus {
-  Draft
-  Scheduled
-  Pending
-  Published
-}
-
-enum ToolTier {
-  Free
-  Standard
-  Premium
-}
-
-enum ReportType {
-  BrokenLink
-  WrongCategory
-  Outdated
-  Other
-}
-
-enum PostStatus {
-  Draft
-  Scheduled
-  Published
+  extensions = [citext, uuid_ossp(map: "uuid-ossp", schema: "extensions")]
 }
 
 model User {
-  id            String    @id @default(cuid(2))
+  id            String     @id @default(cuid(2))
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String     @unique
+  emailVerified Boolean    @default(false)
   image         String?
-  role          String    @default("user")
-  banned        Boolean?  @default(false)
+  role          String     @default("user")
+  banned        Boolean?   @default(false)
   banReason     String?
   banExpires    DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  accounts      Account[]
+  bookmarks     Bookmark[]
+  posts         Post[]
+  sessions      Session[]
+  tools         Tool[]
 
-  // Relations
-  accounts  Account[]
-  sessions  Session[]
-  tools     Tool[]
-  posts     Post[]
-  bookmarks Bookmark[]
-
-  // Indexes
   @@index([id])
 }
 
 model Session {
   id             String   @id @default(cuid(2))
+  userId         String
   token          String   @unique
   expiresAt      DateTime
   ipAddress      String?
@@ -78,17 +41,14 @@ model Session {
   impersonatedBy String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  // Indexes
   @@index([userId])
 }
 
 model Account {
   id                    String    @id @default(cuid(2))
+  userId                String
   accountId             String
   providerId            String
   accessToken           String?
@@ -100,12 +60,8 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  // Indexes
   @@index([userId])
 }
 
@@ -125,14 +81,14 @@ model Ad {
   description String?
   websiteUrl  String
   faviconUrl  String?
-  bannerUrl   String?
-  buttonLabel String?
   type        AdType   @default(All)
   startsAt    DateTime
   endsAt      DateTime
-  sessionId   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  buttonLabel String?
+  sessionId   String?
+  bannerUrl   String?
 }
 
 model Tool {
@@ -146,8 +102,6 @@ model Tool {
   content        String?
   faviconUrl     String?
   screenshotUrl  String?
-  tier           ToolTier   @default(Free)
-  tierPriority   Int        @default(dbgenerated())
   submitterName  String?
   submitterEmail String?
   submitterNote  String?
@@ -155,14 +109,14 @@ model Tool {
   publishedAt    DateTime?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-
-  // Relations
-  categories Category[]
-  tags       Tag[]
-  reports    Report[]
-  bookmarks  Bookmark[]
-  owner      User?      @relation(fields: [ownerId], references: [id])
-  ownerId    String?
+  ownerId        String?
+  tier           ToolTier   @default(Free)
+  tierPriority   Int        @default(dbgenerated("\nCASE\n    WHEN (tier = 'Premium'::\"ToolTier\") THEN 0\n    ELSE 1\nEND"))
+  bookmarks      Bookmark[]
+  reports        Report[]
+  owner          User?      @relation(fields: [ownerId], references: [id])
+  categories     Category[] @relation("CategoryToTool")
+  tags           Tag[]      @relation("TagToTool")
 
   @@index([id, slug])
   @@index([name])
@@ -177,14 +131,11 @@ model Category {
   name        String   @db.Citext
   slug        String   @unique
   label       String?
-  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  description String?
+  tools       Tool[]   @relation("CategoryToTool")
 
-  // Implicit relation
-  tools Tool[]
-
-  // Indexes
   @@index([slug])
 }
 
@@ -194,27 +145,21 @@ model Tag {
   slug      String   @unique
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+  tools     Tool[]   @relation("TagToTool")
 
-  // Relations
-  tools Tool[]
-
-  // Indexes
   @@index([name])
 }
 
 model Report {
   id        String     @id @default(cuid(2))
+  toolId    String?
   type      ReportType @default(Other)
   message   String?
-  email     String     @default("")
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  email     String     @default("")
+  tool      Tool?      @relation(fields: [toolId], references: [id], onDelete: Cascade)
 
-  // Relations
-  tool   Tool?   @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  toolId String?
-
-  // Indexes
   @@index([toolId])
 }
 
@@ -222,14 +167,11 @@ model Bookmark {
   id        String   @id @default(cuid(2))
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId    String
+  toolId    String
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  toolId String
-
-  // Indexes
   @@unique([userId, toolId])
   @@index([userId])
   @@index([toolId])
@@ -247,27 +189,22 @@ model Post {
   publishedAt DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id])
 
-  // Relations
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
-
-  // Indexes
   @@index([slug])
   @@index([status])
   @@index([authorId])
   @@index([publishedAt])
 }
 
-// --- Causeartist models ---
-
 model Company {
-  id              String    @id @default(cuid())
+  id              String            @id @default(cuid())
   name            String
-  slug            String    @unique
-  status          String    @default("draft")
+  slug            String            @unique
+  status          String            @default("draft")
   tagline         String?
-  description     String?   @db.Text
+  description     String?
   logoUrl         String?
   website         String?
   foundedYear     Int?
@@ -275,61 +212,61 @@ model Company {
   linkedin        String?
   twitter         String?
   founderName     String?
-  impactModel     String?   @db.Text
-  impactMetrics   String?   @db.Text
+  impactModel     String?
+  impactMetrics   String?
   seoTitle        String?
   seoDescription  String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  sectors         CompanySector[]
-  locations       CompanyLocation[]
-  funders         CompanyFunder[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   caseStudies     CaseStudy[]
   podcastEpisodes CompanyEpisode[]
+  funders         CompanyFunder[]
+  locations       CompanyLocation[]
+  sectors         CompanySector[]
 }
 
 model Funder {
-  id               String    @id @default(cuid())
+  id               String           @id @default(cuid())
   name             String
-  slug             String    @unique
-  status           String    @default("draft")
+  slug             String           @unique
+  status           String           @default("draft")
   type             String?
-  description      String?   @db.Text
+  description      String?
   logoUrl          String?
   website          String?
   foundedYear      Int?
   aum              String?
   checkSizeMin     Int?
   checkSizeMax     Int?
-  investmentThesis String?   @db.Text
+  investmentThesis String?
   applicationUrl   String?
   linkedin         String?
   seoTitle         String?
   seoDescription   String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  sectors          FunderSector[]
-  stages           FunderStage[]
-  locations        FunderLocation[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   portfolio        CompanyFunder[]
   podcastEpisodes  FunderEpisode[]
+  locations        FunderLocation[]
+  sectors          FunderSector[]
+  stages           FunderStage[]
 }
 
 model Sector {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   name      String
-  slug      String   @unique
-  heroText  String?  @db.Text
-  createdAt DateTime @default(now())
+  slug      String          @unique
+  heroText  String?
+  createdAt DateTime        @default(now())
   companies CompanySector[]
   funders   FunderSector[]
 }
 
 model Location {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
+  slug      String            @unique
+  createdAt DateTime          @default(now())
   companies CompanyLocation[]
   funders   FunderLocation[]
 }
@@ -342,132 +279,141 @@ model FundingStage {
 }
 
 model CompanySector {
-  company   Company @relation(fields: [companyId], references: [id])
   companyId String
-  sector    Sector  @relation(fields: [sectorId], references: [id])
   sectorId  String
+  company   Company @relation(fields: [companyId], references: [id])
+  sector    Sector  @relation(fields: [sectorId], references: [id])
+
   @@id([companyId, sectorId])
 }
 
 model CompanyLocation {
-  company    Company  @relation(fields: [companyId], references: [id])
   companyId  String
-  location   Location @relation(fields: [locationId], references: [id])
   locationId String
+  company    Company  @relation(fields: [companyId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
+
   @@id([companyId, locationId])
 }
 
 model CompanyFunder {
-  company   Company @relation(fields: [companyId], references: [id])
   companyId String
-  funder    Funder  @relation(fields: [funderId], references: [id])
   funderId  String
+  company   Company @relation(fields: [companyId], references: [id])
+  funder    Funder  @relation(fields: [funderId], references: [id])
+
   @@id([companyId, funderId])
 }
 
 model FunderSector {
-  funder   Funder @relation(fields: [funderId], references: [id])
   funderId String
-  sector   Sector @relation(fields: [sectorId], references: [id])
   sectorId String
+  funder   Funder @relation(fields: [funderId], references: [id])
+  sector   Sector @relation(fields: [sectorId], references: [id])
+
   @@id([funderId, sectorId])
 }
 
 model FunderStage {
-  funder       Funder       @relation(fields: [funderId], references: [id])
   funderId     String
-  fundingStage FundingStage @relation(fields: [stageId], references: [id])
   stageId      String
+  funder       Funder       @relation(fields: [funderId], references: [id])
+  fundingStage FundingStage @relation(fields: [stageId], references: [id])
+
   @@id([funderId, stageId])
 }
 
 model FunderLocation {
-  funder     Funder   @relation(fields: [funderId], references: [id])
   funderId   String
-  location   Location @relation(fields: [locationId], references: [id])
   locationId String
+  funder     Funder   @relation(fields: [funderId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
+
   @@id([funderId, locationId])
 }
 
 model PodcastEpisode {
-  id              String   @id @default(cuid())
-  title           String
-  slug            String   @unique
-  status          String   @default("draft")
-  episodeNumber   Int?
-  description     String?  @db.Text
-  content         String?  @db.Text
-  heroImageUrl    String?
-  spotifyUrl      String?
-  appleUrl        String?
-  youtubeUrl      String?
-  excerpt         String?
-  seoTitle        String?
-  seoDescription  String?
-  publishedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  companies       CompanyEpisode[]
-  funders         FunderEpisode[]
+  id             String           @id @default(cuid())
+  title          String
+  slug           String           @unique
+  status         String           @default("draft")
+  episodeNumber  Int?
+  description    String?
+  content        String?
+  heroImageUrl   String?
+  spotifyUrl     String?
+  appleUrl       String?
+  youtubeUrl     String?
+  excerpt        String?
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  show           String?
+  companies      CompanyEpisode[]
+  funders        FunderEpisode[]
 }
 
 model CompanyEpisode {
-  company   Company        @relation(fields: [companyId], references: [id])
   companyId String
-  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
   episodeId String
+  company   Company        @relation(fields: [companyId], references: [id])
+  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
+
   @@id([companyId, episodeId])
 }
 
 model FunderEpisode {
-  funder   Funder         @relation(fields: [funderId], references: [id])
-  funderId String
-  episode  PodcastEpisode @relation(fields: [episodeId], references: [id])
+  funderId  String
   episodeId String
+  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
+  funder    Funder         @relation(fields: [funderId], references: [id])
+
   @@id([funderId, episodeId])
 }
 
 model CaseStudy {
-  id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  status          String    @default("draft")
-  excerpt         String?
-  content         String?   @db.Text
-  heroImageUrl    String?
-  seoTitle        String?
-  seoDescription  String?
-  publishedAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  company         Company?  @relation(fields: [companyId], references: [id])
-  companyId       String?
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  status         String    @default("draft")
+  excerpt        String?
+  content        String?
+  heroImageUrl   String?
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  companyId      String?
+  company        Company?  @relation(fields: [companyId], references: [id])
 }
 
 model BlogPost {
-  id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  status          String    @default("draft")
-  excerpt         String?
-  content         String?   @db.Text
-  heroImageUrl    String?
-  seoTitle        String?
-  seoDescription  String?
-  publishedAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  author          Author?   @relation(fields: [authorId], references: [id])
-  authorId        String?
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  status         String    @default("draft")
+  excerpt        String?
+  content        String?
+  heroImageUrl   String?
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  authorId       String?
+  author         Author?   @relation(fields: [authorId], references: [id])
 }
 
 model GlossaryTerm {
-  id               String   @id @default(cuid())
+  id              String   @id @default(cuid())
   term            String
   slug            String   @unique
   status          String   @default("draft")
-  definition      String?  @db.Text
-  extendedContent String?  @db.Text
+  definition      String?
+  extendedContent String?
   seoTitle        String?
   seoDescription  String?
   createdAt       DateTime @default(now())
@@ -478,10 +424,45 @@ model Author {
   id        String     @id @default(cuid())
   name      String
   slug      String     @unique
-  bio       String?    @db.Text
+  bio       String?
   avatarUrl String?
   twitter   String?
   linkedin  String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
   posts     BlogPost[]
+}
+
+enum AdType {
+  Banner
+  Tools
+  ToolPage
+  BlogPost
+  All
+  Bottom
+}
+
+enum ToolStatus {
+  Draft
+  Scheduled
+  Published
+  Pending
+}
+
+enum ToolTier {
+  Free
+  Standard
+  Premium
+}
+
+enum ReportType {
+  BrokenLink
+  WrongCategory
+  Outdated
+  Other
+}
+
+enum PostStatus {
+  Draft
+  Scheduled
+  Published
 }

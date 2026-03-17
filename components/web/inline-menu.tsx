@@ -1,6 +1,5 @@
 "use client"
 
-import { useScrollSpy } from "@mantine/hooks"
 import { AlignLeftIcon, ChevronDownIcon } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
 import { useTranslations } from "next-intl"
@@ -29,8 +28,61 @@ export const InlineMenu = <T extends { id: string }>({
   const t = useTranslations("common")
   const [isOpen, setIsOpen] = useState(true)
   const selector = useMemo(() => items.map(({ id }) => `[id="${id}"]`).join(","), [items])
-  const { active, data } = useScrollSpy({ selector })
-  const activeId = data[active]?.id
+  const [activeId, setActiveId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!selector) return
+
+    const getActiveId = () => {
+      const elements = Array.from(
+        document.querySelectorAll<HTMLElement>(selector),
+      )
+
+      if (!elements.length) return null
+      const viewportOffset = 96 // roughly header height
+
+      // Prefer the last heading whose top is above the offset (sticky behavior)
+      let lastId: string | null = null
+
+      for (const el of elements) {
+        const rect = el.getBoundingClientRect()
+        const top = rect.top
+
+        if (top <= viewportOffset + 8) {
+          lastId = el.id || null
+        } else {
+          // As soon as we find a heading below the offset, we can stop
+          break
+        }
+      }
+
+      if (lastId) return lastId
+
+      // If we're above the first heading, highlight the first one
+      if (window.scrollY < 120) {
+        return elements[0]?.id ?? null
+      }
+
+      // If we've scrolled past all headings, highlight the last one
+      return elements[elements.length - 1]?.id ?? null
+    }
+
+    const handleScroll = () => {
+      const nextId = getActiveId()
+      setActiveId(prev => (nextId && prev !== nextId ? nextId : prev ?? nextId))
+    }
+
+    // Initial calculation
+    handleScroll()
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("resize", handleScroll)
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleScroll)
+    }
+  }, [selector])
 
   useEffect(() => {
     if (!activeId) return

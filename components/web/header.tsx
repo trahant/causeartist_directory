@@ -35,12 +35,16 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
   const search = useSearch()
   const t = useTranslations()
   const [isNavOpen, setNavOpen] = useState(false)
+  const [dropdownMounted, setDropdownMounted] = useState(false)
 
   // Close the mobile navigation when the user presses the "Escape" key
   useHotkeys([["Escape", () => setNavOpen(false)]])
 
   // Close the mobile navigation when the user navigates to a new page
   useEffect(() => setNavOpen(false), [pathname])
+
+  // Defer Radix dropdown until after mount to avoid hydration mismatch (Radix generates different ids on server vs client)
+  useEffect(() => setDropdownMounted(true), [])
 
   return (
     <header
@@ -63,33 +67,43 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
           </Stack>
 
           <nav className="flex flex-wrap gap-x-4 gap-y-0.5 flex-1 max-lg:hidden">
-            <DropdownMenu>
-              <NavLink
-                className="gap-1"
-                suffix={<ChevronDownIcon className="group-data-[state=open]:-rotate-180" />}
-                asChild
-              >
-                <DropdownMenuTrigger>{t("navigation.browse")}</DropdownMenuTrigger>
-              </NavLink>
+            {dropdownMounted ? (
+              <DropdownMenu>
+                <NavLink
+                  className="gap-1"
+                  suffix={<ChevronDownIcon className="group-data-[state=open]:-rotate-180" />}
+                  asChild
+                >
+                  <DropdownMenuTrigger>{t("navigation.browse")}</DropdownMenuTrigger>
+                </NavLink>
 
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <NavLink href="/?sort=publishedAt.desc" prefix={<CalendarDaysIcon />}>
-                    {t("navigation.latest_tools")}
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <NavLink href="/categories" prefix={<GalleryHorizontalEndIcon />}>
-                    {t("navigation.categories")}
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <NavLink href="/tags" prefix={<TagIcon />}>
-                    {t("navigation.tags")}
-                  </NavLink>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem asChild>
+                    <NavLink href="/?sort=publishedAt.desc" prefix={<CalendarDaysIcon />}>
+                      {t("navigation.latest_tools")}
+                    </NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NavLink href="/categories" prefix={<GalleryHorizontalEndIcon />}>
+                      {t("navigation.categories")}
+                    </NavLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NavLink href="/tags" prefix={<TagIcon />}>
+                      {t("navigation.tags")}
+                    </NavLink>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <NavLink
+                href="/?sort=publishedAt.desc"
+                className="gap-1"
+                suffix={<ChevronDownIcon />}
+              >
+                {t("navigation.browse")}
+              </NavLink>
+            )}
 
             <NavLink href="/about">{t("navigation.about")}</NavLink>
             {adsConfig.enabled && <NavLink href="/advertise">{t("navigation.advertise")}</NavLink>}

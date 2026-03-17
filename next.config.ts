@@ -1,6 +1,8 @@
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 import { withPlausibleProxy } from "next-plausible"
+import fs from "node:fs"
+import path from "node:path"
 
 const withNextIntl = createNextIntlPlugin("./lib/i18n.ts")
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_URL
@@ -58,6 +60,28 @@ const nextConfig: NextConfig = {
         destination: "/api/cron/publish",
       },
     ]
+  },
+
+  async redirects() {
+    try {
+      const redirectsPath = path.join(process.cwd(), "redirects.json")
+      console.log("Loading redirects from:", redirectsPath)
+      console.log("File exists:", fs.existsSync(redirectsPath))
+      const raw = fs.readFileSync(redirectsPath, "utf-8")
+      const entries: Array<{ old_url: string; new_url: string; status_code: number }> =
+        JSON.parse(raw)
+
+      return entries
+        .filter(entry => entry.old_url !== "/")
+        .map(entry => ({
+          source: entry.old_url,
+          destination: entry.new_url,
+          permanent: true,
+        }))
+    } catch (error) {
+      console.warn("Failed to load redirects.json", error)
+      return []
+    }
   },
 }
 
