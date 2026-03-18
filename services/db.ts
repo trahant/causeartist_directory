@@ -5,8 +5,16 @@ import { env } from "~/env"
 
 const prismaClientSingleton = () => {
   const isBuild = env.NEXT_PHASE === PHASE_PRODUCTION_BUILD
-  const connectionString = (isBuild && env.DATABASE_PUBLIC_URL) || env.DATABASE_URL
-  const adapter = new PrismaPg({ connectionString, max: isBuild ? 5 : 10 })
+  const isProd = process.env.NODE_ENV === "production"
+
+  // On Vercel serverless, using the pooled "public" URL (pgbouncer/session pooler)
+  // prevents connection storms that hit max client limits.
+  const connectionString =
+    isProd && env.DATABASE_PUBLIC_URL ? env.DATABASE_PUBLIC_URL : env.DATABASE_URL
+
+  // Keep the pool small in production to avoid "MaxClientsInSessionMode" errors.
+  const max = isProd ? 2 : isBuild ? 5 : 10
+  const adapter = new PrismaPg({ connectionString, max })
 
   return new PrismaClient({ adapter })
 }
