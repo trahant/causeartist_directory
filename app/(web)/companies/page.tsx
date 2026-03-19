@@ -1,10 +1,6 @@
 import type { Metadata } from "next"
 import { cache } from "react"
-import { Badge } from "~/components/common/badge"
-import { Card, CardDescription, CardHeader } from "~/components/common/card"
-import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroTitle } from "~/components/web/ui/intro"
@@ -32,32 +28,51 @@ export const generateMetadata = async (): Promise<Metadata> => {
 }
 
 function CompanyCard({ company }: { company: CompanyMany }) {
-  const locationName = company.locations[0]?.location?.name
+  const description = company.tagline ?? company.description ?? null
+  const firstTwoSectors = company.sectors.slice(0, 2)
+  const initials = company.name.trim().slice(0, 2).toUpperCase()
 
   return (
-    <Card hover asChild>
-      <Link href={`/companies/${company.slug}`}>
-        <CardHeader wrap={false}>
-          <H2 as="h3" className="text-lg leading-snug!">
-            {company.name}
-          </H2>
-        </CardHeader>
+    <Link href={`/companies/${company.slug}`} className="block w-full h-full">
+      <div
+        className="flex h-full min-h-0 flex-col gap-4 p-5 rounded-xl border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all cursor-pointer w-full"
+      >
+        <div className="flex items-center gap-3">
+          {company.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={company.logoUrl}
+              alt={company.name}
+              className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0"
+              loading="lazy"
+            />
+          ) : (
+            <span className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0 flex items-center justify-center text-xs font-bold text-neutral-500">
+              {initials}
+            </span>
+          )}
 
-        {company.tagline && <CardDescription>{company.tagline}</CardDescription>}
+          <div className="text-base font-semibold text-neutral-900 truncate">{company.name}</div>
+        </div>
 
-        <Stack className="flex-wrap gap-1.5" direction="row" wrap>
-          {company.sectors.map(({ sector }) => (
-            <Badge key={sector.id} variant="soft" size="sm">
+        {description ? (
+          <div className="text-sm text-neutral-500 line-clamp-2 leading-relaxed -mt-2">
+            {description}
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
+          {firstTwoSectors.map(({ sector }) => (
+            <span
+              key={sector.id}
+              className="text-xs px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium"
+            >
               {sector.name}
-            </Badge>
+            </span>
           ))}
-        </Stack>
-
-        {locationName && (
-          <p className="text-sm text-muted-foreground">{locationName}</p>
-        )}
-      </Link>
-    </Card>
+        </div>
+      </div>
+    </Link>
   )
 }
 
@@ -74,11 +89,11 @@ export default async function CompaniesPage() {
       </Intro>
 
       <Section>
-        <Section.Content>
+        <Section.Content className="md:col-span-3">
           {companies.length === 0 ? (
             <p className="text-muted-foreground">No companies found.</p>
           ) : (
-            <div className="grid w-full grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full items-stretch">
               {companies.map(company => (
                 <CompanyCard key={company.id} company={company} />
               ))}

@@ -12,7 +12,7 @@ export const metadataConfig: Metadata = {
     images: { url: getOpenGraphImageUrl({}), width: 1200, height: 630 },
   },
   twitter: {
-    site: "@dirstarter",
+    site: "@Causeartist",
     creator: "@piotrkulpinski",
     card: "summary_large_image",
   },

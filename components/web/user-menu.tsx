@@ -1,6 +1,7 @@
 import { getInitials } from "@primoui/utils"
 import { BookmarkIcon, LogOutIcon, ShieldHalfIcon, UserIcon } from "lucide-react"
 import { motion } from "motion/react"
+import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/common/avatar"
 import { Box } from "~/components/common/box"
@@ -22,7 +23,12 @@ export const UserMenu = () => {
   const { data: session, isPending } = useSession()
   const t = useTranslations()
 
-  if (isPending) {
+  const [mounted, setMounted] = useState(false)
+
+  // Ensure SSR + initial client render match (avoids hydration mismatch).
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted || isPending) {
     return (
       <Button size="sm" variant="secondary" disabled>
         {t("navigation.sign_in")}

@@ -2,8 +2,8 @@ import { addDays } from "date-fns"
 import { PostStatus, ToolStatus, ToolTier } from "~/.generated/prisma/client"
 import { db } from "~/services/db"
 
-const ADMIN_EMAIL = "admin@dirstarter.com"
-const USER_EMAIL = "user@dirstarter.com"
+const ADMIN_EMAIL = "admin@causeartist.com"
+const USER_EMAIL = "user@causeartist.com"
 
 const DUMMY_CONTENT = `This tool has revolutionized the way developers approach modern software development. With its **intuitive interface** and powerful features, it streamlines workflows and enhances productivity across teams of all sizes. Whether you're a beginner just starting your development journey or an experienced professional working on complex enterprise applications, this tool provides the flexibility and reliability you need to succeed.
 
@@ -134,7 +134,7 @@ async function main() {
       screenshotUrl: "https://code.visualstudio.com/opengraphimg/opengraph-home.png",
       categories: ["frontend"],
       tags: ["free", "open-source"],
-      owner: { connect: { email: "admin@dirstarter.com" } },
+      owner: { connect: { email: "admin@causeartist.com" } },
     },
     {
       name: "Next.js",
@@ -326,7 +326,7 @@ async function main() {
       screenshotUrl: "https://svelte.dev/images/twitter-thumbnail.jpg",
       categories: ["frontend"],
       tags: ["svelte", "javascript", "free", "open-source"],
-      owner: { connect: { email: "admin@dirstarter.com" } },
+      owner: { connect: { email: "admin@causeartist.com" } },
     },
     {
       name: "Rust",
@@ -339,7 +339,7 @@ async function main() {
       screenshotUrl: "https://www.rust-lang.org/static/images/rust-social-wide.jpg",
       categories: ["backend"],
       tags: ["rust", "free", "open-source"],
-      owner: { connect: { email: "admin@dirstarter.com" } },
+      owner: { connect: { email: "admin@causeartist.com" } },
     },
     {
       name: "Kubernetes",
@@ -352,7 +352,7 @@ async function main() {
       screenshotUrl: "https://kubernetes.io/images/kubernetes-open-graph.png",
       categories: ["devops"],
       tags: ["kubernetes", "free", "open-source"],
-      owner: { connect: { email: "admin@dirstarter.com" } },
+      owner: { connect: { email: "admin@causeartist.com" } },
     },
   ]
 
@@ -374,15 +374,15 @@ async function main() {
   // Create blog posts
   const admin = await db.user.findFirstOrThrow({ where: { email: ADMIN_EMAIL } })
 
-  const boilerplateContent = `Building a directory website from scratch is a time-consuming endeavor. Between setting up authentication, payment processing, admin panels, SEO optimization, and content management, months can fly by before you even launch. That's exactly why we built Dirstarter – a comprehensive Next.js boilerplate that handles all the technical complexity so you can focus on growing your business.
+const boilerplateContent = `Building a directory website from scratch is a time-consuming endeavor. Between setting up authentication, payment processing, admin panels, SEO optimization, and content management, months can fly by before you even launch. That's exactly why we built Causeartist – a comprehensive Next.js boilerplate that handles all the technical complexity so you can focus on growing your business.
 
-## What Makes Dirstarter Different?
+## What Makes Causeartist Different?
 
-Dirstarter isn't just another template. It's a battle-tested, production-ready foundation that combines the latest web technologies with real-world business logic. Built on Next.js 15 with React 19, TypeScript, and Prisma ORM, it provides everything you need to launch a profitable directory website.
+Causeartist isn't just another template. It's a battle-tested, production-ready foundation that combines the latest web technologies with real-world business logic. Built on Next.js 15 with React 19, TypeScript, and Prisma ORM, it provides everything you need to launch a profitable directory website.
 
 ### Built for Monetization
 
-The biggest challenge with directory websites isn't building them – it's making them profitable. Dirstarter comes with multiple revenue streams built-in:
+The biggest challenge with directory websites isn't building them – it's making them profitable. Causeartist comes with multiple revenue streams built-in:
 
 1. **Featured Listings** - Spotlight premium tools at the top of your directory
 2. **Sponsored Content** - Flexible ad placement system
@@ -390,7 +390,7 @@ The biggest challenge with directory websites isn't building them – it's makin
 
 ## Technical Excellence Out of the Box
 
-Dirstarter leverages modern web technologies to ensure your directory is fast, scalable, and maintainable.
+Causeartist leverages modern web technologies to ensure your directory is fast, scalable, and maintainable.
 
 ### Performance First
 
@@ -405,10 +405,10 @@ The entire setup process takes less than an hour, and you'll have a fully functi
 
   await db.post.create({
     data: {
-      title: "Why Dirstarter is the Ultimate Next.js Boilerplate for Directory Websites",
+      title: "Why Causeartist is the Ultimate Next.js Boilerplate for Directory Websites",
       slug: "boilerplate",
       description:
-        "Discover how Dirstarter helps you launch profitable directory websites in days, not months. Built with Next.js 15, TypeScript, and everything you need to monetize from day one.",
+        "Discover how Causeartist helps you launch profitable directory websites in days, not months. Built with Next.js 15, TypeScript, and everything you need to monetize from day one.",
       content: boilerplateContent,
       plainText: boilerplateContent,
       imageUrl: "/content/boilerplate.webp",
@@ -418,7 +418,7 @@ The entire setup process takes less than an hour, and you'll have a fully functi
     },
   })
 
-  const contentStrategyContent = `Content marketing is essential for directory websites, but publishing without a clear process leads to inconsistent results. Dirstarter helps you standardize your content workflow so every post supports both discoverability and conversion goals.
+  const contentStrategyContent = `Content marketing is essential for directory websites, but publishing without a clear process leads to inconsistent results. Causeartist helps you standardize your content workflow so every post supports both discoverability and conversion goals.
 
 ## Why This Strategy Matters
 
@@ -436,7 +436,7 @@ A disciplined content strategy turns your blog into a reliable acquisition chann
 
   await db.post.create({
     data: {
-      title: "Content Strategy for Directory Websites with Dirstarter",
+      title: "Content Strategy for Directory Websites with Causeartist",
       slug: "content-strategy",
       description:
         "Learn a practical framework to plan, write, and distribute blog content that grows your directory website.",

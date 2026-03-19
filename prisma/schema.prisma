@@ -223,6 +223,7 @@ model Company {
   funders         CompanyFunder[]
   locations       CompanyLocation[]
   sectors         CompanySector[]
+  subcategories   CompanySubcategory[]
 }
 
 model Funder {
@@ -249,6 +250,7 @@ model Funder {
   podcastEpisodes  FunderEpisode[]
   locations        FunderLocation[]
   sectors          FunderSector[]
+  subcategories    FunderSubcategory[]
   stages           FunderStage[]
 }
 
@@ -260,6 +262,15 @@ model Sector {
   createdAt DateTime        @default(now())
   companies CompanySector[]
   funders   FunderSector[]
+}
+
+model Subcategory {
+  id        String              @id @default(cuid())
+  name      String
+  slug      String              @unique
+  createdAt DateTime            @default(now())
+  companies CompanySubcategory[]
+  funders   FunderSubcategory[]
 }
 
 model Location {
@@ -305,6 +316,15 @@ model CompanyFunder {
   @@id([companyId, funderId])
 }
 
+model CompanySubcategory {
+  companyId     String
+  subcategoryId String
+  company       Company     @relation(fields: [companyId], references: [id])
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+
+  @@id([companyId, subcategoryId])
+}
+
 model FunderSector {
   funderId String
   sectorId String
@@ -312,6 +332,15 @@ model FunderSector {
   sector   Sector @relation(fields: [sectorId], references: [id])
 
   @@id([funderId, sectorId])
+}
+
+model FunderSubcategory {
+  funderId      String
+  subcategoryId String
+  funder        Funder      @relation(fields: [funderId], references: [id])
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+
+  @@id([funderId, subcategoryId])
 }
 
 model FunderStage {

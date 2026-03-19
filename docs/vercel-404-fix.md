@@ -6,7 +6,7 @@ If the deployment is **green** in Vercel but **causeartist-directory.vercel.app*
 
 - In Vercel, open your project and go to **Deployments**.
 - Open the **latest successful (green)** deployment.
-- Use the deployment URL shown there (e.g. `causeartist-directory-xxxxx-trahants-projects.vercel.app` or `dirstarter-xxxxx-trahants-projects.vercel.app`).
+- Use the deployment URL shown there (e.g. `causeartist-directory-xxxxx-trahants-projects.vercel.app` or `causeartist-xxxxx-trahants-projects.vercel.app`).
 - If that URL loads the app, the build is fine and the issue is only domain assignment.
 
 ## 2. Assign the production domain to this project
@@ -18,7 +18,7 @@ If the deployment is **green** in Vercel but **causeartist-directory.vercel.app*
 
 ## 3. If the project name is different
 
-- If the project is named e.g. **dirstarter**, the default Vercel URL is `dirstarter.vercel.app` (or `dirstarter-*-*.vercel.app`).
+- If the project is named e.g. **causeartist**, the default Vercel URL is `causeartist.vercel.app` (or `causeartist-*-*.vercel.app`).
 - Then `causeartist-directory.vercel.app` might belong to a **different**, empty project.
 - Either:
   - Use the default URL of the project that has the green deployment, or

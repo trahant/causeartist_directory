@@ -115,12 +115,29 @@ type CompanyCsvRow = {
   url: string
   companyName: string
   primaryCategory: string
+  subcategories: string[]
 }
 
 type FunderCsvRow = {
   url: string
   funderName: string
   primaryCategory: string
+  subcategories: string[]
+}
+
+function parseSubcategoryValues(rawSubcategory: string, rawSecondaryTags: string): string[] {
+  const fromSubcategory = rawSubcategory
+    .split(/[;,|]/)
+    .map(v => v.trim())
+    .filter(Boolean)
+
+  const fromSecondaryTags = rawSecondaryTags
+    .split(/[;,|]/)
+    .map(v => v.trim())
+    .filter(Boolean)
+
+  const merged = [...fromSubcategory, ...fromSecondaryTags]
+  return Array.from(new Set(merged))
 }
 
 function parseCompaniesCsv(raw: string): CompanyCsvRow[] {
@@ -136,6 +153,8 @@ function parseCompaniesCsv(raw: string): CompanyCsvRow[] {
   const websiteUrlIdx = headerMap.get("Website URL")
   const companyNameIdx = headerMap.get("Company Name")
   const primaryCategoryIdx = headerMap.get("Primary Category")
+  const subcategoryIdx = headerMap.get("Subcategory")
+  const secondaryTagsIdx = headerMap.get("Secondary Tags")
 
   const hasRequired =
     websiteUrlIdx != null && companyNameIdx != null && primaryCategoryIdx != null
@@ -157,6 +176,10 @@ function parseCompaniesCsv(raw: string): CompanyCsvRow[] {
       primaryCategory: (cols[primaryCategoryIdx] ?? "")
         .trim()
         .replace(/^"|"$/g, ""),
+      subcategories: parseSubcategoryValues(
+        (subcategoryIdx != null ? cols[subcategoryIdx] : "") ?? "",
+        (secondaryTagsIdx != null ? cols[secondaryTagsIdx] : "") ?? "",
+      ),
     })
   }
 
@@ -376,9 +399,11 @@ Rules:
 async function upsertCompanyAndSectors({
   url,
   extracted,
+  subcategoryNames,
 }: {
   url: string
   extracted: ExtractedCompanyData
+  subcategoryNames: string[]
 }) {
   const slug = slugifyName(extracted.name)
   if (!slug) throw new Error("Could not generate slug from extracted company name")
@@ -438,14 +463,43 @@ async function upsertCompanyAndSectors({
       // If it already exists, don't treat as a failure for re-runs.
     })
   }
+
+  for (const subcategoryName of subcategoryNames) {
+    const cleanName = subcategoryName.trim()
+    if (!cleanName) continue
+
+    const subcategorySlug = slugifyName(cleanName)
+    if (!subcategorySlug) continue
+
+    const subcategory = await db.subcategory.upsert({
+      where: { slug: subcategorySlug },
+      update: {},
+      create: {
+        name: cleanName,
+        slug: subcategorySlug,
+      },
+      select: { id: true },
+    })
+
+    await db.companySubcategory.create({
+      data: {
+        companyId: company.id,
+        subcategoryId: subcategory.id,
+      },
+    }).catch(() => {
+      // If it already exists, don't treat as a failure for re-runs.
+    })
+  }
 }
 
 async function upsertFunderAndSectors({
   url,
   extracted,
+  subcategoryNames,
 }: {
   url: string
   extracted: ExtractedCompanyData
+  subcategoryNames: string[]
 }) {
   const slug = slugifyName(extracted.name)
   if (!slug) throw new Error("Could not generate slug from extracted funder name")
@@ -493,6 +547,33 @@ async function upsertFunderAndSectors({
       data: {
         funderId: funder.id,
         sectorId: sector.id,
+      },
+    }).catch(() => {
+      // If it already exists, don't treat as a failure for re-runs.
+    })
+  }
+
+  for (const subcategoryName of subcategoryNames) {
+    const cleanName = subcategoryName.trim()
+    if (!cleanName) continue
+
+    const subcategorySlug = slugifyName(cleanName)
+    if (!subcategorySlug) continue
+
+    const subcategory = await db.subcategory.upsert({
+      where: { slug: subcategorySlug },
+      update: {},
+      create: {
+        name: cleanName,
+        slug: subcategorySlug,
+      },
+      select: { id: true },
+    })
+
+    await db.funderSubcategory.create({
+      data: {
+        funderId: funder.id,
+        subcategoryId: subcategory.id,
       },
     }).catch(() => {
       // If it already exists, don't treat as a failure for re-runs.
@@ -584,7 +665,11 @@ async function processUrlsAsCompanies(companyUrls: CompanyCsvRow[]) {
       // Always override with favicon-derived logo to avoid large hero images.
       extracted.logoUrl = faviconUrl
 
-      await upsertCompanyAndSectors({ url, extracted })
+      await upsertCompanyAndSectors({
+        url,
+        extracted,
+        subcategoryNames: company.subcategories,
+      })
 
       companiesCreated++
       console.log(`Created draft Company: ${url}`)
@@ -683,7 +768,11 @@ async function processUrlsAsFunders(funderUrls: FunderCsvRow[]) {
       // Always override with favicon-derived logo to avoid large hero images.
       extracted.logoUrl = faviconUrl
 
-      await upsertFunderAndSectors({ url, extracted })
+      await upsertFunderAndSectors({
+        url,
+        extracted,
+        subcategoryNames: funder.subcategories,
+      })
 
       fundersCreated++
       console.log(`Created draft Funder: ${url}`)
@@ -723,6 +812,7 @@ async function main() {
         url: row.url,
         funderName: row.companyName,
         primaryCategory: row.primaryCategory,
+        subcategories: row.subcategories,
       }))
     : []
 

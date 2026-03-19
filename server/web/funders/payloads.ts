@@ -12,6 +12,19 @@ export const funderLocationsPayload = {
   orderBy: { location: { name: "asc" } },
 } satisfies Prisma.Funder$locationsArgs
 
+export const funderSubcategoriesPayload = {
+  select: {
+    subcategory: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+    },
+  },
+  orderBy: { subcategory: { name: "asc" } },
+} satisfies Prisma.Funder$subcategoriesArgs
+
 export const funderOnePayload = {
   id: true,
   name: true,
@@ -34,6 +47,7 @@ export const funderOnePayload = {
   updatedAt: true,
   sectors: funderSectorsPayload,
   locations: funderLocationsPayload,
+  subcategories: funderSubcategoriesPayload,
 } satisfies Prisma.FunderSelect
 
 export const funderManyPayload = {
@@ -49,6 +63,7 @@ export const funderManyPayload = {
   updatedAt: true,
   sectors: funderSectorsPayload,
   locations: funderLocationsPayload,
+  subcategories: funderSubcategoriesPayload,
 } satisfies Prisma.FunderSelect
 
 export type FunderOne = Prisma.FunderGetPayload<{ select: typeof funderOnePayload }>
