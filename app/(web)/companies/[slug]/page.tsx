@@ -13,6 +13,7 @@ import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-ico
 import { Markdown } from "~/components/web/markdown"
 import { Nav } from "~/components/web/nav"
 import { StructuredData } from "~/components/web/structured-data"
+import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Backdrop } from "~/components/web/ui/backdrop"
 import { Favicon } from "~/components/web/ui/favicon"
 import { IntroDescription } from "~/components/web/ui/intro"
@@ -76,10 +77,12 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
 }
 
 export default async function (props: Props) {
-  const { company, metadata, structuredData } = await getData(props)
+  const { company, metadata, breadcrumbs, structuredData } = await getData(props)
 
   return (
     <>
+      <Breadcrumbs items={breadcrumbs} />
+
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
