@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import { cache, Suspense } from "react"
-import { Card, CardHeader } from "~/components/common/card"
-import { H4 } from "~/components/common/heading"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
@@ -43,24 +41,26 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return getPageMetadata({ url: pageUrl, metadata })
 }
 
+const formatDate = (date: Date | null | undefined) => {
+  if (!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 function NewsletterCard({ item }: { item: NewsletterMany }) {
   return (
-    <Card hover asChild>
+    <Card asChild>
       <Link href={`/newsletter/${item.slug}`}>
-        {item.heroImageUrl && (
-          <Image
-            src={item.heroImageUrl}
-            alt={item.title}
-            width={1200}
-            height={630}
-            className="-m-5 mb-0 w-[calc(100%+2.5rem)] max-w-none aspect-video object-cover"
-          />
-        )}
         <CardHeader wrap={false}>
-          <H4 as="h3" className="text-sm leading-snug!">
-            {item.title}
-          </H4>
+          <span className="font-semibold text-sm line-clamp-2">{item.title}</span>
         </CardHeader>
+        <CardDescription>{item.excerpt}</CardDescription>
+        <CardFooter>
+          <span>{formatDate(item.publishedAt)}</span>
+        </CardFooter>
       </Link>
     </Card>
   )
@@ -80,7 +80,7 @@ export default async function NewsletterPage() {
 
       <Section>
         <Section.Content>
-          <div className="grid w-full grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {newsletters.map((item: NewsletterMany) => (
               <NewsletterCard key={item.id} item={item} />
             ))}

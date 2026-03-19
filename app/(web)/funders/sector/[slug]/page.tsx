@@ -2,11 +2,9 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { cache } from "react"
 import { Badge } from "~/components/common/badge"
-import { Card, CardDescription } from "~/components/common/card"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
-import { Favicon } from "~/components/web/ui/favicon"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription } from "~/components/web/ui/intro"
@@ -79,45 +77,25 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
 }
 
 function FunderCard({ funder }: { funder: FunderMany }) {
-  const subtitle = funder.description ?? null
-  const displayedSectors = funder.sectors.slice(0, 4)
-  const remaining = funder.sectors.length - displayedSectors.length
-
   return (
-    <Card hover asChild className="h-full">
+    <Card asChild>
       <Link href={`/funders/${funder.slug}`}>
-        <Stack direction="column" className="h-full justify-between gap-4">
-          <Stack direction="row" wrap={false} className="items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-              {funder.logoUrl ? (
-                <Favicon
-                  src={funder.logoUrl}
-                  title={funder.name}
-                  size={32}
-                  className="!size-8 !rounded-sm"
-                />
-              ) : (
-                <span className="text-sm font-semibold text-muted-foreground">{getInitials(funder.name)}</span>
-              )}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <H2 as="h3" className="text-base leading-snug!">
-                {funder.name}
-              </H2>
-              {subtitle && <CardDescription className="mt-1">{subtitle}</CardDescription>}
-            </div>
-          </Stack>
-
-          <Stack direction="row" wrap className="flex-wrap gap-2 pt-2">
-            {displayedSectors.map(({ sector }) => (
-              <Badge key={sector.id} variant="soft" size="md">
-                {sector.name}
-              </Badge>
-            ))}
-            {remaining > 0 && <Badge variant="soft" size="md">{`+${remaining}`}</Badge>}
-          </Stack>
-        </Stack>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <img
+              src={funder.logoUrl ?? undefined}
+              alt={funder.name}
+              className="size-8 rounded object-contain"
+            />
+            <span className="font-semibold text-sm truncate">{funder.name}</span>
+          </div>
+        </CardHeader>
+        <CardDescription>{funder.description}</CardDescription>
+        <CardFooter>
+          {funder.sectors.slice(0, 3).map(s => (
+            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
+          ))}
+        </CardFooter>
       </Link>
     </Card>
   )
@@ -145,7 +123,7 @@ export default async function (props: Props) {
           {funders.length === 0 ? (
             <p className="text-muted-foreground">No funders found.</p>
           ) : (
-            <div className="grid w-full items-stretch grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
               {funders.map(funder => (
                 <FunderCard key={funder.id} funder={funder} />
               ))}

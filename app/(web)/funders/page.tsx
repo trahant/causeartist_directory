@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { cache } from "react"
+import { Badge } from "~/components/common/badge"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
@@ -27,52 +29,60 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return getPageMetadata({ url: pageUrl, metadata })
 }
 
+function formatFunderType(type: string | null): string {
+  switch (type) {
+    case "vc":
+      return "Venture Capital"
+    case "foundation":
+      return "Foundation"
+    case "accelerator":
+      return "Accelerator"
+    case "family-office":
+      return "Family Office"
+    case "cdfi":
+      return "CDFI"
+    case "impact-fund":
+      return "Impact Fund"
+    case "fellowship":
+      return "Fellowship"
+    case "corporate":
+      return "Corporate"
+    default:
+      return "Impact Fund"
+  }
+}
+
 function FunderCard({ funder }: { funder: FunderMany }) {
-  const description = funder.description ?? null
-  const firstTwoSectors = funder.sectors.slice(0, 2)
-  const initials = funder.name.trim().slice(0, 2).toUpperCase()
+  const title = funder.description ?? ""
 
   return (
-    <Link href={`/funders/${funder.slug}`} className="block w-full h-full">
-      <div
-        className="flex h-full min-h-0 flex-col gap-4 p-5 rounded-xl border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all cursor-pointer w-full"
-      >
-        <div className="flex items-center gap-3">
-          {funder.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+    <Card asChild>
+      <Link href={`/funders/${funder.slug}`}>
+        <CardHeader>
+          <div className="flex items-center gap-3">
             <img
-              src={funder.logoUrl}
+              src={funder.logoUrl ?? undefined}
               alt={funder.name}
-              className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0"
-              loading="lazy"
+              className="size-8 rounded object-contain"
             />
-          ) : (
-            <span className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0 flex items-center justify-center text-xs font-bold text-neutral-500">
-              {initials}
-            </span>
-          )}
-
-          <div className="text-base font-semibold text-neutral-900 truncate">{funder.name}</div>
-        </div>
-
-        {description ? (
-          <div className="text-sm text-neutral-500 line-clamp-2 leading-relaxed -mt-2">
-            {description}
-          </div>
-        ) : null}
-
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
-          {firstTwoSectors.map(({ sector }) => (
-            <span
-              key={sector.id}
-              className="text-xs px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium"
+            <span className="font-semibold text-sm truncate">{funder.name}</span>
+            <Badge
+              className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 font-medium shrink-0"
             >
-              {sector.name}
-            </span>
+              {formatFunderType(funder.type)}
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardDescription>{title}</CardDescription>
+
+        <CardFooter>
+          {funder.sectors.slice(0, 3).map(s => (
+            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
           ))}
-        </div>
-      </div>
-    </Link>
+        </CardFooter>
+      </Link>
+    </Card>
   )
 }
 
@@ -93,7 +103,7 @@ export default async function FundersPage() {
           {funders.length === 0 ? (
             <p className="text-muted-foreground">No funders found.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
               {funders.map(funder => (
                 <FunderCard key={funder.id} funder={funder} />
               ))}

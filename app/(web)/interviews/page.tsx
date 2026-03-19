@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { cache, Suspense } from "react"
-import { Card, CardHeader } from "~/components/common/card"
-import { H4 } from "~/components/common/heading"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
@@ -23,6 +21,15 @@ const description =
   "In-depth interviews with founders, investors, and leaders in the impact economy."
 
 const redirectsCsvPath = path.join(process.cwd(), "redirects.csv")
+
+const formatDate = (date: Date | null | undefined) => {
+  if (!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
 
 function getInterviewSlugsFromRedirectsCsv(): string[] {
   const raw = fs.readFileSync(redirectsCsvPath, "utf-8")
@@ -66,22 +73,15 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 function InterviewCard({ post }: { post: BlogPostMany }) {
   return (
-    <Card hover asChild>
+    <Card asChild>
       <Link href={`/interviews/${post.slug}`}>
-        {post.heroImageUrl && (
-          <Image
-            src={post.heroImageUrl}
-            alt={post.title}
-            width={1200}
-            height={630}
-            className="-m-5 mb-0 w-[calc(100%+2.5rem)] max-w-none aspect-video object-cover"
-          />
-        )}
         <CardHeader wrap={false}>
-          <H4 as="h3" className="text-sm leading-snug!">
-            {post.title}
-          </H4>
+          <span className="font-semibold text-sm line-clamp-2">{post.title}</span>
         </CardHeader>
+        <CardDescription>{post.excerpt}</CardDescription>
+        <CardFooter>
+          <span>{formatDate(post.publishedAt)}</span>
+        </CardFooter>
       </Link>
     </Card>
   )
@@ -101,7 +101,7 @@ export default async function InterviewsPage() {
 
       <Section>
         <Section.Content>
-          <div className="grid w-full grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {posts.map((post: BlogPostMany) => (
               <InterviewCard key={post.id} post={post} />
             ))}

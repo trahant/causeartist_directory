@@ -224,6 +224,7 @@ model Company {
   locations       CompanyLocation[]
   sectors         CompanySector[]
   subcategories   CompanySubcategory[]
+  certifications  CompanyCertification[]
 }
 
 model Funder {
@@ -494,4 +495,24 @@ enum PostStatus {
   Draft
   Scheduled
   Published
+}
+
+model Certification {
+  id          String                @id @default(cuid())
+  name        String
+  slug        String                @unique
+  description String?
+  logoUrl     String?
+  website     String?
+  createdAt   DateTime              @default(now())
+  companies   CompanyCertification[]
+}
+
+model CompanyCertification {
+  company         Company       @relation(fields: [companyId], references: [id])
+  companyId       String
+  certification   Certification @relation(fields: [certificationId], references: [id])
+  certificationId String
+
+  @@id([companyId, certificationId])
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import { cache } from "react"
+import { Badge } from "~/components/common/badge"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
@@ -28,51 +30,31 @@ export const generateMetadata = async (): Promise<Metadata> => {
 }
 
 function CompanyCard({ company }: { company: CompanyMany }) {
-  const description = company.tagline ?? company.description ?? null
-  const firstTwoSectors = company.sectors.slice(0, 2)
-  const initials = company.name.trim().slice(0, 2).toUpperCase()
+  const title = company.tagline ?? company.description ?? ""
 
   return (
-    <Link href={`/companies/${company.slug}`} className="block w-full h-full">
-      <div
-        className="flex h-full min-h-0 flex-col gap-4 p-5 rounded-xl border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all cursor-pointer w-full"
-      >
-        <div className="flex items-center gap-3">
-          {company.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+    <Card asChild>
+      <Link href={`/companies/${company.slug}`}>
+        <CardHeader>
+          <div className="flex items-center gap-3">
             <img
-              src={company.logoUrl}
+              src={company.logoUrl ?? undefined}
               alt={company.name}
-              className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0"
-              loading="lazy"
+              className="size-8 rounded object-contain"
             />
-          ) : (
-            <span className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-50 object-contain p-1 shrink-0 flex items-center justify-center text-xs font-bold text-neutral-500">
-              {initials}
-            </span>
-          )}
-
-          <div className="text-base font-semibold text-neutral-900 truncate">{company.name}</div>
-        </div>
-
-        {description ? (
-          <div className="text-sm text-neutral-500 line-clamp-2 leading-relaxed -mt-2">
-            {description}
+            <span className="font-semibold text-sm truncate">{company.name}</span>
           </div>
-        ) : null}
+        </CardHeader>
 
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
-          {firstTwoSectors.map(({ sector }) => (
-            <span
-              key={sector.id}
-              className="text-xs px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium"
-            >
-              {sector.name}
-            </span>
+        <CardDescription>{title}</CardDescription>
+
+        <CardFooter>
+          {company.sectors.slice(0, 3).map(s => (
+            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
           ))}
-        </div>
-      </div>
-    </Link>
+        </CardFooter>
+      </Link>
+    </Card>
   )
 }
 
@@ -93,7 +75,7 @@ export default async function CompaniesPage() {
           {companies.length === 0 ? (
             <p className="text-muted-foreground">No companies found.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
               {companies.map(company => (
                 <CompanyCard key={company.id} company={company} />
               ))}

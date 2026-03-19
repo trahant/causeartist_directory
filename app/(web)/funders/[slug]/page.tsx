@@ -83,6 +83,29 @@ function formatCheckSize(min: number | null, max: number | null): string {
   return "Varies"
 }
 
+function formatFunderType(type: string | null): string {
+  switch (type) {
+    case "vc":
+      return "Venture Capital"
+    case "foundation":
+      return "Foundation"
+    case "accelerator":
+      return "Accelerator"
+    case "family-office":
+      return "Family Office"
+    case "cdfi":
+      return "CDFI"
+    case "impact-fund":
+      return "Impact Fund"
+    case "fellowship":
+      return "Fellowship"
+    case "corporate":
+      return "Corporate"
+    default:
+      return "Impact Fund"
+  }
+}
+
 export default async function (props: Props) {
   const { funder, metadata, structuredData } = await getData(props)
 
@@ -104,11 +127,9 @@ export default async function (props: Props) {
                   <H2 as="h1" className="leading-tight! truncate">
                     {funder.name}
                   </H2>
-                  {funder.type && (
-                    <Badge variant="outline" size="lg">
-                      {funder.type}
-                    </Badge>
-                  )}
+                  <Badge variant="outline" size="lg">
+                    {formatFunderType(funder.type)}
+                  </Badge>
                 </Stack>
               </Stack>
 

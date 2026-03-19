@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { cache } from "react"
+import { Card, CardDescription, CardHeader } from "~/components/common/card"
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
@@ -71,7 +72,14 @@ export default async function GlossaryPage() {
                 <ul className="list-none space-y-2 pl-0">
                   {byLetter[letter]!.map((term: GlossaryTermMany) => (
                     <li key={term.id}>
-                      <Link href={`/glossary/${term.slug}`}>{term.term}</Link>
+                      <Card asChild>
+                        <Link href={`/glossary/${term.slug}`}>
+                          <CardHeader>
+                            <span className="font-semibold text-sm">{term.term}</span>
+                          </CardHeader>
+                          <CardDescription>{term.definition}</CardDescription>
+                        </Link>
+                      </Card>
                     </li>
                   ))}
                 </ul>

@@ -1,9 +1,7 @@
 import type { Metadata } from "next"
 import { cache, Suspense } from "react"
-import { Card, CardHeader } from "~/components/common/card"
-import { H4 } from "~/components/common/heading"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { StructuredData } from "~/components/web/structured-data"
@@ -40,22 +38,26 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return getPageMetadata({ url: pageUrl, metadata })
 }
 
+const formatDate = (date: Date | null | undefined) => {
+  if (!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
 function EpisodeCard({ episode }: { episode: PodcastEpisodeMany }) {
   return (
-    <Card hover asChild>
+    <Card asChild>
       <Link href={`/podcast/investing-in-impact/${episode.slug}`}>
         <CardHeader wrap={false}>
-          <Stack className="gap-1.5" direction="row" wrap>
-            <H4 as="h3" className="text-sm leading-snug!">
-              {episode.title}
-            </H4>
-            {episode.episodeNumber != null && (
-              <span className="text-sm text-muted-foreground">
-                Episode {episode.episodeNumber}
-              </span>
-            )}
-          </Stack>
+          <span className="font-semibold text-sm line-clamp-2">{episode.title}</span>
         </CardHeader>
+        <CardDescription>{episode.excerpt}</CardDescription>
+        <CardFooter>
+          <span>{formatDate(episode.publishedAt)}</span>
+        </CardFooter>
       </Link>
     </Card>
   )
@@ -77,7 +79,7 @@ export default async function InvestingInImpactPage() {
           {episodes.length === 0 ? (
             <p className="text-muted-foreground">No episodes found.</p>
           ) : (
-            <div className="grid w-full grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
               {episodes.map((episode: PodcastEpisodeMany) => (
                 <EpisodeCard key={episode.id} episode={episode} />
               ))}

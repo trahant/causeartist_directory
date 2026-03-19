@@ -2,8 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import { getFormatter, getTranslations } from "next-intl/server"
 import { cache, Suspense } from "react"
-import { Card, CardHeader } from "~/components/common/card"
-import { H4 } from "~/components/common/heading"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
@@ -19,6 +18,15 @@ import { findBlogPosts } from "~/server/web/blog/queries"
 
 // I18n page namespace
 const namespace = "pages.blog"
+
+const formatDate = (date: Date | null | undefined) => {
+  if (!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
 
 // Get page data
 const getData = cache(async () => {
@@ -56,24 +64,17 @@ export default async function () {
 
       <Section>
         <Section.Content>
-          <div className="grid w-full grid-cols-1 place-content-start gap-6 md:grid-cols-2 lg:grid-cols-2 lg:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {posts.map((post: BlogPostMany) => (
-              <Card key={post.id} hover asChild>
+              <Card key={post.id} asChild>
                 <Link href={`/blog/${post.slug}`}>
-                  {post.heroImageUrl && (
-                    <Image
-                      src={post.heroImageUrl}
-                      alt={post.title}
-                      width={1200}
-                      height={630}
-                      className="-m-5 mb-0 w-[calc(100%+2.5rem)] max-w-none aspect-video object-cover rounded-t-lg"
-                    />
-                  )}
                   <CardHeader wrap={false}>
-                    <H4 as="h3" className="text-sm leading-snug!">
-                      {post.title}
-                    </H4>
+                    <span className="font-semibold text-sm line-clamp-2">{post.title}</span>
                   </CardHeader>
+                  <CardDescription>{post.excerpt}</CardDescription>
+                  <CardFooter>
+                    <span>{formatDate(post.publishedAt)}</span>
+                  </CardFooter>
                 </Link>
               </Card>
             ))}

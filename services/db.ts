@@ -9,8 +9,11 @@ const prismaClientSingleton = () => {
 
   // On Vercel serverless, using the pooled "public" URL (pgbouncer/session pooler)
   // prevents connection storms that hit max client limits.
-  const connectionString =
-    isBuild && env.DATABASE_PUBLIC_URL ? env.DATABASE_PUBLIC_URL : env.DATABASE_URL
+  const connectionString = isBuild
+    ? env.DATABASE_URL
+    : env.DATABASE_PUBLIC_URL
+      ? env.DATABASE_PUBLIC_URL
+      : env.DATABASE_URL
 
   // Keep the pool small in production to avoid "MaxClientsInSessionMode" errors.
   const max = isProd ? 2 : isBuild ? 5 : 10

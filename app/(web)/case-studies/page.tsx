@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import { cache, Suspense } from "react"
-import { Card, CardHeader } from "~/components/common/card"
-import { H2, H4 } from "~/components/common/heading"
+import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
+import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
-import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { StructuredData } from "~/components/web/structured-data"
@@ -19,6 +17,15 @@ import type { CaseStudyMany } from "~/server/web/case-studies/payloads"
 const url = "/case-studies"
 const title = "Impact Case Studies | Causeartist"
 const description = "Deep dives into how impact companies actually work."
+
+const formatDate = (date: Date | null | undefined) => {
+  if (!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
 
 const getData = cache(async () => {
   const caseStudies = await findCaseStudies({ orderBy: { publishedAt: "desc" } })
@@ -36,27 +43,16 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 function CaseStudyCard({ study }: { study: CaseStudyMany }) {
   return (
-    <Card hover asChild>
+    <Card asChild>
       <Link href={`/case-studies/${study.slug}`}>
-        {study.heroImageUrl && (
-          <Image
-            src={study.heroImageUrl}
-            alt={study.title}
-            width={1200}
-            height={630}
-            className="-m-5 mb-0 w-[calc(100%+2.5rem)] max-w-none aspect-video object-cover"
-          />
-        )}
         <CardHeader wrap={false}>
-          <H4 as="h3" className="text-sm leading-snug!">
-            {study.title}
-          </H4>
+          <span className="font-semibold text-sm line-clamp-2">{study.title}</span>
         </CardHeader>
-        {study.company && (
-          <p className="text-sm text-muted-foreground">
-            <Link href={`/companies/${study.company.slug}`}>{study.company.name}</Link>
-          </p>
-        )}
+        <CardDescription>{study.excerpt}</CardDescription>
+        <CardFooter>
+          <span>{formatDate(study.publishedAt)}</span>
+          {study.company ? <span>{study.company.name}</span> : null}
+        </CardFooter>
       </Link>
     </Card>
   )
@@ -76,7 +72,7 @@ export default async function CaseStudiesPage() {
 
       <Section>
         <Section.Content>
-          <div className="grid w-full grid-cols-1 place-content-start gap-5 md:grid-cols-2 lg:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {caseStudies.map((study: CaseStudyMany) => (
               <CaseStudyCard key={study.id} study={study} />
             ))}

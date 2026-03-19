@@ -596,12 +596,41 @@ async function processUrlsAsCompanies(companyUrls: CompanyCsvRow[]) {
     try {
       const exists = await db.company.findFirst({
         where: { website: url },
-        select: { id: true },
+        select: { id: true, name: true },
       })
 
       if (exists) {
         companiesSkipped++
-        console.log(`Skipping: ${url} already exists`)
+        console.log(`Skipping creation: ${url} already exists`)
+
+        for (const subcategoryName of company.subcategories) {
+          const cleanName = subcategoryName.trim()
+          if (!cleanName) continue
+
+          const subcategorySlug = slugifyName(cleanName)
+          if (!subcategorySlug) continue
+
+          const subcategory = await db.subcategory.upsert({
+            where: { slug: subcategorySlug },
+            update: {},
+            create: {
+              name: cleanName,
+              slug: subcategorySlug,
+            },
+            select: { id: true },
+          })
+
+          await db.companySubcategory.create({
+            data: {
+              companyId: exists.id,
+              subcategoryId: subcategory.id,
+            },
+          }).catch(() => {
+            // If it already exists, don't treat as a failure for re-runs.
+          })
+        }
+
+        console.log(`Updated subcategories for: ${exists.name}`)
         continue
       }
 
@@ -708,12 +737,41 @@ async function processUrlsAsFunders(funderUrls: FunderCsvRow[]) {
     try {
       const exists = await db.funder.findFirst({
         where: { website: url },
-        select: { id: true },
+        select: { id: true, name: true },
       })
 
       if (exists) {
         fundersSkipped++
-        console.log(`Skipping: ${url} already exists`)
+        console.log(`Skipping creation: ${url} already exists`)
+
+        for (const subcategoryName of funder.subcategories) {
+          const cleanName = subcategoryName.trim()
+          if (!cleanName) continue
+
+          const subcategorySlug = slugifyName(cleanName)
+          if (!subcategorySlug) continue
+
+          const subcategory = await db.subcategory.upsert({
+            where: { slug: subcategorySlug },
+            update: {},
+            create: {
+              name: cleanName,
+              slug: subcategorySlug,
+            },
+            select: { id: true },
+          })
+
+          await db.funderSubcategory.create({
+            data: {
+              funderId: exists.id,
+              subcategoryId: subcategory.id,
+            },
+          }).catch(() => {
+            // If it already exists, don't treat as a failure for re-runs.
+          })
+        }
+
+        console.log(`Updated subcategories for: ${exists.name}`)
         continue
       }
 
