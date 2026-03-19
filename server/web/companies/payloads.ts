@@ -25,6 +25,18 @@ export const companySubcategoriesPayload = {
   orderBy: { subcategory: { name: "asc" } },
 } satisfies Prisma.Company$subcategoriesArgs
 
+export const companyCertificationsPayload = {
+  select: {
+    certification: {
+      select: {
+        name: true,
+        slug: true,
+        website: true,
+      },
+    },
+  },
+} satisfies Prisma.Company$certificationsArgs
+
 export const companyOnePayload = {
   id: true,
   name: true,
@@ -48,6 +60,7 @@ export const companyOnePayload = {
   sectors: companySectorsPayload,
   locations: companyLocationsPayload,
   subcategories: companySubcategoriesPayload,
+  certifications: companyCertificationsPayload,
 } satisfies Prisma.CompanySelect
 
 export const companyManyPayload = {
@@ -64,6 +77,7 @@ export const companyManyPayload = {
   sectors: companySectorsPayload,
   locations: companyLocationsPayload,
   subcategories: companySubcategoriesPayload,
+  certifications: companyCertificationsPayload,
 } satisfies Prisma.CompanySelect
 
 export type CompanyOne = Prisma.CompanyGetPayload<{ select: typeof companyOnePayload }>

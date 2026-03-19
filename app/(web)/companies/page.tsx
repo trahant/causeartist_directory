@@ -33,8 +33,11 @@ function CompanyCard({ company }: { company: CompanyMany }) {
   const title = company.tagline ?? company.description ?? ""
 
   return (
-    <Card asChild>
-      <Link href={`/companies/${company.slug}`}>
+    <Card>
+      <Link
+        href={`/companies/${company.slug}`}
+        className="flex flex-col gap-4 w-full min-w-0 text-left"
+      >
         <CardHeader>
           <div className="flex items-center gap-3">
             <img
@@ -47,13 +50,27 @@ function CompanyCard({ company }: { company: CompanyMany }) {
         </CardHeader>
 
         <CardDescription>{title}</CardDescription>
-
-        <CardFooter>
-          {company.sectors.slice(0, 3).map(s => (
-            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
-          ))}
-        </CardFooter>
       </Link>
+
+      <CardFooter>
+        {company.sectors.slice(0, 3).map(s => (
+          <Badge key={s.sector.slug}>{s.sector.name}</Badge>
+        ))}
+        {company.certifications
+          .filter(c =>
+            ["b-corp", "benefit-corporation"].includes(c.certification.slug),
+          )
+          .map(c => (
+            <Link key={c.certification.slug} href={`/certifications/${c.certification.slug}`}>
+              <Badge
+                variant="outline"
+                className="text-xs border-green-500 text-green-700"
+              >
+                {c.certification.name}
+              </Badge>
+            </Link>
+          ))}
+      </CardFooter>
     </Card>
   )
 }

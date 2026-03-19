@@ -128,6 +128,23 @@ export default async function (props: Props) {
             </Stack>
           )}
 
+          {company.certifications.length > 0 && (
+            <div>
+              <h3>Certifications</h3>
+              <div className="flex flex-wrap gap-2">
+                {company.certifications.map(c => (
+                  <Link
+                    key={c.certification.slug}
+                    href={`/certifications/${c.certification.slug}`}
+                    className="text-sm px-3 py-1 rounded-full border border-green-500 text-green-700 hover:bg-green-50 transition-colors"
+                  >
+                    {c.certification.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Locations */}
           {!!company.locations.length && (
             <Stack direction="column" className="w-full max-md:order-6">
