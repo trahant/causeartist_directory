@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "start": "next start",
-    "build": "node scripts/check-db-url.cjs && prisma migrate deploy && next build",
+    "build": "node scripts/check-db-url.cjs && prisma migrate deploy && next build --webpack",
     "lint": "oxlint . --fix",
     "format": "oxfmt --write .",
     "email": "SKIP_ENV_VALIDATION=1 email dev",

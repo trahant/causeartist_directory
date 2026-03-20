@@ -1,7 +1,6 @@
 "use client"
 
 import { type HotkeyItem, useDebouncedState, useHotkeys } from "@mantine/hooks"
-import type { InferRouterOutputs } from "@orpc/server"
 import { getDomain } from "@primoui/utils"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
@@ -22,9 +21,14 @@ import { Kbd } from "~/components/common/kbd"
 import { useSearch } from "~/contexts/search-context"
 import { useSession } from "~/lib/auth-client"
 import { orpc } from "~/lib/orpc-query"
-import type { AppRouter } from "~/server/router"
-
-type SearchResults = InferRouterOutputs<AppRouter>["web"]["search"]["searchItems"]
+import type {
+  SearchCategoryRow,
+  SearchDirectoryCompany,
+  SearchDirectoryFunder,
+  SearchItemsOutput,
+  SearchTagRow,
+  SearchToolRow,
+} from "~/server/web/search/types"
 
 type SearchResultsProps<T> = {
   name: string
@@ -78,7 +82,7 @@ export const Search = () => {
   const router = useRouter()
   const pathname = usePathname()
   const search = useSearch()
-  const [results, setResults] = useState<SearchResults>()
+  const [results, setResults] = useState<SearchItemsOutput>()
   const [q, setQuery] = useDebouncedState("", 250)
   const listRef = useRef<HTMLDivElement>(null)
 
@@ -238,7 +242,7 @@ export const Search = () => {
             </CommandGroup>
           ))}
 
-        <SearchResults
+        <SearchResults<SearchToolRow>
           name={t(`navigation.${hasFeaturedTools ? "featured_tools" : "tools"}`)}
           items={hasFeaturedTools ? featuredTools : results?.tools}
           onItemSelect={navigateTo}
@@ -253,7 +257,7 @@ export const Search = () => {
           )}
         />
 
-        <SearchResults
+        <SearchResults<SearchDirectoryCompany>
           name={t("navigation.companies")}
           items={
             hasFeaturedDirectory ? featuredDirectory?.companies : results?.companies
@@ -271,7 +275,7 @@ export const Search = () => {
           )}
         />
 
-        <SearchResults
+        <SearchResults<SearchDirectoryFunder>
           name={t("navigation.funders")}
           items={hasFeaturedDirectory ? featuredDirectory?.funders : results?.funders}
           onItemSelect={navigateTo}
@@ -290,7 +294,7 @@ export const Search = () => {
           )}
         />
 
-        <SearchResults
+        <SearchResults<SearchCategoryRow>
           name={t("navigation.categories")}
           items={results?.categories}
           onItemSelect={navigateTo}
@@ -301,7 +305,7 @@ export const Search = () => {
           renderItemDisplay={({ name }) => name}
         />
 
-        <SearchResults
+        <SearchResults<SearchTagRow>
           name={t("navigation.tags")}
           items={results?.tags}
           onItemSelect={navigateTo}

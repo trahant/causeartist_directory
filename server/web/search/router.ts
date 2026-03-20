@@ -3,6 +3,11 @@ import { ToolTier } from "~/.generated/prisma/client"
 import { withOptionalAuth } from "~/lib/orpc"
 import { findCategories } from "~/server/web/categories/queries"
 import { findTags } from "~/server/web/tags/queries"
+import type {
+  SearchDirectoryCompany,
+  SearchDirectoryFunder,
+  SearchItemsOutput,
+} from "~/server/web/search/types"
 import { findTools } from "~/server/web/tools/queries"
 import { db } from "~/services/db"
 
@@ -52,17 +57,9 @@ const searchItems = withOptionalAuth
         tools,
         categories,
         tags,
-        companies: [] as Awaited<
-          ReturnType<
-            typeof db.company.findMany<{ select: typeof directorySearchSelect }>
-          >
-        >,
-        funders: [] as Awaited<
-          ReturnType<
-            typeof db.funder.findMany<{ select: typeof funderSearchSelect }>
-          >
-        >,
-      }
+        companies: [] as SearchDirectoryCompany[],
+        funders: [] as SearchDirectoryFunder[],
+      } satisfies SearchItemsOutput
     }
 
     const text = query.trim()
@@ -96,9 +93,9 @@ const searchItems = withOptionalAuth
       tools: [],
       categories: [],
       tags: [],
-      companies,
-      funders,
-    }
+      companies: companies as SearchDirectoryCompany[],
+      funders: funders as SearchDirectoryFunder[],
+    } satisfies SearchItemsOutput
   })
 
 const findFeaturedTools = withOptionalAuth.handler(async () => {
@@ -121,7 +118,10 @@ const findFeaturedDirectory = withOptionalAuth.handler(async () => {
     }),
   ])
 
-  return { companies, funders }
+  return {
+    companies: companies as SearchDirectoryCompany[],
+    funders: funders as SearchDirectoryFunder[],
+  }
 })
 
 export const searchRouter = {
