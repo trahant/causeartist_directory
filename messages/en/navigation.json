@@ -1,5 +1,9 @@
 {
   "home": "Home",
+  "directory": "Directory",
+  "companies": "Companies",
+  "funders": "Funders",
+  "certifications": "Certifications",
   "tools": "Tools",
   "featured_tools": "Featured Tools",
   "categories": "Categories",

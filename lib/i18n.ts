@@ -5,6 +5,7 @@ import brand from "../messages/en/brand.json"
 import categories from "../messages/en/categories.json"
 import common from "../messages/en/common.json"
 import components from "../messages/en/components.json"
+import directory from "../messages/en/directory.json"
 import dialogs from "../messages/en/dialogs.json"
 import forms from "../messages/en/forms.json"
 import navigation from "../messages/en/navigation.json"
@@ -23,6 +24,7 @@ export default getRequestConfig(async () => {
       categories,
       common,
       components,
+      directory,
       dialogs,
       forms,
       navigation,

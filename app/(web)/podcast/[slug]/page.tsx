@@ -9,7 +9,6 @@ import { Prose } from "~/components/common/prose"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
-import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { Nav } from "~/components/web/nav"
 import { StructuredData } from "~/components/web/structured-data"
 import { TableOfContents } from "~/components/web/table-of-contents"
@@ -165,9 +164,6 @@ export default async function (props: Props) {
             <AdCard type="ToolPage" className="max-md:order-3" />
           </Suspense>
           {content && <TableOfContents content={content} className="max-md:order-7" />}
-          <Suspense>
-            <FeaturedToolsIcons className="max-md:order-8" />
-          </Suspense>
         </Section.Sidebar>
       </Section>
 

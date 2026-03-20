@@ -1,0 +1,11 @@
+{
+  "filters": {
+    "search_placeholder": "Search companies and funders…",
+    "kind_label": "Listing type",
+    "kind_all": "All",
+    "kind_companies": "Companies",
+    "kind_funders": "Funders",
+    "sector_label": "Sector",
+    "sector_all": "All sectors"
+  }
+}

@@ -4,7 +4,6 @@ import { Card, CardDescription, CardFooter, CardHeader } from "~/components/comm
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
-import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
@@ -85,9 +84,6 @@ export default async function CaseStudiesPage() {
         <Section.Sidebar className="max-h-(--sidebar-max-height)">
           <Suspense fallback={<AdCardSkeleton />}>
             <AdCard type="BlogPost" />
-          </Suspense>
-          <Suspense>
-            <FeaturedToolsIcons />
           </Suspense>
         </Section.Sidebar>
       </Section>

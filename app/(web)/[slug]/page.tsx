@@ -9,7 +9,6 @@ import { H2, H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
-import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { RelatedTools, RelatedToolsSkeleton } from "~/components/web/listings/related-tools"
 import { Markdown } from "~/components/web/markdown"
 import { Nav } from "~/components/web/nav"
@@ -179,10 +178,6 @@ export default async function (props: Props) {
             <AdCard type="ToolPage" className="max-md:order-3" />
           </Suspense>
 
-          {/* Featured */}
-          <Suspense>
-            <FeaturedToolsIcons className="max-md:order-8" />
-          </Suspense>
         </Section.Sidebar>
       </Section>
 

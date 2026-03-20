@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server"
 import { cache, Suspense } from "react"
 import { Hero } from "~/app/(web)/(home)/hero"
+import { DirectoryListingSkeleton } from "~/components/web/directory/directory-listing"
+import { DirectoryQuery } from "~/components/web/directory/directory-query"
 import { StructuredData } from "~/components/web/structured-data"
-import { ToolListingSkeleton } from "~/components/web/tools/tool-listing"
-import { ToolQuery } from "~/components/web/tools/tool-query"
 import { siteConfig } from "~/config/site"
 import { getPageData } from "~/lib/pages"
 
@@ -22,8 +22,8 @@ export async function HomeContent(props: { searchParams: Promise<Record<string, 
     <>
       <Hero />
 
-      <Suspense fallback={<ToolListingSkeleton />}>
-        <ToolQuery searchParams={props.searchParams} options={{ enableFilters: true }} ad="Tools" />
+      <Suspense fallback={<DirectoryListingSkeleton />}>
+        <DirectoryQuery searchParams={props.searchParams} />
       </Suspense>
 
       <StructuredData data={structuredData} />

@@ -32,6 +32,7 @@ type SearchResultsProps<T> = {
   onItemSelect: (url: string) => void
   getHref: (item: T) => string
   renderItemDisplay: (item: T) => ReactNode
+  itemKey?: (item: T) => string
 }
 
 const SearchResults = <T extends { id: string; slug: string; name: string }>({
@@ -40,6 +41,7 @@ const SearchResults = <T extends { id: string; slug: string; name: string }>({
   onItemSelect,
   getHref,
   renderItemDisplay,
+  itemKey = item => item.slug,
 }: SearchResultsProps<T>) => {
   if (!items?.length) return null
 
@@ -47,7 +49,7 @@ const SearchResults = <T extends { id: string; slug: string; name: string }>({
     <CommandGroup heading={name}>
       {items.map(item => (
         <CommandItem
-          key={item.slug}
+          key={itemKey(item)}
           value={`${name.toLowerCase()}:${item.slug}`}
           onSelect={() => onItemSelect(getHref(item))}
         >
@@ -83,11 +85,18 @@ export const Search = () => {
   const isAdmin = session?.user.role === "admin"
   const isAdminPath = pathname.startsWith("/admin")
   const hasQuery = !!q.length
-  const hasFeaturedTools = !isAdmin && !hasQuery && !results
+  const hasFeaturedTools = isAdmin && !hasQuery && !results
+  const hasFeaturedDirectory = !isAdmin && !hasQuery && !results
 
   const { data: featuredTools } = useQuery(
     orpc.web.search.findFeaturedTools.queryOptions({
-      enabled: search.isOpen && !hasQuery,
+      enabled: search.isOpen && !hasQuery && isAdmin,
+    }),
+  )
+
+  const { data: featuredDirectory } = useQuery(
+    orpc.web.search.findFeaturedDirectory.queryOptions({
+      enabled: search.isOpen && !hasQuery && !isAdmin,
     }),
   )
 
@@ -109,7 +118,6 @@ export const Search = () => {
   const commandSections: CommandSection[] = []
   const hotkeys: HotkeyItem[] = [["mod+K", () => search.open()]]
 
-  // Admin command sections & hotkeys
   if (isAdmin) {
     commandSections.push({
       name: t("navigation.create"),
@@ -136,15 +144,14 @@ export const Search = () => {
         },
       ],
     })
-
-    // User command sections & hotkeys
   } else {
     commandSections.push({
       name: t("navigation.quick_links"),
       items: [
-        { label: t("navigation.tools"), onSelect: () => navigateTo("/") },
-        { label: t("navigation.categories"), onSelect: () => navigateTo("/categories") },
-        { label: t("navigation.tags"), onSelect: () => navigateTo("/tags") },
+        { label: t("navigation.directory"), onSelect: () => navigateTo("/#directory") },
+        { label: t("navigation.companies"), onSelect: () => navigateTo("/companies") },
+        { label: t("navigation.funders"), onSelect: () => navigateTo("/funders") },
+        { label: t("navigation.certifications"), onSelect: () => navigateTo("/certifications") },
       ],
     })
   }
@@ -189,6 +196,14 @@ export const Search = () => {
     }
   }, [q, search.isOpen, mutate, hasQuery])
 
+  const hasAnyResults =
+    !!results &&
+    (results.tools.length > 0 ||
+      results.companies.length > 0 ||
+      results.funders.length > 0 ||
+      results.categories.length > 0 ||
+      results.tags.length > 0)
+
   return (
     <CommandDialog open={search.isOpen} onOpenChange={handleOpenChange} shouldFilter={false}>
       <CommandInput
@@ -199,22 +214,24 @@ export const Search = () => {
         suffix={<Kbd keys={["meta", "K"]} />}
       />
 
-      {hasQuery && !isPending && <CommandEmpty>{t("components.search.no_results")}</CommandEmpty>}
+      {hasQuery && !isPending && !hasAnyResults && (
+        <CommandEmpty>{t("components.search.no_results")}</CommandEmpty>
+      )}
 
       <CommandList ref={listRef}>
         {!hasQuery &&
           commandSections.map(({ name, items }) => (
             <CommandGroup key={name} heading={name}>
-              {items.map(({ value, label, shortcut, icon, isPending, onSelect }) => (
+              {items.map(({ value, label, shortcut, icon, isPending: itemPending, onSelect }) => (
                 <CommandItem
                   key={value || label}
                   onSelect={onSelect}
                   value={value || label}
-                  disabled={isPending}
+                  disabled={itemPending}
                 >
                   {icon}
                   <span className="flex-1 truncate">{label}</span>
-                  {isPending && <LoaderIcon className="animate-spin" />}
+                  {itemPending && <LoaderIcon className="animate-spin" />}
                   {shortcut && <CommandShortcut {...shortcut} />}
                 </CommandItem>
               ))}
@@ -226,11 +243,49 @@ export const Search = () => {
           items={hasFeaturedTools ? featuredTools : results?.tools}
           onItemSelect={navigateTo}
           getHref={({ id, slug }) => (isAdminPath ? `/admin/tools/${id}` : `/${slug}`)}
+          itemKey={item => `tool-${item.id}`}
           renderItemDisplay={({ name, faviconUrl, websiteUrl }) => (
             <>
               {faviconUrl && <Image src={faviconUrl} alt="" width={16} height={16} />}
               <span className="flex-1 truncate">{name}</span>
               <span className="opacity-50">{getDomain(websiteUrl)}</span>
+            </>
+          )}
+        />
+
+        <SearchResults
+          name={t("navigation.companies")}
+          items={
+            hasFeaturedDirectory ? featuredDirectory?.companies : results?.companies
+          }
+          onItemSelect={navigateTo}
+          getHref={({ slug }) => `/companies/${slug}`}
+          itemKey={item => `company-${item.id}`}
+          renderItemDisplay={({ name, logoUrl }) => (
+            <>
+              {logoUrl && (
+                <Image src={logoUrl} alt="" width={16} height={16} className="rounded-sm" />
+              )}
+              <span className="flex-1 truncate">{name}</span>
+            </>
+          )}
+        />
+
+        <SearchResults
+          name={t("navigation.funders")}
+          items={hasFeaturedDirectory ? featuredDirectory?.funders : results?.funders}
+          onItemSelect={navigateTo}
+          getHref={({ slug }) => `/funders/${slug}`}
+          itemKey={item => `funder-${item.id}`}
+          renderItemDisplay={({ name, logoUrl, website }) => (
+            <>
+              {logoUrl && (
+                <Image src={logoUrl} alt="" width={16} height={16} className="rounded-sm" />
+              )}
+              <span className="flex-1 truncate">{name}</span>
+              {website ? (
+                <span className="opacity-50">{getDomain(website)}</span>
+              ) : null}
             </>
           )}
         />
@@ -242,6 +297,7 @@ export const Search = () => {
           getHref={({ id, slug }) =>
             isAdminPath ? `/admin/categories/${id}` : `/categories/${slug}`
           }
+          itemKey={item => `cat-${item.id}`}
           renderItemDisplay={({ name }) => name}
         />
 
@@ -250,6 +306,7 @@ export const Search = () => {
           items={results?.tags}
           onItemSelect={navigateTo}
           getHref={({ id, slug }) => (isAdminPath ? `/admin/tags/${id}` : `/tags/${slug}`)}
+          itemKey={item => `tag-${item.id}`}
           renderItemDisplay={({ name }) => name}
         />
       </CommandList>

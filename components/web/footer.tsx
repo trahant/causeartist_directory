@@ -88,16 +88,16 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
         <Stack direction="column" className="text-sm md:col-span-3 md:col-start-8">
           <H6 as="strong">{t("navigation.browse")}:</H6>
 
-          <NavLink href="/">{t("navigation.tools")}</NavLink>
-          <NavLink href="/categories">{t("navigation.categories")}</NavLink>
-          <NavLink href="/tags">{t("navigation.tags")}</NavLink>
+          <NavLink href="/">{t("navigation.directory")}</NavLink>
+          <NavLink href="/companies">{t("navigation.companies")}</NavLink>
+          <NavLink href="/funders">{t("navigation.funders")}</NavLink>
+          <NavLink href="/certifications">{t("navigation.certifications")}</NavLink>
           <NavLink href="/blog">{t("navigation.blog")}</NavLink>
         </Stack>
 
         <Stack direction="column" className="text-sm md:col-span-3">
           <H6 as="strong">{t("navigation.quick_links")}:</H6>
 
-          <NavLink href="/submit">{t("navigation.submit")}</NavLink>
           <NavLink href="/about">{t("navigation.about")}</NavLink>
           {adsConfig.enabled && <NavLink href="/advertise">{t("navigation.advertise")}</NavLink>}
         </Stack>

@@ -9,7 +9,6 @@ import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
-import { FeaturedToolsIcons } from "~/components/web/listings/featured-tools-icons"
 import { Markdown } from "~/components/web/markdown"
 import { Nav } from "~/components/web/nav"
 import { StructuredData } from "~/components/web/structured-data"
@@ -208,9 +207,6 @@ export default async function (props: Props) {
         <Section.Sidebar className="max-md:contents">
           <Suspense fallback={<AdCardSkeleton className="max-md:order-3" />}>
             <AdCard type="ToolPage" className="max-md:order-3" />
-          </Suspense>
-          <Suspense>
-            <FeaturedToolsIcons className="max-md:order-8" />
           </Suspense>
         </Section.Sidebar>
       </Section>
