@@ -3,7 +3,7 @@ import { StructuredData } from "~/components/web/structured-data"
 import { DirectoryListing } from "~/components/web/directory/directory-listing"
 import { DirectoryResults } from "~/components/web/directory/directory-results"
 import { createGraph, generateItemList } from "~/lib/structured-data"
-import { findDirectorySectors, searchDirectory } from "~/server/web/directory/queries"
+import { findDirectorySectorCounts, searchDirectory } from "~/server/web/directory/queries"
 import { directoryFilterParamsCache } from "~/server/web/directory/schema"
 
 type Props = {
@@ -12,9 +12,9 @@ type Props = {
 
 export async function DirectoryQuery({ searchParams }: Props) {
   const params = directoryFilterParamsCache.parse(await searchParams)
-  const [{ items, total, page, perPage }, sectors] = await Promise.all([
+  const [{ items, total, page, perPage }, sectorFacets] = await Promise.all([
     searchDirectory(params),
-    findDirectorySectors(),
+    findDirectorySectorCounts(),
   ])
 
   const itemList = items.map(row =>
@@ -38,7 +38,7 @@ export async function DirectoryQuery({ searchParams }: Props) {
       <StructuredData data={structuredData} />
 
       <DirectoryListing
-        sectors={sectors}
+        sectorFacets={sectorFacets}
         pagination={{ total, perPage, page }}
       >
         <DirectoryResults items={items} />

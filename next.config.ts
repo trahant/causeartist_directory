@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
       revalidate: Number.POSITIVE_INFINITY,
       expire: Number.POSITIVE_INFINITY,
     },
+    /** Bounded freshness for directory totals and facet counts; pair with revalidateTag("directory-count") on writes if needed */
+    directoryStats: {
+      stale: 120,
+      revalidate: 300,
+      expire: 3600,
+    },
   },
 
   experimental: {

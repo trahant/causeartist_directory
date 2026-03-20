@@ -12,20 +12,25 @@
   --header-outer-offset: calc(var(--header-inner-offset) + var(--header-bottom));
   --sidebar-max-height: calc(100vh - var(--header-outer-offset) - var(--header-bottom));
 
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(0 0% 12%);
-  --color-border: hsl(0 0% 88%);
-  --color-input: hsl(0 0% 88%);
-  --color-ring: hsl(0 0% 83%);
+  /* Brand: navy #0b1632, mint #00ffc3, sky #39c0f0, white #ffffff */
+  --color-background: #ffffff;
+  --color-foreground: #0b1632;
+  --color-border: hsl(220 16% 88%);
+  --color-input: hsl(220 16% 88%);
+  --color-ring: #39c0f0;
 
-  --color-card: hsl(0 0% 98%);
-  --color-card-foreground: hsl(0 0% 12%);
+  --color-card: hsl(220 20% 98%);
+  --color-card-foreground: #0b1632;
 
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(0 0% 3.9%);
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0b1632;
 
-  --color-primary: hsl(234 98% 61%);
-  --color-primary-foreground: hsl(0 0% 98%);
+  --color-primary: #00ffc3;
+  --color-primary-foreground: #0b1632;
+
+  --color-brand-navy: #0b1632;
+  --color-brand-mint: #00ffc3;
+  --color-brand-sky: #39c0f0;
 
   --color-secondary: hsl(0 0% 96%);
   --color-secondary-foreground: hsl(0 0% 30%);
@@ -124,20 +129,20 @@
   }
 
   .dark {
-    --color-background: hsl(0 0% 5%);
-    --color-foreground: hsl(0 0% 90%);
-    --color-border: hsl(0 0% 15%);
-    --color-input: hsl(0 0% 15%);
-    --color-ring: hsl(0 0% 20%);
+    --color-background: #0b1632;
+    --color-foreground: hsl(0 0% 96%);
+    --color-border: hsl(220 24% 22%);
+    --color-input: hsl(220 24% 22%);
+    --color-ring: #39c0f0;
 
-    --color-card: hsl(0 0% 8%);
-    --color-card-foreground: hsl(0 0% 90%);
+    --color-card: hsl(220 28% 14%);
+    --color-card-foreground: hsl(0 0% 96%);
 
-    --color-popover: hsl(0 0% 5%);
-    --color-popover-foreground: hsl(0 0% 90%);
+    --color-popover: hsl(220 28% 12%);
+    --color-popover-foreground: hsl(0 0% 96%);
 
-    --color-primary: hsl(234 98% 61%);
-    --color-primary-foreground: hsl(0 0% 98%);
+    --color-primary: #00ffc3;
+    --color-primary-foreground: #0b1632;
 
     --color-secondary: hsl(0 0% 10%);
     --color-secondary-foreground: hsl(0 0% 70%);

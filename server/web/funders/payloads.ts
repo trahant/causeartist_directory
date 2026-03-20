@@ -60,6 +60,7 @@ export const funderManyPayload = {
   website: true,
   foundedYear: true,
   status: true,
+  createdAt: true,
   updatedAt: true,
   sectors: funderSectorsPayload,
   locations: funderLocationsPayload,

@@ -14,8 +14,8 @@
     "cta_description": "Join {count}+ other members and get updates straight to your inbox."
   },
   "count_badge": {
-    "new_tools": "{count} new {count, plural, =0 {tools} =1 {tool} other {tools}} added",
-    "total_tools": "{count} {count, plural, =0 {tools} =1 {tool} other {tools}} listed"
+    "new_entries": "{count} new {count, plural, =0 {entries} =1 {entry} other {entries}} added",
+    "total_entries": "{count} {count, plural, =0 {entries} =1 {entry} other {entries}} listed"
   },
   "cta_proof": {
     "message": "Join {count}+ directory enthusiasts"

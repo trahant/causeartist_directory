@@ -2,27 +2,37 @@ import { formatNumber } from "@primoui/utils"
 import { subDays } from "date-fns"
 import { getTranslations } from "next-intl/server"
 import { cacheLife, cacheTag } from "next/cache"
-import { ToolStatus } from "~/.generated/prisma/client"
 import { Badge } from "~/components/common/badge"
 import { Link } from "~/components/common/link"
 import { Ping } from "~/components/common/ping"
 import { db } from "~/services/db"
 
+const publishedWhere = { status: "published" as const }
+const weekAgo = () => subDays(new Date(), 7)
+
 const getCounts = async () => {
   "use cache"
 
-  cacheTag("tools")
-  cacheLife("infinite")
+  cacheTag("directory-count")
+  cacheLife("directoryStats")
 
-  return await db.$transaction([
-    db.tool.count({
-      where: { status: ToolStatus.Published },
+  const since = weekAgo()
+
+  const [companyTotal, funderTotal, companyNew, funderNew] = await db.$transaction([
+    db.company.count({ where: publishedWhere }),
+    db.funder.count({ where: publishedWhere }),
+    db.company.count({
+      where: { ...publishedWhere, createdAt: { gte: since } },
     }),
-
-    db.tool.count({
-      where: { status: ToolStatus.Published, publishedAt: { gte: subDays(new Date(), 7) } },
+    db.funder.count({
+      where: { ...publishedWhere, createdAt: { gte: since } },
     }),
   ])
+
+  const total = companyTotal + funderTotal
+  const newTotal = companyNew + funderNew
+
+  return [total, newTotal] as const
 }
 
 const CountBadge = async () => {
@@ -31,10 +41,10 @@ const CountBadge = async () => {
 
   return (
     <Badge prefix={<Ping />} className="order-first" asChild>
-      <Link href="/?sort=publishedAt.desc">
+      <Link href="/#directory">
         {newCount
-          ? t("new_tools", { count: formatNumber(newCount) })
-          : t("total_tools", { count: formatNumber(count) })}
+          ? t("new_entries", { count: formatNumber(newCount) })
+          : t("total_entries", { count: formatNumber(count) })}
       </Link>
     </Badge>
   )

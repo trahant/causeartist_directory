@@ -73,6 +73,7 @@ export const companyManyPayload = {
   website: true,
   foundedYear: true,
   status: true,
+  createdAt: true,
   updatedAt: true,
   sectors: companySectorsPayload,
   locations: companyLocationsPayload,

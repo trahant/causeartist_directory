@@ -6,6 +6,20 @@
     "kind_companies": "Companies",
     "kind_funders": "Funders",
     "sector_label": "Sector",
-    "sector_all": "All sectors"
+    "sector_all": "All sectors",
+    "sector_search_placeholder": "Search sector"
+  },
+  "toolbar": {
+    "search_placeholder": "Search companies and funders…",
+    "search_aria": "Search directory",
+    "loading": "Loading…",
+    "clear": "Clear search and filters",
+    "filters": "Filters",
+    "order_by": "Order by",
+    "sort_name_asc": "Name (A–Z)",
+    "sort_name_desc": "Name (Z–A)",
+    "sort_newest": "Newest",
+    "clear_all": "Clear filters",
+    "all_sectors_count": "—"
   }
 }
