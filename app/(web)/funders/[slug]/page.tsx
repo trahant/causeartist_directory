@@ -5,18 +5,31 @@ import { cache, Suspense } from "react"
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { H2, H5 } from "~/components/common/heading"
-import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
 import { Markdown } from "~/components/web/markdown"
 import { Nav } from "~/components/web/nav"
+import {
+  FunderHeroBand,
+  FunderKeyBenefitsSection,
+  FunderPodcastSection,
+  FunderPortfolioSection,
+  FunderSecondaryCtas,
+  FunderSocialRow,
+  FunderTaxonomyBand,
+} from "~/components/web/profiles/funder-profile-sections"
+import { FunderProfileStatsCard } from "~/components/web/profiles/funder-profile-stats"
+import { RelatedFunders, RelatedFundersSkeleton } from "~/components/web/listings/related-funders"
 import { StructuredData } from "~/components/web/structured-data"
+import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Backdrop } from "~/components/web/ui/backdrop"
 import { Favicon } from "~/components/web/ui/favicon"
 import { Section } from "~/components/web/ui/section"
 import { Sticky } from "~/components/web/ui/sticky"
 import type { Thing } from "schema-dts"
+import { formatFunderCheckSize } from "~/lib/format-funder-check-size"
+import { formatFunderType } from "~/lib/format-funder-type"
 import type { OpenGraphParams } from "~/lib/opengraph"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateFunderSchema } from "~/lib/schema"
@@ -73,55 +86,22 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
   })
 }
 
-function formatCheckSize(min: number | null, max: number | null): string {
-  if (min != null && max != null) {
-    return `$${min.toLocaleString()} – $${max.toLocaleString()}`
-  }
-  if (min != null) return `From $${min.toLocaleString()}`
-  if (max != null) return `Up to $${max.toLocaleString()}`
-  return "Varies"
-}
-
-function formatFunderType(type: string | null): string {
-  switch (type) {
-    case "vc":
-      return "Venture Capital"
-    case "foundation":
-      return "Foundation"
-    case "accelerator":
-      return "Accelerator"
-    case "family-office":
-      return "Family Office"
-    case "cdfi":
-      return "CDFI"
-    case "impact-fund":
-      return "Impact Fund"
-    case "fellowship":
-      return "Fellowship"
-    case "corporate":
-      return "Corporate"
-    default:
-      return "Impact Fund"
-  }
-}
-
 export default async function (props: Props) {
-  const { funder, metadata, structuredData } = await getData(props)
+  const { funder, metadata, breadcrumbs, structuredData } = await getData(props)
 
-  const checkSizeText =
-    funder.checkSizeMin != null || funder.checkSizeMax != null
-      ? formatCheckSize(funder.checkSizeMin, funder.checkSizeMax)
-      : null
+  const checkSizeText = formatFunderCheckSize(funder.checkSizeMin, funder.checkSizeMax)
 
   return (
     <>
+      <Breadcrumbs items={breadcrumbs} />
+
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
             <Stack className="@container self-stretch">
               <Favicon src={funder.logoUrl} title={funder.name} className="size-8" />
 
-              <Stack className="flex-1 min-w-0">
+              <Stack className="min-w-0 flex-1">
                 <Stack className="gap-2" direction="row" wrap>
                   <H2 as="h1" className="leading-tight! truncate">
                     {funder.name}
@@ -136,65 +116,48 @@ export default async function (props: Props) {
             </Stack>
           </Sticky>
 
-          {funder.website && (
-            <Stack className="w-full -mt-fluid-md pt-8">
+          <FunderHeroBand funder={funder} />
+          <FunderSocialRow funder={funder} />
+
+          {funder.website ? (
+            <Stack className="w-full -mt-fluid-md pt-6 max-md:order-3">
               <Button variant="primary" suffix={<ArrowUpRightIcon />} className="md:min-w-36" asChild>
                 <ExternalLink href={funder.website} doFollow doTrack>
                   Visit {funder.name}
                 </ExternalLink>
               </Button>
             </Stack>
-          )}
+          ) : null}
 
-          {funder.description && (
+          <FunderSecondaryCtas funder={funder} />
+          <FunderTaxonomyBand funder={funder} />
+
+          {funder.description ? (
             <Markdown code={funder.description} className="-mt-fluid-md pt-4 max-md:order-4" />
-          )}
+          ) : null}
 
-          {/* Investment thesis */}
-          {funder.investmentThesis && (
+          <FunderKeyBenefitsSection funder={funder} />
+
+          {funder.investmentThesis ? (
             <Stack direction="column" className="w-full max-md:order-5">
               <H5 as="strong">Investment thesis</H5>
               <Markdown code={funder.investmentThesis} />
             </Stack>
-          )}
+          ) : null}
 
-          {/* Check size */}
-          {checkSizeText && (
+          {checkSizeText ? (
             <Stack direction="column" className="w-full max-md:order-5">
               <H5 as="strong">Check size</H5>
               <p className="text-muted-foreground">{checkSizeText}</p>
             </Stack>
-          )}
+          ) : null}
 
-          {/* Application CTA */}
-          {funder.applicationUrl && (
-            <Stack className="w-full -mt-fluid-md pt-4 max-md:order-5">
-              <Button variant="primary" suffix={<ArrowUpRightIcon />} className="md:min-w-36" asChild>
-                <ExternalLink href={funder.applicationUrl} doFollow doTrack>
-                  Apply
-                </ExternalLink>
-              </Button>
-            </Stack>
-          )}
+          <FunderPortfolioSection funder={funder} />
+          <FunderPodcastSection funder={funder} />
 
-          {/* Sectors */}
-          {!!funder.sectors.length && (
-            <Stack direction="column" className="w-full max-md:order-6">
-              <H5 as="strong">Sectors:</H5>
-              <Stack className="gap-2">
-                {funder.sectors.map(({ sector }) => (
-                  <Badge key={sector.id} size="lg" asChild>
-                    <Link href={`/funders/sector/${sector.slug}`}>{sector.name}</Link>
-                  </Badge>
-                ))}
-              </Stack>
-            </Stack>
-          )}
-
-          {/* Locations */}
           {!!funder.locations.length && (
             <Stack direction="column" className="w-full max-md:order-7">
-              <H5 as="strong">Locations:</H5>
+              <H5 as="strong">Locations</H5>
               <Stack className="gap-2">
                 {funder.locations.map(({ location }) => (
                   <Badge key={location.id} size="lg" variant="soft">
@@ -205,18 +168,25 @@ export default async function (props: Props) {
             </Stack>
           )}
 
-          <Stack className="w-full md:sticky md:bottom-2 md:z-10 max-md:order-9">
-            <div className="absolute -inset-x-1 -bottom-3 -top-8 -z-1 pointer-events-none bg-background mask-t-from-66% max-md:hidden" />
+          <Stack className="w-full max-md:order-9 md:sticky md:bottom-2 md:z-10">
+            <div className="pointer-events-none absolute -inset-x-1 -bottom-3 -top-8 -z-1 bg-background mask-t-from-66% max-md:hidden" />
             <Nav className="mr-auto" title={metadata.title} />
           </Stack>
         </Section.Content>
 
         <Section.Sidebar className="max-md:contents">
-          <Suspense fallback={<AdCardSkeleton className="max-md:order-3" />}>
-            <AdCard type="ToolPage" className="max-md:order-3" />
-          </Suspense>
+          <Stack className="max-md:order-3 gap-4">
+            <FunderProfileStatsCard funder={funder} />
+            <Suspense fallback={<AdCardSkeleton />}>
+              <AdCard type="ToolPage" />
+            </Suspense>
+          </Stack>
         </Section.Sidebar>
       </Section>
+
+      <Suspense fallback={<RelatedFundersSkeleton funder={funder} className="mt-10" />}>
+        <RelatedFunders funder={funder} className="mt-10" />
+      </Suspense>
 
       <StructuredData data={structuredData} />
     </>

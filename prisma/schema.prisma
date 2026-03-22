@@ -216,6 +216,9 @@ model Company {
   impactMetrics   String?
   seoTitle        String?
   seoDescription  String?
+  heroImageUrl    String?
+  /// JSON array of `{ "title": string, "body": string }` for structured “key benefits” on the profile.
+  keyBenefits     Json?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   caseStudies     CaseStudy[]
@@ -245,6 +248,9 @@ model Funder {
   linkedin         String?
   seoTitle         String?
   seoDescription   String?
+  heroImageUrl     String?
+  /// JSON array of `{ "title": string, "body": string }` for structured “key benefits” on the profile.
+  keyBenefits      Json?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   portfolio        CompanyFunder[]
@@ -275,12 +281,15 @@ model Subcategory {
 }
 
 model Location {
-  id        String            @id @default(cuid())
-  name      String
-  slug      String            @unique
-  createdAt DateTime          @default(now())
-  companies CompanyLocation[]
-  funders   FunderLocation[]
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  createdAt   DateTime          @default(now())
+  country     String?
+  region      String?
+  countryCode String? // ISO 2-letter code e.g. "US", "GB", "DE"
+  companies   CompanyLocation[]
+  funders     FunderLocation[]
 }
 
 model FundingStage {

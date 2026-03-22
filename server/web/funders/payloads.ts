@@ -43,11 +43,53 @@ export const funderOnePayload = {
   linkedin: true,
   seoTitle: true,
   seoDescription: true,
+  heroImageUrl: true,
+  keyBenefits: true,
   createdAt: true,
   updatedAt: true,
   sectors: funderSectorsPayload,
   locations: funderLocationsPayload,
   subcategories: funderSubcategoriesPayload,
+  portfolio: {
+    where: { company: { status: "published" } },
+    orderBy: { company: { name: "asc" } },
+    select: {
+      company: {
+        select: {
+          slug: true,
+          name: true,
+          logoUrl: true,
+          tagline: true,
+        },
+      },
+    },
+  },
+  stages: {
+    orderBy: { fundingStage: { name: "asc" } },
+    select: {
+      fundingStage: {
+        select: {
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  },
+  podcastEpisodes: {
+    where: { episode: { status: "published" } },
+    orderBy: { episode: { publishedAt: "desc" } },
+    select: {
+      episode: {
+        select: {
+          slug: true,
+          title: true,
+          excerpt: true,
+          show: true,
+          publishedAt: true,
+        },
+      },
+    },
+  },
 } satisfies Prisma.FunderSelect
 
 export const funderManyPayload = {

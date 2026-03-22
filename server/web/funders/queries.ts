@@ -43,3 +43,44 @@ export const findFunder = async ({ where, ...args }: Prisma.FunderFindFirstArgs)
     select: funderOnePayload,
   })
 }
+
+export const findRelatedFunders = async ({ slug }: { slug: string }) => {
+  "use cache"
+
+  cacheTag("related-funders")
+  cacheLife("minutes")
+
+  const source = await db.funder.findFirst({
+    where: { slug, status: "published" },
+    select: {
+      sectors: { select: { sectorId: true } },
+      stages: { select: { stageId: true } },
+    },
+  })
+
+  if (!source) return []
+
+  const sectorIds = source.sectors.map(s => s.sectorId)
+  const stageIds = source.stages.map(s => s.stageId)
+
+  const orClause: Prisma.FunderWhereInput[] = []
+  if (sectorIds.length > 0) {
+    orClause.push({ sectors: { some: { sectorId: { in: sectorIds } } } })
+  }
+  if (stageIds.length > 0) {
+    orClause.push({ stages: { some: { stageId: { in: stageIds } } } })
+  }
+
+  if (orClause.length === 0) return []
+
+  return db.funder.findMany({
+    where: {
+      status: "published",
+      slug: { not: slug },
+      OR: orClause,
+    },
+    select: funderManyPayload,
+    orderBy: { name: "asc" },
+    take: 8,
+  })
+}

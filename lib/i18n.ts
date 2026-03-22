@@ -10,6 +10,7 @@ import dialogs from "../messages/en/dialogs.json"
 import forms from "../messages/en/forms.json"
 import navigation from "../messages/en/navigation.json"
 import pages from "../messages/en/pages.json"
+import profiles from "../messages/en/profiles.json"
 import posts from "../messages/en/posts.json"
 import schema from "../messages/en/schema.json"
 import tags from "../messages/en/tags.json"
@@ -29,6 +30,7 @@ export default getRequestConfig(async () => {
       forms,
       navigation,
       pages,
+      profiles,
       posts,
       schema,
       tags,

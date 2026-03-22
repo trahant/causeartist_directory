@@ -25,6 +25,8 @@ const allowedSectors = [
 
 const allowedSectorSet = new Set<string>(allowedSectors)
 
+type KeyBenefitExtract = { title: string; body: string }
+
 type ExtractedCompanyData = {
   name: string
   tagline?: string
@@ -37,6 +39,10 @@ type ExtractedCompanyData = {
   twitter: string | null
   founderName: string | null
   logoUrl: string | null
+  /** Wide banner for profile hero; often same as og:image when suitable */
+  heroImageUrl?: string | null
+  /** Up to ~6 structured bullets for the profile “Key benefits” section */
+  keyBenefits?: KeyBenefitExtract[] | null
 }
 
 function delay(ms: number) {
@@ -339,7 +345,9 @@ Return this exact JSON structure:
   "linkedin": "full linkedin URL or null",
   "twitter": "full twitter/x URL or null",
   "founderName": "founder name or null",
-  "logoUrl": "full URL to logo image or null"
+  "logoUrl": "full URL to logo image or null",
+  "heroImageUrl": "full URL for a wide hero image (e.g. product shot) or null — may match og:image if it is banner-like",
+  "keyBenefits": [ { "title": "Benefit headline", "body": "One short sentence." } ] or null — at most 6 items, only if clearly stated on the page
 }
 
 Rules:
@@ -422,6 +430,12 @@ async function upsertCompanyAndSectors({
       twitter: extracted.twitter ?? null,
       founderName: extracted.founderName ?? null,
       logoUrl: extracted.logoUrl ?? null,
+      ...(extracted.heroImageUrl != null && extracted.heroImageUrl !== ""
+        ? { heroImageUrl: extracted.heroImageUrl }
+        : {}),
+      ...(Array.isArray(extracted.keyBenefits) && extracted.keyBenefits.length > 0
+        ? { keyBenefits: extracted.keyBenefits }
+        : {}),
     },
     update: {
       name: extracted.name,
@@ -434,6 +448,12 @@ async function upsertCompanyAndSectors({
       twitter: extracted.twitter ?? null,
       founderName: extracted.founderName ?? null,
       logoUrl: extracted.logoUrl ?? null,
+      ...(extracted.heroImageUrl != null && extracted.heroImageUrl !== ""
+        ? { heroImageUrl: extracted.heroImageUrl }
+        : {}),
+      ...(Array.isArray(extracted.keyBenefits) && extracted.keyBenefits.length > 0
+        ? { keyBenefits: extracted.keyBenefits }
+        : {}),
     },
     select: { id: true },
   })
@@ -515,6 +535,12 @@ async function upsertFunderAndSectors({
       foundedYear: extracted.foundedYear ?? null,
       linkedin: extracted.linkedin ?? null,
       logoUrl: extracted.logoUrl ?? null,
+      ...(extracted.heroImageUrl != null && extracted.heroImageUrl !== ""
+        ? { heroImageUrl: extracted.heroImageUrl }
+        : {}),
+      ...(Array.isArray(extracted.keyBenefits) && extracted.keyBenefits.length > 0
+        ? { keyBenefits: extracted.keyBenefits }
+        : {}),
     },
     update: {
       name: extracted.name,
@@ -524,6 +550,12 @@ async function upsertFunderAndSectors({
       foundedYear: extracted.foundedYear ?? null,
       linkedin: extracted.linkedin ?? null,
       logoUrl: extracted.logoUrl ?? null,
+      ...(extracted.heroImageUrl != null && extracted.heroImageUrl !== ""
+        ? { heroImageUrl: extracted.heroImageUrl }
+        : {}),
+      ...(Array.isArray(extracted.keyBenefits) && extracted.keyBenefits.length > 0
+        ? { keyBenefits: extracted.keyBenefits }
+        : {}),
     },
     select: { id: true },
   })

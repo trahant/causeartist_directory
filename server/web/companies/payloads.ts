@@ -55,12 +55,53 @@ export const companyOnePayload = {
   impactMetrics: true,
   seoTitle: true,
   seoDescription: true,
+  heroImageUrl: true,
+  keyBenefits: true,
   createdAt: true,
   updatedAt: true,
   sectors: companySectorsPayload,
   locations: companyLocationsPayload,
   subcategories: companySubcategoriesPayload,
   certifications: companyCertificationsPayload,
+  funders: {
+    where: { funder: { status: "published" } },
+    orderBy: { funder: { name: "asc" } },
+    select: {
+      funder: {
+        select: {
+          slug: true,
+          name: true,
+          logoUrl: true,
+          type: true,
+        },
+      },
+    },
+  },
+  caseStudies: {
+    where: { status: "published" },
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    select: {
+      slug: true,
+      title: true,
+      excerpt: true,
+      heroImageUrl: true,
+    },
+  },
+  podcastEpisodes: {
+    where: { episode: { status: "published" } },
+    orderBy: { episode: { publishedAt: "desc" } },
+    select: {
+      episode: {
+        select: {
+          slug: true,
+          title: true,
+          excerpt: true,
+          show: true,
+          publishedAt: true,
+        },
+      },
+    },
+  },
 } satisfies Prisma.CompanySelect
 
 export const companyManyPayload = {

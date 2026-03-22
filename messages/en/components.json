@@ -32,7 +32,11 @@
   "listings": {
     "featured_tools": "Featured Tools",
     "similar_to": "Similar to {toolName}",
-    "view_all_tools": "View all tools"
+    "view_all_tools": "View all tools",
+    "similar_companies": "Similar companies",
+    "similar_funders": "Similar funders",
+    "view_all_companies": "View all companies",
+    "view_all_funders": "View all funders"
   },
   "pagination": {
     "prev": "Prev",

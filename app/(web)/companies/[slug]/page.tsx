@@ -5,17 +5,28 @@ import { cache, Suspense } from "react"
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { H2, H5 } from "~/components/common/heading"
-import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
 import { Markdown } from "~/components/web/markdown"
 import { Nav } from "~/components/web/nav"
+import {
+  CompanyCaseStudiesSection,
+  CompanyFounderMetadata,
+  CompanyHeroBand,
+  CompanyInvestorsSection,
+  CompanyKeyBenefitsSection,
+  CompanyPodcastSection,
+  CompanySecondaryCtas,
+  CompanySocialRow,
+  CompanyTaxonomyBand,
+} from "~/components/web/profiles/company-profile-sections"
+import { CompanyProfileStatsCard } from "~/components/web/profiles/company-profile-stats"
+import { RelatedCompanies, RelatedCompaniesSkeleton } from "~/components/web/listings/related-companies"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Backdrop } from "~/components/web/ui/backdrop"
 import { Favicon } from "~/components/web/ui/favicon"
-import { IntroDescription } from "~/components/web/ui/intro"
 import { Section } from "~/components/web/ui/section"
 import { Sticky } from "~/components/web/ui/sticky"
 import type { Thing } from "schema-dts"
@@ -88,7 +99,7 @@ export default async function (props: Props) {
             <Stack className="@container self-stretch">
               <Favicon src={company.logoUrl} title={company.name} className="size-8" />
 
-              <Stack className="flex-1 min-w-0">
+              <Stack className="min-w-0 flex-1">
                 <H2 as="h1" className="leading-tight! truncate">
                   {company.name}
                 </H2>
@@ -98,59 +109,34 @@ export default async function (props: Props) {
             </Stack>
           </Sticky>
 
-          {company.tagline && (
-            <IntroDescription className="-mt-fluid-md pt-4">{company.tagline}</IntroDescription>
-          )}
+          <CompanyHeroBand company={company} />
+          <CompanySocialRow company={company} />
 
-          {company.website && (
-            <Stack className="w-full -mt-fluid-md pt-8">
+          {company.website ? (
+            <Stack className="w-full -mt-fluid-md pt-6 max-md:order-3">
               <Button variant="primary" suffix={<ArrowUpRightIcon />} className="md:min-w-36" asChild>
                 <ExternalLink href={company.website} doFollow doTrack>
                   Visit {company.name}
                 </ExternalLink>
               </Button>
             </Stack>
-          )}
+          ) : null}
 
-          {company.description && (
+          <CompanySecondaryCtas company={company} />
+          <CompanyTaxonomyBand company={company} />
+
+          {company.description ? (
             <Markdown code={company.description} className="max-md:order-4" />
-          )}
+          ) : null}
 
-          {/* Sectors */}
-          {!!company.sectors.length && (
-            <Stack direction="column" className="w-full max-md:order-5">
-              <H5 as="strong">Sectors:</H5>
-              <Stack className="gap-2">
-                {company.sectors.map(({ sector }) => (
-                  <Badge key={sector.id} size="lg" asChild>
-                    <Link href={`/companies/sector/${sector.slug}`}>{sector.name}</Link>
-                  </Badge>
-                ))}
-              </Stack>
-            </Stack>
-          )}
+          <CompanyKeyBenefitsSection company={company} />
+          <CompanyInvestorsSection company={company} />
+          <CompanyCaseStudiesSection company={company} />
+          <CompanyPodcastSection company={company} />
 
-          {company.certifications.length > 0 && (
-            <div>
-              <h3>Certifications</h3>
-              <div className="flex flex-wrap gap-2">
-                {company.certifications.map(c => (
-                  <Link
-                    key={c.certification.slug}
-                    href={`/certifications/${c.certification.slug}`}
-                    className="text-sm px-3 py-1 rounded-full border border-green-500 text-green-700 hover:bg-green-50 transition-colors"
-                  >
-                    {c.certification.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Locations */}
           {!!company.locations.length && (
             <Stack direction="column" className="w-full max-md:order-6">
-              <H5 as="strong">Locations:</H5>
+              <H5 as="strong">Locations</H5>
               <Stack className="gap-2">
                 {company.locations.map(({ location }) => (
                   <Badge key={location.id} size="lg" variant="soft">
@@ -161,55 +147,41 @@ export default async function (props: Props) {
             </Stack>
           )}
 
-          {/* Metadata: foundedYear, totalFunding, founderName */}
-          {(company.foundedYear != null || company.totalFunding || company.founderName) && (
-            <Stack direction="column" className="w-full max-md:order-6 gap-1">
-              {company.foundedYear != null && (
-                <p className="text-sm text-muted-foreground">
-                  <strong>Founded:</strong> {company.foundedYear}
-                </p>
-              )}
-              {company.totalFunding && (
-                <p className="text-sm text-muted-foreground">
-                  <strong>Total funding:</strong> {company.totalFunding}
-                </p>
-              )}
-              {company.founderName && (
-                <p className="text-sm text-muted-foreground">
-                  <strong>Founder:</strong> {company.founderName}
-                </p>
-              )}
-            </Stack>
-          )}
+          <CompanyFounderMetadata company={company} />
 
-          {/* Impact model */}
-          {company.impactModel && (
+          {company.impactModel ? (
             <Stack direction="column" className="w-full max-md:order-7">
               <H5 as="strong">Impact model</H5>
               <Markdown code={company.impactModel} />
             </Stack>
-          )}
+          ) : null}
 
-          {/* Impact metrics */}
-          {company.impactMetrics && (
+          {company.impactMetrics ? (
             <Stack direction="column" className="w-full max-md:order-8">
               <H5 as="strong">Impact metrics</H5>
               <Markdown code={company.impactMetrics} />
             </Stack>
-          )}
+          ) : null}
 
-          <Stack className="w-full md:sticky md:bottom-2 md:z-10 max-md:order-9">
-            <div className="absolute -inset-x-1 -bottom-3 -top-8 -z-1 pointer-events-none bg-background mask-t-from-66% max-md:hidden" />
+          <Stack className="w-full max-md:order-9 md:sticky md:bottom-2 md:z-10">
+            <div className="pointer-events-none absolute -inset-x-1 -bottom-3 -top-8 -z-1 bg-background mask-t-from-66% max-md:hidden" />
             <Nav className="mr-auto" title={metadata.title} />
           </Stack>
         </Section.Content>
 
         <Section.Sidebar className="max-md:contents">
-          <Suspense fallback={<AdCardSkeleton className="max-md:order-3" />}>
-            <AdCard type="ToolPage" className="max-md:order-3" />
-          </Suspense>
+          <Stack className="max-md:order-3 gap-4">
+            <CompanyProfileStatsCard company={company} />
+            <Suspense fallback={<AdCardSkeleton />}>
+              <AdCard type="ToolPage" />
+            </Suspense>
+          </Stack>
         </Section.Sidebar>
       </Section>
+
+      <Suspense fallback={<RelatedCompaniesSkeleton company={company} className="mt-10" />}>
+        <RelatedCompanies company={company} className="mt-10" />
+      </Suspense>
 
       <StructuredData data={structuredData} />
     </>
