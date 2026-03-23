@@ -4,12 +4,15 @@ export const locationManyPayload = {
   id: true,
   name: true,
   slug: true,
+  countryCode: true,
+  region: true,
 } satisfies Prisma.LocationSelect
 
 export const locationOnePayload = {
   id: true,
   name: true,
   slug: true,
+  countryCode: true,
   createdAt: true,
 } satisfies Prisma.LocationSelect
 

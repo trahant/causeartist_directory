@@ -3,11 +3,13 @@
 import { useMediaQuery } from "@mantine/hooks"
 import { cx } from "cva"
 import {
+  Building2Icon,
   DockIcon,
   ExternalLinkIcon,
   FileTextIcon,
   GalleryHorizontalEndIcon,
   GemIcon,
+  HandCoinsIcon,
   LogOutIcon,
   MegaphoneIcon,
   TagIcon,
@@ -89,6 +91,16 @@ export const Sidebar = () => {
           title: "Blog Posts",
           href: "/admin/posts",
           prefix: <FileTextIcon />,
+        },
+        {
+          title: "Companies",
+          href: "/admin/companies",
+          prefix: <Building2Icon />,
+        },
+        {
+          title: "Funders",
+          href: "/admin/funders",
+          prefix: <HandCoinsIcon />,
         },
 
         undefined, // Separator

@@ -1,30 +1,9 @@
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
+import { formatFunderType } from "~/lib/format-funder-type"
 import type { DirectoryListItem } from "~/server/web/directory/queries"
-
-function formatFunderType(type: string | null): string {
-  switch (type) {
-    case "vc":
-      return "Venture Capital"
-    case "foundation":
-      return "Foundation"
-    case "accelerator":
-      return "Accelerator"
-    case "family-office":
-      return "Family Office"
-    case "cdfi":
-      return "CDFI"
-    case "impact-fund":
-      return "Impact Fund"
-    case "fellowship":
-      return "Fellowship"
-    case "corporate":
-      return "Corporate"
-    default:
-      return "Impact Fund"
-  }
-}
 
 export function DirectoryResults({ items }: { items: DirectoryListItem[] }) {
   if (items.length === 0) {
@@ -91,6 +70,14 @@ function CompanyDirectoryCard({
               </Badge>
             </Link>
           ))}
+        {company.locations[0] && (
+          <Link href={`/companies/location/${company.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={company.locations[0].location.countryCode} />
+              <span className="truncate">{company.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
       </CardFooter>
     </Card>
   )
@@ -104,8 +91,11 @@ function FunderDirectoryCard({
   const desc = funder.description ?? ""
 
   return (
-    <Card asChild>
-      <Link href={`/funders/${funder.slug}`}>
+    <Card>
+      <Link
+        href={`/funders/${funder.slug}`}
+        className="flex flex-col gap-4 w-full min-w-0 text-left"
+      >
         <CardHeader>
           <div className="flex items-center gap-3">
             <img
@@ -120,12 +110,20 @@ function FunderDirectoryCard({
           </div>
         </CardHeader>
         <CardDescription>{desc}</CardDescription>
-        <CardFooter>
-          {funder.sectors.slice(0, 3).map(s => (
-            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
-          ))}
-        </CardFooter>
       </Link>
+      <CardFooter>
+        {funder.sectors.slice(0, 3).map(s => (
+          <Badge key={s.sector.slug}>{s.sector.name}</Badge>
+        ))}
+        {funder.locations[0] && (
+          <Link href={`/funders/location/${funder.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={funder.locations[0].location.countryCode} />
+              <span className="truncate">{funder.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
+      </CardFooter>
     </Card>
   )
 }

@@ -2,13 +2,12 @@ import { ArrowUpRightIcon } from "lucide-react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { cache, Suspense } from "react"
-import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { H2, H5 } from "~/components/common/heading"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
-import { Markdown } from "~/components/web/markdown"
+import { ProfileContent } from "~/components/web/profiles/profile-content"
 import { Nav } from "~/components/web/nav"
 import {
   CompanyCaseStudiesSection,
@@ -17,6 +16,7 @@ import {
   CompanyInvestorsSection,
   CompanyKeyBenefitsSection,
   CompanyPodcastSection,
+  CompanyProfileLocationsSection,
   CompanySecondaryCtas,
   CompanySocialRow,
   CompanyTaxonomyBand,
@@ -123,45 +123,32 @@ export default async function (props: Props) {
           ) : null}
 
           <CompanySecondaryCtas company={company} />
-          <CompanyTaxonomyBand company={company} />
+          <CompanyProfileLocationsSection company={company} />
 
-          {company.description ? (
-            <Markdown code={company.description} className="max-md:order-4" />
-          ) : null}
+          <ProfileContent content={company.description} className="max-md:order-4" />
 
           <CompanyKeyBenefitsSection company={company} />
           <CompanyInvestorsSection company={company} />
           <CompanyCaseStudiesSection company={company} />
           <CompanyPodcastSection company={company} />
 
-          {!!company.locations.length && (
-            <Stack direction="column" className="w-full max-md:order-6">
-              <H5 as="strong">Locations</H5>
-              <Stack className="gap-2">
-                {company.locations.map(({ location }) => (
-                  <Badge key={location.id} size="lg" variant="soft">
-                    {location.name}
-                  </Badge>
-                ))}
-              </Stack>
-            </Stack>
-          )}
-
           <CompanyFounderMetadata company={company} />
 
           {company.impactModel ? (
             <Stack direction="column" className="w-full max-md:order-7">
               <H5 as="strong">Impact model</H5>
-              <Markdown code={company.impactModel} />
+              <ProfileContent content={company.impactModel} />
             </Stack>
           ) : null}
 
           {company.impactMetrics ? (
             <Stack direction="column" className="w-full max-md:order-8">
               <H5 as="strong">Impact metrics</H5>
-              <Markdown code={company.impactMetrics} />
+              <ProfileContent content={company.impactMetrics} />
             </Stack>
           ) : null}
+
+          <CompanyTaxonomyBand company={company} />
 
           <Stack className="w-full max-md:order-9 md:sticky md:bottom-2 md:z-10">
             <div className="pointer-events-none absolute -inset-x-1 -bottom-3 -top-8 -z-1 bg-background mask-t-from-66% max-md:hidden" />

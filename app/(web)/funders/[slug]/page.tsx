@@ -8,13 +8,14 @@ import { H2, H5 } from "~/components/common/heading"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
-import { Markdown } from "~/components/web/markdown"
+import { ProfileContent } from "~/components/web/profiles/profile-content"
 import { Nav } from "~/components/web/nav"
 import {
   FunderHeroBand,
   FunderKeyBenefitsSection,
   FunderPodcastSection,
   FunderPortfolioSection,
+  FunderProfileLocationsSection,
   FunderSecondaryCtas,
   FunderSocialRow,
   FunderTaxonomyBand,
@@ -130,18 +131,19 @@ export default async function (props: Props) {
           ) : null}
 
           <FunderSecondaryCtas funder={funder} />
-          <FunderTaxonomyBand funder={funder} />
+          <FunderProfileLocationsSection funder={funder} />
 
-          {funder.description ? (
-            <Markdown code={funder.description} className="-mt-fluid-md pt-4 max-md:order-4" />
-          ) : null}
+          <ProfileContent
+            content={funder.description}
+            className="-mt-fluid-md pt-4 max-md:order-4"
+          />
 
           <FunderKeyBenefitsSection funder={funder} />
 
           {funder.investmentThesis ? (
             <Stack direction="column" className="w-full max-md:order-5">
               <H5 as="strong">Investment thesis</H5>
-              <Markdown code={funder.investmentThesis} />
+              <ProfileContent content={funder.investmentThesis} />
             </Stack>
           ) : null}
 
@@ -155,18 +157,7 @@ export default async function (props: Props) {
           <FunderPortfolioSection funder={funder} />
           <FunderPodcastSection funder={funder} />
 
-          {!!funder.locations.length && (
-            <Stack direction="column" className="w-full max-md:order-7">
-              <H5 as="strong">Locations</H5>
-              <Stack className="gap-2">
-                {funder.locations.map(({ location }) => (
-                  <Badge key={location.id} size="lg" variant="soft">
-                    {location.name}
-                  </Badge>
-                ))}
-              </Stack>
-            </Stack>
-          )}
+          <FunderTaxonomyBand funder={funder} />
 
           <Stack className="w-full max-md:order-9 md:sticky md:bottom-2 md:z-10">
             <div className="pointer-events-none absolute -inset-x-1 -bottom-3 -top-8 -z-1 bg-background mask-t-from-66% max-md:hidden" />

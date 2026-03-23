@@ -3,6 +3,7 @@ import { cache } from "react"
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroTitle } from "~/components/web/ui/intro"
@@ -70,6 +71,14 @@ function CompanyCard({ company }: { company: CompanyMany }) {
               </Badge>
             </Link>
           ))}
+        {company.locations[0] && (
+          <Link href={`/companies/location/${company.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={company.locations[0].location.countryCode} />
+              <span className="truncate">{company.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
       </CardFooter>
     </Card>
   )

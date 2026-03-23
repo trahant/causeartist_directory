@@ -7,7 +7,10 @@
     "kind_funders": "Funders",
     "sector_label": "Sector",
     "sector_all": "All sectors",
-    "sector_search_placeholder": "Search sector"
+    "sector_search_placeholder": "Search sector",
+    "location_label": "Location",
+    "location_all": "All locations",
+    "location_search_placeholder": "Search location"
   },
   "toolbar": {
     "search_placeholder": "Search companies and funders…",
@@ -20,6 +23,7 @@
     "sort_name_desc": "Name (Z–A)",
     "sort_newest": "Newest",
     "clear_all": "Clear filters",
-    "all_sectors_count": "—"
+    "all_sectors_count": "—",
+    "all_locations_count": "—"
   }
 }

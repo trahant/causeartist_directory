@@ -186,12 +186,17 @@ Extract the following and return ONLY a JSON object with no markdown,
 no backticks, no explanation:
 
 {
-  "description": "2-3 paragraph description of what this fund/organization 
-    does, their investment focus, and their mission. Write in third person. 
-    Minimum 150 words. Maximum 300 words.",
-  "investmentThesis": "1-2 paragraphs explaining their investment thesis, 
-    what types of companies or projects they fund, their geographic focus, 
-    and their approach to impact investing. Minimum 75 words.",
+  "description": "Write 3 separate paragraphs about this fund/organization.
+    Paragraph 1: What they do and their investment focus (2-3 sentences).
+    Paragraph 2: Their mission and how they operate (2-3 sentences).
+    Paragraph 3: Their impact in the ecosystem and why they matter (2-3 sentences).
+    Separate each paragraph with a blank line (\\n\\n).
+    Minimum 150 words total.",
+  "investmentThesis": "Write 2 separate paragraphs explaining their investment thesis.
+    Paragraph 1: What types of companies or projects they fund, sectors, and approach (2-3 sentences).
+    Paragraph 2: Geographic focus, stage, and how they define impact (2-3 sentences).
+    Separate paragraphs with \\n\\n.
+    Minimum 75 words total.",
   "impactMetrics": "Specific measurable impact claims the funder publishes. 
     Portfolio size, AUM, number of investments, companies funded, 
     total capital deployed. If no specific metrics found return null.",

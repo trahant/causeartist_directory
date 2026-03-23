@@ -188,12 +188,17 @@ Extract the following and return ONLY a JSON object with no markdown,
 no backticks, no explanation:
 
 {
-  "description": "2-3 paragraph description of what the company does, 
-    their products/services, and their story. Write in third person. 
-    Minimum 150 words. Maximum 300 words.",
-  "impactModel": "1-2 paragraphs explaining specifically HOW this company 
-    creates social or environmental impact. What is their theory of change? 
-    How does their business model create positive outcomes? Minimum 75 words.",
+  "description": "Write 3 separate paragraphs about this company. 
+    Paragraph 1: What they do and their products/services (2-3 sentences).
+    Paragraph 2: Their founding story or mission (2-3 sentences).  
+    Paragraph 3: Their impact and why they matter (2-3 sentences).
+    Separate each paragraph with a blank line (\\n\\n).
+    Minimum 150 words total.",
+  "impactModel": "Write 2 separate paragraphs explaining impact.
+    Paragraph 1: How their business model creates impact (2-3 sentences).
+    Paragraph 2: Specific outcomes or results (2-3 sentences).
+    Separate paragraphs with \\n\\n.
+    Minimum 75 words total.",
   "impactMetrics": "Specific measurable impact claims the company publishes. 
     Include numbers, statistics, and outcomes if available. 
     Examples: trees planted, people served, CO2 avoided, jobs created.

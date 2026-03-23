@@ -5,6 +5,7 @@ import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription } from "~/components/web/ui/intro"
@@ -78,8 +79,11 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
 
 function CompanyCard({ company }: { company: CompanyMany }) {
   return (
-    <Card asChild>
-      <Link href={`/companies/${company.slug}`}>
+    <Card>
+      <Link
+        href={`/companies/${company.slug}`}
+        className="flex flex-col gap-4 w-full min-w-0 text-left"
+      >
         <CardHeader>
           <div className="flex items-center gap-3">
             <img
@@ -91,12 +95,20 @@ function CompanyCard({ company }: { company: CompanyMany }) {
           </div>
         </CardHeader>
         <CardDescription>{company.tagline ?? company.description}</CardDescription>
-        <CardFooter>
-          {company.sectors.slice(0, 3).map(s => (
-            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
-          ))}
-        </CardFooter>
       </Link>
+      <CardFooter>
+        {company.sectors.slice(0, 3).map(s => (
+          <Badge key={s.sector.slug}>{s.sector.name}</Badge>
+        ))}
+        {company.locations[0] && (
+          <Link href={`/companies/location/${company.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={company.locations[0].location.countryCode} />
+              <span className="truncate">{company.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
+      </CardFooter>
     </Card>
   )
 }

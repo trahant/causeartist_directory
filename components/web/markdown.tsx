@@ -2,10 +2,12 @@ import { slugify } from "@primoui/utils"
 import type { ComponentProps, ReactNode } from "react"
 import { Children } from "react"
 import ReactMarkdown from "react-markdown"
+import remarkBreaks from "remark-breaks"
 import remarkGfm from "remark-gfm"
 import { Link } from "~/components/common/link"
 import { Prose } from "~/components/common/prose"
 import { ExternalLink } from "~/components/web/external-link"
+import { cx } from "~/lib/utils"
 
 type Heading = {
   id: string
@@ -116,6 +118,25 @@ export const Markdown = ({ code, ...props }: MarkdownProps) => {
   return (
     <Prose {...props}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {code}
+      </ReactMarkdown>
+    </Prose>
+  )
+}
+
+const profileMarkdownProseClassName = cx(
+  "prose-lg max-w-none",
+  "prose-p:mb-4 prose-p:leading-relaxed",
+  "prose-ul:my-4 prose-ol:my-4 prose-li:my-1.5 prose-li:marker:text-muted-foreground",
+)
+
+/** Long-form profile copy: line breaks + relaxed typography (company/funder profiles). */
+export const ProfileMarkdown = ({ code, className, ...props }: MarkdownProps) => {
+  const components = createComponents()
+
+  return (
+    <Prose className={cx(profileMarkdownProseClassName, className)} {...props}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={components}>
         {code}
       </ReactMarkdown>
     </Prose>

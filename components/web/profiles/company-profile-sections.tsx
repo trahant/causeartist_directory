@@ -6,10 +6,23 @@ import { H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { ExternalLink } from "~/components/web/external-link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { parseKeyBenefits } from "~/lib/key-benefits"
 import { episodeProfileHref } from "~/lib/podcast-links"
 import { cx } from "~/lib/utils"
 import type { CompanyOne } from "~/server/web/companies/payloads"
+
+const formatRegionLabel = (region: string) => {
+  const map: Record<string, string> = {
+    "north-america": "North America",
+    europe: "Europe",
+    "asia-pacific": "Asia Pacific",
+    "latin-america": "Latin America",
+    africa: "Africa",
+    "middle-east": "Middle East",
+  }
+  return map[region] ?? region
+}
 
 export async function CompanyHeroBand({ company }: { company: CompanyOne }) {
   if (!company.tagline && !company.heroImageUrl) return null
@@ -114,7 +127,7 @@ export async function CompanyTaxonomyBand({ company }: { company: CompanyOne }) 
   if (!hasAny) return null
 
   return (
-    <Stack direction="column" className="w-full gap-3 max-md:order-4">
+    <Stack direction="column" className="w-full gap-3 max-md:order-8">
       <div className="flex flex-wrap gap-2">
         {company.sectors.length > 0 ? (
           <>
@@ -134,8 +147,8 @@ export async function CompanyTaxonomyBand({ company }: { company: CompanyOne }) 
               {t("taxonomy_subcategories")}
             </span>
             {company.subcategories.map(({ subcategory }) => (
-              <Badge key={subcategory.id} size="lg" variant="soft">
-                {subcategory.name}
+              <Badge key={subcategory.id} size="lg" variant="soft" asChild>
+                <Link href={`/companies/focus/${subcategory.slug}`}>{subcategory.name}</Link>
               </Badge>
             ))}
           </>
@@ -153,6 +166,37 @@ export async function CompanyTaxonomyBand({ company }: { company: CompanyOne }) 
           </>
         ) : null}
       </div>
+    </Stack>
+  )
+}
+
+export async function CompanyProfileLocationsSection({ company }: { company: CompanyOne }) {
+  if (!company.locations.length) return null
+  const t = await getTranslations("profiles")
+
+  return (
+    <Stack direction="column" className="w-full max-md:order-4 gap-3">
+      <H5 as="strong">{t("locations_heading")}</H5>
+      <Stack className="gap-2">
+        {company.locations.map(({ location }) => (
+          <Badge key={location.slug} size="lg" variant="soft" asChild>
+            <Link
+              href={`/companies/location/${location.slug}`}
+              className="inline-flex items-center gap-1.5"
+            >
+              <LocationCountryFlag countryCode={location.countryCode} />
+              <span>{location.name}</span>
+            </Link>
+          </Badge>
+        ))}
+        {company.locations[0]?.location.region && (
+          <Badge size="lg" variant="soft" asChild>
+            <Link href={`/companies/region/${company.locations[0].location.region}`}>
+              {formatRegionLabel(company.locations[0].location.region)}
+            </Link>
+          </Badge>
+        )}
+      </Stack>
     </Stack>
   )
 }

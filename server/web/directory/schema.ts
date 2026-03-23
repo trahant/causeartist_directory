@@ -15,6 +15,7 @@ export const directoryFilterParams = {
   q: parseAsString.withDefault(""),
   kind: parseAsStringEnum(directoryKindValues).withDefault("all"),
   sector: parseAsString.withDefault(""),
+  location: parseAsString.withDefault(""),
   sort: parseAsStringEnum([...directorySortValues]).withDefault("name.asc"),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(24),

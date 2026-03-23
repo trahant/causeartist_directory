@@ -7,18 +7,24 @@ import { Pagination, type PaginationProps } from "~/components/web/pagination"
 import { directoryFilterParams } from "~/server/web/directory/schema"
 import { useTranslations } from "next-intl"
 import { DirectoryFilterBar } from "~/components/web/directory/directory-filter-bar"
-import type { DirectorySectorFacet } from "~/server/web/directory/types"
+import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
 
 type DirectoryListingProps = PropsWithChildren & {
   pagination: PaginationProps
   sectorFacets: DirectorySectorFacet[]
+  locationFacets: DirectoryLocationFacet[]
 }
 
-export function DirectoryListing({ children, pagination, sectorFacets }: DirectoryListingProps) {
+export function DirectoryListing({
+  children,
+  pagination,
+  sectorFacets,
+  locationFacets,
+}: DirectoryListingProps) {
   return (
     <FiltersProvider schema={directoryFilterParams} enableSort={false} enableFilters={false}>
       <div className="space-y-5" id="directory">
-        <DirectoryFilterBar sectorFacets={sectorFacets} />
+        <DirectoryFilterBar sectorFacets={sectorFacets} locationFacets={locationFacets} />
         {children}
       </div>
 

@@ -1,6 +1,7 @@
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import type { CompanyMany } from "~/server/web/companies/payloads"
 
 function CompanyDirectoryCard({ company }: { company: CompanyMany }) {
@@ -30,6 +31,28 @@ function CompanyDirectoryCard({ company }: { company: CompanyMany }) {
         {company.sectors.slice(0, 3).map(s => (
           <Badge key={s.sector.slug}>{s.sector.name}</Badge>
         ))}
+        {company.certifications
+          .filter(c =>
+            ["b-corp", "benefit-corporation"].includes(c.certification.slug),
+          )
+          .map(c => (
+            <Link key={c.certification.slug} href={`/certifications/${c.certification.slug}`}>
+              <Badge
+                variant="outline"
+                className="text-xs border-green-500 text-green-700"
+              >
+                {c.certification.name}
+              </Badge>
+            </Link>
+          ))}
+        {company.locations[0] && (
+          <Link href={`/companies/location/${company.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={company.locations[0].location.countryCode} />
+              <span className="truncate">{company.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
       </CardFooter>
     </Card>
   )

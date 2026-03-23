@@ -3,6 +3,7 @@ import { cache } from "react"
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroTitle } from "~/components/web/ui/intro"
@@ -56,8 +57,11 @@ function FunderCard({ funder }: { funder: FunderMany }) {
   const title = funder.description ?? ""
 
   return (
-    <Card asChild>
-      <Link href={`/funders/${funder.slug}`}>
+    <Card>
+      <Link
+        href={`/funders/${funder.slug}`}
+        className="flex flex-col gap-4 w-full min-w-0 text-left"
+      >
         <CardHeader>
           <div className="flex items-center gap-3">
             <img
@@ -75,13 +79,21 @@ function FunderCard({ funder }: { funder: FunderMany }) {
         </CardHeader>
 
         <CardDescription>{title}</CardDescription>
-
-        <CardFooter>
-          {funder.sectors.slice(0, 3).map(s => (
-            <Badge key={s.sector.slug}>{s.sector.name}</Badge>
-          ))}
-        </CardFooter>
       </Link>
+
+      <CardFooter>
+        {funder.sectors.slice(0, 3).map(s => (
+          <Badge key={s.sector.slug}>{s.sector.name}</Badge>
+        ))}
+        {funder.locations[0] && (
+          <Link href={`/funders/location/${funder.locations[0].location.slug}`}>
+            <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">
+              <LocationCountryFlag countryCode={funder.locations[0].location.countryCode} />
+              <span className="truncate">{funder.locations[0].location.name}</span>
+            </Badge>
+          </Link>
+        )}
+      </CardFooter>
     </Card>
   )
 }

@@ -6,10 +6,23 @@ import { H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { ExternalLink } from "~/components/web/external-link"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { parseKeyBenefits } from "~/lib/key-benefits"
 import { episodeProfileHref } from "~/lib/podcast-links"
 import { cx } from "~/lib/utils"
 import type { FunderOne } from "~/server/web/funders/payloads"
+
+const formatRegionLabel = (region: string) => {
+  const map: Record<string, string> = {
+    "north-america": "North America",
+    europe: "Europe",
+    "asia-pacific": "Asia Pacific",
+    "latin-america": "Latin America",
+    africa: "Africa",
+    "middle-east": "Middle East",
+  }
+  return map[region] ?? region
+}
 
 export async function FunderHeroBand({ funder }: { funder: FunderOne }) {
   if (!funder.heroImageUrl) return null
@@ -80,7 +93,7 @@ export async function FunderTaxonomyBand({ funder }: { funder: FunderOne }) {
   if (!hasAny) return null
 
   return (
-    <Stack direction="column" className="w-full gap-3 max-md:order-4">
+    <Stack direction="column" className="w-full gap-3 max-md:order-8">
       <div className="flex flex-wrap gap-2">
         {funder.sectors.length > 0 ? (
           <>
@@ -100,8 +113,8 @@ export async function FunderTaxonomyBand({ funder }: { funder: FunderOne }) {
               {t("taxonomy_subcategories")}
             </span>
             {funder.subcategories.map(({ subcategory }) => (
-              <Badge key={subcategory.id} size="lg" variant="soft">
-                {subcategory.name}
+              <Badge key={subcategory.id} size="lg" variant="soft" asChild>
+                <Link href={`/funders/focus/${subcategory.slug}`}>{subcategory.name}</Link>
               </Badge>
             ))}
           </>
@@ -119,6 +132,37 @@ export async function FunderTaxonomyBand({ funder }: { funder: FunderOne }) {
           </>
         ) : null}
       </div>
+    </Stack>
+  )
+}
+
+export async function FunderProfileLocationsSection({ funder }: { funder: FunderOne }) {
+  if (!funder.locations.length) return null
+  const t = await getTranslations("profiles")
+
+  return (
+    <Stack direction="column" className="w-full max-md:order-4 gap-3">
+      <H5 as="strong">{t("locations_heading")}</H5>
+      <Stack className="gap-2">
+        {funder.locations.map(({ location }) => (
+          <Badge key={location.slug} size="lg" variant="soft" asChild>
+            <Link
+              href={`/funders/location/${location.slug}`}
+              className="inline-flex items-center gap-1.5"
+            >
+              <LocationCountryFlag countryCode={location.countryCode} />
+              <span>{location.name}</span>
+            </Link>
+          </Badge>
+        ))}
+        {funder.locations[0]?.location.region && (
+          <Badge size="lg" variant="soft" asChild>
+            <Link href={`/funders/region/${funder.locations[0].location.region}`}>
+              {formatRegionLabel(funder.locations[0].location.region)}
+            </Link>
+          </Badge>
+        )}
+      </Stack>
     </Stack>
   )
 }

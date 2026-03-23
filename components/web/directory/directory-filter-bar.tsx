@@ -8,7 +8,8 @@ import { Input } from "~/components/common/input"
 import { useFilters } from "~/contexts/filter-context"
 import { isDefaultState } from "~/lib/parsers"
 import { cx } from "~/lib/utils"
-import type { DirectorySectorFacet } from "~/server/web/directory/types"
+import { LocationCountryFlag } from "~/components/web/location-country-flag"
+import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
 import {
   directoryFilterParams,
   directorySortValues,
@@ -23,12 +24,19 @@ const selectTriggerClass = cx(
   "text-foreground font-medium",
 )
 
-export function DirectoryFilterBar({ sectorFacets }: { sectorFacets: DirectorySectorFacet[] }) {
+export function DirectoryFilterBar({
+  sectorFacets,
+  locationFacets,
+}: {
+  sectorFacets: DirectorySectorFacet[]
+  locationFacets: DirectoryLocationFacet[]
+}) {
   const t = useTranslations("directory.filters")
   const tToolbar = useTranslations("directory.toolbar")
   const { filters, isLoading, updateFilters } = useFilters<DirectoryFilterSchema>()
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sectorSearch, setSectorSearch] = useState("")
+  const [locationSearch, setLocationSearch] = useState("")
 
   const isDefault = isDefaultState(directoryFilterParams, filters, ["page", "perPage"])
 
@@ -39,6 +47,14 @@ export function DirectoryFilterBar({ sectorFacets }: { sectorFacets: DirectorySe
       s => s.name.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q),
     )
   }, [sectorFacets, sectorSearch])
+
+  const filteredLocations = useMemo(() => {
+    const q = locationSearch.trim().toLowerCase()
+    if (!q) return locationFacets
+    return locationFacets.filter(
+      l => l.name.toLowerCase().includes(q) || l.slug.toLowerCase().includes(q),
+    )
+  }, [locationFacets, locationSearch])
 
   const showResetInSearch = !isDefault
 
@@ -125,7 +141,7 @@ export function DirectoryFilterBar({ sectorFacets }: { sectorFacets: DirectorySe
 
       {filtersOpen && (
         <div className="overflow-hidden rounded-lg border border-input bg-background shadow-sm">
-          <div className="grid grid-cols-1 divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0">
+          <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-3 lg:divide-x lg:divide-y-0">
             <div className="flex flex-col gap-3 p-4 md:p-5">
               <h3 className="text-sm font-semibold text-foreground">{t("kind_label")}</h3>
               <ul className="flex flex-col gap-2" role="radiogroup" aria-label={t("kind_label")}>
@@ -193,6 +209,62 @@ export function DirectoryFilterBar({ sectorFacets }: { sectorFacets: DirectorySe
                       </span>
                       <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
                         {s.count}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-col gap-3 p-4 md:p-5">
+              <h3 className="text-sm font-semibold text-foreground">{t("location_label")}</h3>
+              <Input
+                size="sm"
+                value={locationSearch}
+                onChange={e => setLocationSearch(e.target.value)}
+                placeholder={t("location_search_placeholder")}
+                className="w-full"
+                aria-label={t("location_search_placeholder")}
+              />
+              <ul
+                className="max-h-64 space-y-1 overflow-y-auto pr-1"
+                role="radiogroup"
+                aria-label={t("location_label")}
+              >
+                <li>
+                  <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md py-1 text-sm hover:bg-muted/50">
+                    <span className="flex items-center gap-2 min-w-0">
+                      <input
+                        type="radio"
+                        name="directory-location"
+                        className="size-4 shrink-0 border-input text-primary accent-primary"
+                        checked={!filters.location}
+                        onChange={() => updateFilters({ location: "" })}
+                      />
+                      <LocationCountryFlag countryCode={null} />
+                      <span className="truncate">{t("location_all")}</span>
+                    </span>
+                    <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                      {tToolbar("all_locations_count")}
+                    </span>
+                  </label>
+                </li>
+                {filteredLocations.map(loc => (
+                  <li key={loc.slug}>
+                    <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md py-1 text-sm hover:bg-muted/50">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <input
+                          type="radio"
+                          name="directory-location"
+                          className="size-4 shrink-0 border-input text-primary accent-primary"
+                          checked={filters.location === loc.slug}
+                          onChange={() => updateFilters({ location: loc.slug })}
+                        />
+                        <LocationCountryFlag countryCode={loc.countryCode} />
+                        <span className="truncate">{loc.name}</span>
+                      </span>
+                      <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                        {loc.count}
                       </span>
                     </label>
                   </li>

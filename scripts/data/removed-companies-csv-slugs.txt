@@ -1,0 +1,36 @@
+# Companies to remove (exported from Company_rows*.csv — defunct or not a fit for the directory)
+# One slug per line; lines starting with # are ignored.
+
+1money
+337-brand
+7-virtues-perfume
+8000-kicks
+america-on-tech
+anheuser-busch-inbev
+apparel-impact-institute
+away-travel
+b1g1
+back-on-my-feet
+beam
+beautyologie
+cabin-dao
+charity-water
+donegood
+dream-org
+first-mile
+gochain
+heroic-hearts-project
+minority-millennials
+panafrica-fr
+share-our-strength
+sneaker-impact
+source-my-garment
+stoked
+team-rubicon
+the-hidden-genius-project
+thread-caravan
+threads-international
+vivid-roots
+waterboys
+wordproof
+yourway-learning
