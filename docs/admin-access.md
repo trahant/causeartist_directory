@@ -9,8 +9,12 @@
 ## Login
 
 1. Open `/auth/login?next=/admin` (the `next` query returns you to admin after sign-in).
-2. Sign in with **magic link** (email) and/or **Google** if `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` are set in `.env`.
-3. Email delivery requires your email provider env vars (e.g. Resend) to be configured like the rest of the app.
+2. Sign in with **magic link** (email only).
+
+### Magic link email
+
+- **Real inbox:** Set **`RESEND_API_KEY`** and **`RESEND_SENDER_EMAIL`** in `.env.local` (verified sender/domain in [Resend](https://resend.com)). Emails send in **development and production** once both are set.
+- **Local dev without Resend:** After you submit your email, check the **terminal where `bun run dev` is running** — the sign-in URL is printed there so you can paste it into the browser.
 
 ## Admin role
 

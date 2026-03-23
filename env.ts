@@ -15,8 +15,6 @@ export const env = createEnv({
     CRON_SECRET: z.string().optional(),
     BETTER_AUTH_SECRET: z.string().min(1).default("replace-me-in-production"),
     BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
-    AUTH_GOOGLE_ID: z.string().optional(),
-    AUTH_GOOGLE_SECRET: z.string().optional(),
     REDIS_URL: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     RESEND_SENDER_EMAIL: z.string().optional(),

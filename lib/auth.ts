@@ -11,8 +11,8 @@ import { cache } from "react"
 import { claimsConfig } from "~/config/claims"
 import { siteConfig } from "~/config/site"
 import { EmailMagicLink } from "~/emails/magic-link"
-import { env } from "~/env"
-import { sendEmail } from "~/lib/email"
+import { isDev } from "~/env"
+import { isEmailDeliveryConfigured, sendEmail } from "~/lib/email"
 import { db } from "~/services/db"
 import { redis } from "~/services/redis"
 
@@ -34,17 +34,6 @@ export const auth = betterAuth({
         },
       }
     : undefined,
-
-  socialProviders: {
-    ...(env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET
-      ? {
-          google: {
-            clientId: env.AUTH_GOOGLE_ID,
-            clientSecret: env.AUTH_GOOGLE_SECRET,
-          },
-        }
-      : {}),
-  },
 
   session: {
     freshAge: 0,
@@ -84,7 +73,14 @@ export const auth = betterAuth({
       sendMagicLink: async ({ email, url }) => {
         const to = email
         const subject = `Your ${siteConfig.name} Login Link`
-        await sendEmail({ to, subject, react: EmailMagicLink({ to, url }) })
+        const sent = await sendEmail({ to, subject, react: EmailMagicLink({ to, url }) })
+
+        // Local dev: no Resend (or send failed) — print link so you can sign in without inbox
+        if (isDev && (!isEmailDeliveryConfigured() || !sent)) {
+          console.info(
+            `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔐 Magic link sign-in (${to})\n\n${url}\n\n(Paste in browser. Configure RESEND_API_KEY + RESEND_SENDER_EMAIL to receive real emails.)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`,
+          )
+        }
       },
     }),
 
