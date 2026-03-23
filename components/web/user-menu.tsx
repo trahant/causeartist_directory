@@ -4,8 +4,8 @@ import { motion } from "motion/react"
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/common/avatar"
-import { Box } from "~/components/common/box"
-import { Button } from "~/components/common/button"
+import { Box, boxVariants } from "~/components/common/box"
+import { Button, buttonVariants } from "~/components/common/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,10 @@ import { Link } from "~/components/common/link"
 import { NavLink } from "~/components/web/ui/nav-link"
 import { UserLogout } from "~/components/web/user-logout"
 import { useSession } from "~/lib/auth-client"
+import { cx } from "~/lib/utils"
 
 export const UserMenu = () => {
-  const { data: session, isPending } = useSession()
+  const { data: session } = useSession()
   const t = useTranslations()
 
   const [mounted, setMounted] = useState(false)
@@ -28,7 +29,8 @@ export const UserMenu = () => {
   // Ensure SSR + initial client render match (avoids hydration mismatch).
   useEffect(() => setMounted(true), [])
 
-  if (!mounted || isPending) {
+  // Only gate on mount — do not wait on session `isPending` (slow/hanging fetch left a disabled button forever).
+  if (!mounted) {
     return (
       <Button size="sm" variant="secondary" disabled>
         {t("navigation.sign_in")}
@@ -39,13 +41,21 @@ export const UserMenu = () => {
   if (!session?.user) {
     return (
       <motion.div
+        className="relative shrink-0"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <Button size="sm" variant="secondary" asChild>
-          <Link href="/auth/login">{t("navigation.sign_in")}</Link>
-        </Button>
+        <Link
+          href="/auth/login"
+          className={cx(
+            boxVariants({ hover: true, focus: true }),
+            buttonVariants({ variant: "secondary", size: "sm" }),
+            "inline-flex no-underline",
+          )}
+        >
+          {t("navigation.sign_in")}
+        </Link>
       </motion.div>
     )
   }
