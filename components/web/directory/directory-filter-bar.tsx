@@ -1,5 +1,6 @@
 "use client"
 
+import type { inferParserType } from "nuqs"
 import { ArrowUpDownIcon, ListFilterIcon, LoaderIcon, SearchIcon, XIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
@@ -10,13 +11,11 @@ import { isDefaultState } from "~/lib/parsers"
 import { cx } from "~/lib/utils"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
-import {
-  directoryFilterParams,
-  directorySortValues,
-  type DirectoryFilterSchema,
-} from "~/server/web/directory/schema"
+import { companyListFilterParams } from "~/server/web/companies/list-schema"
+import { directoryFilterParams, directorySortValues } from "~/server/web/directory/schema"
+import { funderListFilterParams } from "~/server/web/funders/list-schema"
 
-const kindOptions = ["all", "companies", "funders"] as const
+const kindOptions = ["companies", "funders"] as const
 
 const selectTriggerClass = cx(
   "h-10 min-w-[9.5rem] shrink-0 rounded-lg border border-input bg-background px-3 text-sm",
@@ -24,21 +23,37 @@ const selectTriggerClass = cx(
   "text-foreground font-medium",
 )
 
+type DirectoryFilterBarProps = {
+  sectorFacets: DirectorySectorFacet[]
+  locationFacets: DirectoryLocationFacet[]
+  /** When true, show Companies | Funders control (home directory only). */
+  enableKindToggle?: boolean
+  variant?: "home" | "companies" | "funders"
+}
+
 export function DirectoryFilterBar({
   sectorFacets,
   locationFacets,
-}: {
-  sectorFacets: DirectorySectorFacet[]
-  locationFacets: DirectoryLocationFacet[]
-}) {
+  enableKindToggle = false,
+  variant = "home",
+}: DirectoryFilterBarProps) {
   const t = useTranslations("directory.filters")
   const tToolbar = useTranslations("directory.toolbar")
-  const { filters, isLoading, updateFilters } = useFilters<DirectoryFilterSchema>()
+  const { filters, isLoading, updateFilters } = useFilters()
+
+  const parserMap = enableKindToggle ? directoryFilterParams : variant === "companies"
+    ? companyListFilterParams
+    : funderListFilterParams
+
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sectorSearch, setSectorSearch] = useState("")
   const [locationSearch, setLocationSearch] = useState("")
 
-  const isDefault = isDefaultState(directoryFilterParams, filters, ["page", "perPage"])
+  const isDefault = isDefaultState(
+    parserMap,
+    filters as inferParserType<typeof parserMap>,
+    ["page", "perPage"],
+  )
 
   const filteredSectors = useMemo(() => {
     const q = sectorSearch.trim().toLowerCase()
@@ -58,9 +73,24 @@ export function DirectoryFilterBar({
 
   const showResetInSearch = !isDefault
 
+  const searchPlaceholder =
+    variant === "companies"
+      ? tToolbar("search_placeholder_companies")
+      : variant === "funders"
+        ? tToolbar("search_placeholder_funders")
+        : tToolbar("search_placeholder")
+
+  const kind = enableKindToggle && "kind" in filters ? filters.kind : undefined
+
+  const setKind = (next: (typeof kindOptions)[number]) => {
+    if (enableKindToggle) {
+      ;(updateFilters as (v: { kind: (typeof kindOptions)[number] }) => void)({ kind: next })
+    }
+  }
+
   return (
     <div className="w-full space-y-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-stretch lg:gap-2">
         <div
           className={cx(
             "flex min-h-10 min-w-0 flex-1 overflow-hidden rounded-lg border border-input bg-background",
@@ -75,7 +105,7 @@ export function DirectoryFilterBar({
               size="lg"
               value={filters.q ?? ""}
               onChange={e => updateFilters({ q: e.target.value })}
-              placeholder={isLoading ? tToolbar("loading") : tToolbar("search_placeholder")}
+              placeholder={isLoading ? tToolbar("loading") : searchPlaceholder}
               className={cx(
                 "h-10 min-h-10 rounded-none border-0 bg-transparent py-2 shadow-none focus-visible:ring-0",
                 "pl-9",
@@ -117,6 +147,32 @@ export function DirectoryFilterBar({
           </Button>
         </div>
 
+        {enableKindToggle && kind !== undefined && (
+          <div
+            className="flex h-10 shrink-0 overflow-hidden rounded-lg border border-input bg-muted/30 p-0.5"
+            role="radiogroup"
+            aria-label={tToolbar("listing_type_aria")}
+          >
+            {kindOptions.map(option => (
+              <button
+                key={option}
+                type="button"
+                role="radio"
+                aria-checked={kind === option}
+                className={cx(
+                  "min-w-0 flex-1 rounded-md px-3 text-sm font-semibold transition-colors",
+                  kind === option
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                onClick={() => setKind(option)}
+              >
+                {t(`kind_${option}` as "kind_companies")}
+              </button>
+            ))}
+          </div>
+        )}
+
         <label className={cx("flex items-center gap-2", selectTriggerClass)}>
           <span className="text-muted-foreground font-medium max-sm:hidden">{tToolbar("order_by")}</span>
           <ArrowUpDownIcon className="size-4 shrink-0 opacity-50 sm:order-last" aria-hidden />
@@ -141,27 +197,7 @@ export function DirectoryFilterBar({
 
       {filtersOpen && (
         <div className="overflow-hidden rounded-lg border border-input bg-background shadow-sm">
-          <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-            <div className="flex flex-col gap-3 p-4 md:p-5">
-              <h3 className="text-sm font-semibold text-foreground">{t("kind_label")}</h3>
-              <ul className="flex flex-col gap-2" role="radiogroup" aria-label={t("kind_label")}>
-                {kindOptions.map(kind => (
-                  <li key={kind}>
-                    <label className="flex cursor-pointer items-center gap-2 text-sm">
-                      <input
-                        type="radio"
-                        name="directory-kind"
-                        className="size-4 shrink-0 rounded-full border-input text-primary accent-primary"
-                        checked={filters.kind === kind}
-                        onChange={() => updateFilters({ kind })}
-                      />
-                      <span>{t(`kind_${kind}` as "kind_all")}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+          <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-2 lg:divide-x lg:divide-y-0">
             <div className="flex flex-col gap-3 p-4 md:p-5">
               <h3 className="text-sm font-semibold text-foreground">{t("sector_label")}</h3>
               <Input

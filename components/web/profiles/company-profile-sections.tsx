@@ -127,7 +127,7 @@ export async function CompanyTaxonomyBand({ company }: { company: CompanyOne }) 
   if (!hasAny) return null
 
   return (
-    <Stack direction="column" className="w-full gap-3 max-md:order-8">
+    <Stack direction="column" className="w-full gap-3 max-md:order-10">
       <div className="flex flex-wrap gap-2">
         {company.sectors.length > 0 ? (
           <>
@@ -226,7 +226,7 @@ export async function CompanyInvestorsSection({ company }: { company: CompanyOne
   const t = await getTranslations("profiles")
 
   return (
-    <Stack direction="column" className="w-full max-md:order-5 gap-3">
+    <Stack direction="column" className="w-full max-md:order-9 gap-3">
       <H5 as="h2">{t("investors_heading")}</H5>
       <div className="grid gap-3 sm:grid-cols-2">
         {company.funders.map(({ funder }) => (

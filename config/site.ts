@@ -1,7 +1,8 @@
 import { getDomain } from "@primoui/utils"
 import { env } from "~/env"
 
-const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? "https://localhost:3000"
+// Align with auth client / Better Auth defaults for local dev (http, not https)
+const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
 export const siteConfig = {
   name: "Causeartist",

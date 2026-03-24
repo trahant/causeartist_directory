@@ -3,6 +3,7 @@ import { type PropsWithChildren, Suspense } from "react"
 import { Wrapper } from "~/components/common/wrapper"
 import { AdBanner } from "~/components/web/ads/ad-banner"
 import { Footer } from "~/components/web/footer"
+import { AuthErrorBanner } from "~/components/web/auth/auth-error-banner"
 import { Header } from "~/components/web/header"
 import { Backdrop } from "~/components/web/ui/backdrop"
 import { Container } from "~/components/web/ui/container"
@@ -24,6 +25,10 @@ export default function ({ children }: PropsWithChildren) {
 
         <Container asChild>
           <Wrapper className="grow py-fluid-md">
+            <Suspense fallback={null}>
+              <AuthErrorBanner />
+            </Suspense>
+
             {children}
 
             <Footer />

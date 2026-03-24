@@ -89,14 +89,7 @@ export const Search = () => {
   const isAdmin = session?.user.role === "admin"
   const isAdminPath = pathname.startsWith("/admin")
   const hasQuery = !!q.length
-  const hasFeaturedTools = isAdmin && !hasQuery && !results
   const hasFeaturedDirectory = !isAdmin && !hasQuery && !results
-
-  const { data: featuredTools } = useQuery(
-    orpc.web.search.findFeaturedTools.queryOptions({
-      enabled: search.isOpen && !hasQuery && isAdmin,
-    }),
-  )
 
   const { data: featuredDirectory } = useQuery(
     orpc.web.search.findFeaturedDirectory.queryOptions({
@@ -127,24 +120,19 @@ export const Search = () => {
       name: t("navigation.create"),
       items: [
         {
-          label: t("navigation.new_tool"),
+          label: t("navigation.new_company"),
           shortcut: { keys: ["meta", "1"] },
-          onSelect: () => navigateTo("/admin/tools/new"),
+          onSelect: () => navigateTo("/admin/companies"),
         },
         {
-          label: t("navigation.new_category"),
+          label: t("navigation.new_funder"),
           shortcut: { keys: ["meta", "2"] },
-          onSelect: () => navigateTo("/admin/categories/new"),
-        },
-        {
-          label: t("navigation.new_tag"),
-          shortcut: { keys: ["meta", "3"] },
-          onSelect: () => navigateTo("/admin/tags/new"),
+          onSelect: () => navigateTo("/admin/funders"),
         },
         {
           label: t("navigation.new_post"),
-          shortcut: { keys: ["meta", "4"] },
-          onSelect: () => navigateTo("/admin/posts/new"),
+          shortcut: { keys: ["meta", "3"] },
+          onSelect: () => navigateTo("/admin/blog-posts/new"),
         },
       ],
     })
@@ -202,11 +190,13 @@ export const Search = () => {
 
   const hasAnyResults =
     !!results &&
-    (results.tools.length > 0 ||
-      results.companies.length > 0 ||
-      results.funders.length > 0 ||
-      results.categories.length > 0 ||
-      results.tags.length > 0)
+    (isAdminPath
+      ? results.companies.length > 0 || results.funders.length > 0
+      : results.tools.length > 0 ||
+        results.companies.length > 0 ||
+        results.funders.length > 0 ||
+        results.categories.length > 0 ||
+        results.tags.length > 0)
 
   return (
     <CommandDialog open={search.isOpen} onOpenChange={handleOpenChange} shouldFilter={false}>
@@ -242,20 +232,22 @@ export const Search = () => {
             </CommandGroup>
           ))}
 
-        <SearchResults<SearchToolRow>
-          name={t(`navigation.${hasFeaturedTools ? "featured_tools" : "tools"}`)}
-          items={hasFeaturedTools ? featuredTools : results?.tools}
-          onItemSelect={navigateTo}
-          getHref={({ id, slug }) => (isAdminPath ? `/admin/tools/${id}` : `/${slug}`)}
-          itemKey={item => `tool-${item.id}`}
-          renderItemDisplay={({ name, faviconUrl, websiteUrl }) => (
-            <>
-              {faviconUrl && <Image src={faviconUrl} alt="" width={16} height={16} />}
-              <span className="flex-1 truncate">{name}</span>
-              <span className="opacity-50">{getDomain(websiteUrl)}</span>
-            </>
-          )}
-        />
+        {!isAdminPath && (
+          <SearchResults<SearchToolRow>
+            name={t("navigation.tools")}
+            items={results?.tools}
+            onItemSelect={navigateTo}
+            getHref={({ slug }) => `/${slug}`}
+            itemKey={item => `tool-${item.id}`}
+            renderItemDisplay={({ name, faviconUrl, websiteUrl }) => (
+              <>
+                {faviconUrl && <Image src={faviconUrl} alt="" width={16} height={16} />}
+                <span className="flex-1 truncate">{name}</span>
+                <span className="opacity-50">{getDomain(websiteUrl)}</span>
+              </>
+            )}
+          />
+        )}
 
         <SearchResults<SearchDirectoryCompany>
           name={t("navigation.companies")}
@@ -294,25 +286,29 @@ export const Search = () => {
           )}
         />
 
-        <SearchResults<SearchCategoryRow>
-          name={t("navigation.categories")}
-          items={results?.categories}
-          onItemSelect={navigateTo}
-          getHref={({ id, slug }) =>
-            isAdminPath ? `/admin/categories/${id}` : `/categories/${slug}`
-          }
-          itemKey={item => `cat-${item.id}`}
-          renderItemDisplay={({ name }) => name}
-        />
+        {!isAdminPath && (
+          <SearchResults<SearchCategoryRow>
+            name={t("navigation.categories")}
+            items={results?.categories}
+            onItemSelect={navigateTo}
+            getHref={({ id, slug }) =>
+              isAdminPath ? `/admin/categories/${id}` : `/categories/${slug}`
+            }
+            itemKey={item => `cat-${item.id}`}
+            renderItemDisplay={({ name }) => name}
+          />
+        )}
 
-        <SearchResults<SearchTagRow>
-          name={t("navigation.tags")}
-          items={results?.tags}
-          onItemSelect={navigateTo}
-          getHref={({ id, slug }) => (isAdminPath ? `/admin/tags/${id}` : `/tags/${slug}`)}
-          itemKey={item => `tag-${item.id}`}
-          renderItemDisplay={({ name }) => name}
-        />
+        {!isAdminPath && (
+          <SearchResults<SearchTagRow>
+            name={t("navigation.tags")}
+            items={results?.tags}
+            onItemSelect={navigateTo}
+            getHref={({ id, slug }) => (isAdminPath ? `/admin/tags/${id}` : `/tags/${slug}`)}
+            itemKey={item => `tag-${item.id}`}
+            renderItemDisplay={({ name }) => name}
+          />
+        )}
       </CommandList>
     </CommandDialog>
   )

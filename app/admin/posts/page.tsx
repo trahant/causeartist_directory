@@ -1,5 +1,5 @@
-import { PostTable } from "~/app/admin/posts/_components/post-table"
+import { redirect } from "next/navigation"
 
 export default function () {
-  return <PostTable />
+  redirect("/admin/blog-posts")
 }

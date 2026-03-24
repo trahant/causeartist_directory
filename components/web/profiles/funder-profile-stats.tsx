@@ -32,7 +32,7 @@ export async function FunderProfileStatsCard({ funder }: { funder: FunderOne }) 
   if (!hasTaxonomy && !rows.length) return null
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm">
+    <div className="mb-10 space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm">
       <h3 className="border-b border-border pb-3 text-sm font-semibold text-foreground">
         {t("at_a_glance")}
       </h3>

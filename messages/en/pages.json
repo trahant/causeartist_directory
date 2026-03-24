@@ -19,7 +19,14 @@
   "auth": {
     "login": {
       "title": "Sign In",
-      "description": "Get access to the dashboard and manage your submitted tools."
+      "description": "Get access to the dashboard and manage your submitted tools.",
+      "errors": {
+        "title": "Sign-in could not complete",
+        "ATTEMPTS_EXCEEDED": "This sign-in link was used too many times or expired. Request a new magic link and open it once—preferably in a private/incognito window if your email provider scans links.",
+        "generic": "Something went wrong during sign-in. Request a new magic link and try again.",
+        "dismiss": "Dismiss",
+        "cta_login": "Back to sign in"
+      }
     },
     "verify": {
       "title": "Check your inbox",

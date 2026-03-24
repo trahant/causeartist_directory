@@ -14,6 +14,7 @@ import { formatFunderType } from "~/lib/format-funder-type"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { db } from "~/services/db"
+import { isRetiredSectorSlug } from "~/server/web/sectors/retired"
 import { funderManyPayload } from "~/server/web/funders/payloads"
 import type { FunderMany } from "~/server/web/funders/payloads"
 
@@ -91,6 +92,7 @@ export const generateStaticParams = async () => {
   for (const f of funders) {
     if (!f.type) continue
     for (const s of f.sectors) {
+      if (isRetiredSectorSlug(s.sector.slug)) continue
       const key = `${f.type}:${s.sector.slug}`
       if (seen.has(key)) continue
       seen.add(key)

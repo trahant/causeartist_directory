@@ -85,6 +85,7 @@ async function main() {
     { name: "Responsible Fashion", slug: "responsible-fashion" },
     { name: "Clean Transportation", slug: "clean-transportation" },
     { name: "Built Environment", slug: "built-environment" },
+    { name: "AI and Robotics", slug: "ai-and-robotics" },
   ]
 
   for (const sector of newSectors) {

@@ -1,8 +1,6 @@
 {
   "filters": {
     "search_placeholder": "Search companies and funders…",
-    "kind_label": "Listing type",
-    "kind_all": "All",
     "kind_companies": "Companies",
     "kind_funders": "Funders",
     "sector_label": "Sector",
@@ -12,8 +10,15 @@
     "location_all": "All locations",
     "location_search_placeholder": "Search location"
   },
+  "results": {
+    "empty_companies": "No companies match your filters.",
+    "empty_funders": "No funders match your filters."
+  },
   "toolbar": {
     "search_placeholder": "Search companies and funders…",
+    "search_placeholder_companies": "Search companies…",
+    "search_placeholder_funders": "Search funders…",
+    "listing_type_aria": "Listing type",
     "search_aria": "Search directory",
     "loading": "Loading…",
     "clear": "Clear search and filters",

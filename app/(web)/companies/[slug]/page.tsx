@@ -128,7 +128,6 @@ export default async function (props: Props) {
           <ProfileContent content={company.description} className="max-md:order-4" />
 
           <CompanyKeyBenefitsSection company={company} />
-          <CompanyInvestorsSection company={company} />
           <CompanyCaseStudiesSection company={company} />
           <CompanyPodcastSection company={company} />
 
@@ -148,9 +147,11 @@ export default async function (props: Props) {
             </Stack>
           ) : null}
 
+          <CompanyInvestorsSection company={company} />
+
           <CompanyTaxonomyBand company={company} />
 
-          <Stack className="w-full max-md:order-9 md:sticky md:bottom-2 md:z-10">
+          <Stack className="w-full max-md:order-11 md:sticky md:bottom-2 md:z-10">
             <div className="pointer-events-none absolute -inset-x-1 -bottom-3 -top-8 -z-1 bg-background mask-t-from-66% max-md:hidden" />
             <Nav className="mr-auto" title={metadata.title} />
           </Stack>

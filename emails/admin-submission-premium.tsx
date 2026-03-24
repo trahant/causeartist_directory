@@ -19,6 +19,7 @@ export const EmailAdminSubmissionPremium = ({ tool, ...props }: EmailProps) => {
         tier. You should review and approve it as soon as possible.
       </Text>
 
+      {/** Tool submissions still live under /admin/tools (sidebar link removed; URL remains valid). */}
       <EmailButton href={`${siteConfig.url}/admin/tools/${tool.id}`}>
         Review {tool.name}
       </EmailButton>

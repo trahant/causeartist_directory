@@ -13,6 +13,7 @@ import { Section } from "~/components/web/ui/section"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { db } from "~/services/db"
+import { isRetiredSectorSlug } from "~/server/web/sectors/retired"
 import { companyManyPayload } from "~/server/web/companies/payloads"
 import type { CompanyMany } from "~/server/web/companies/payloads"
 
@@ -20,6 +21,10 @@ type Props = { params: Promise<{ slug: string; cert: string }> }
 
 const getData = cache(async ({ params }: Props) => {
   const { slug: sectorSlug, cert: certSlug } = await params
+
+  if (isRetiredSectorSlug(sectorSlug)) {
+    notFound()
+  }
 
   const [sector, certification] = await Promise.all([
     db.sector.findUnique({
@@ -80,6 +85,7 @@ export const generateStaticParams = async () => {
 
   for (const c of published) {
     for (const s of c.sectors) {
+      if (isRetiredSectorSlug(s.sector.slug)) continue
       for (const cert of c.certifications) {
         const key = `${s.sector.slug}:${cert.certification.slug}`
         if (seen.has(key)) continue

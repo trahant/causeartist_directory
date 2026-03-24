@@ -3,16 +3,19 @@
 import { useMediaQuery } from "@mantine/hooks"
 import { cx } from "cva"
 import {
+  AwardIcon,
   Building2Icon,
+  CrosshairIcon,
   DockIcon,
   ExternalLinkIcon,
   FileTextIcon,
-  GalleryHorizontalEndIcon,
-  GemIcon,
   HandCoinsIcon,
+  LayersIcon,
+  LineChartIcon,
   LogOutIcon,
+  MapPinIcon,
+  PenLineIcon,
   MegaphoneIcon,
-  TagIcon,
   TriangleAlertIcon,
   UsersIcon,
 } from "lucide-react"
@@ -73,24 +76,14 @@ export const Sidebar = () => {
         undefined, // Separator
 
         {
-          title: "Tools",
-          href: "/admin/tools",
-          prefix: <GemIcon />,
-        },
-        {
-          title: "Categories",
-          href: "/admin/categories",
-          prefix: <GalleryHorizontalEndIcon />,
-        },
-        {
-          title: "Tags",
-          href: "/admin/tags",
-          prefix: <TagIcon />,
-        },
-        {
-          title: "Blog Posts",
-          href: "/admin/posts",
+          title: "Blog",
+          href: "/admin/blog-posts",
           prefix: <FileTextIcon />,
+        },
+        {
+          title: "Authors",
+          href: "/admin/authors",
+          prefix: <PenLineIcon />,
         },
         {
           title: "Companies",
@@ -101,6 +94,35 @@ export const Sidebar = () => {
           title: "Funders",
           href: "/admin/funders",
           prefix: <HandCoinsIcon />,
+        },
+
+        undefined, // Separator
+
+        { type: "section", title: "Directory taxonomy" },
+        {
+          title: "Sectors",
+          href: "/admin/sectors",
+          prefix: <LayersIcon />,
+        },
+        {
+          title: "Certifications",
+          href: "/admin/certifications",
+          prefix: <AwardIcon />,
+        },
+        {
+          title: "Focus areas",
+          href: "/admin/focus-areas",
+          prefix: <CrosshairIcon />,
+        },
+        {
+          title: "Locations",
+          href: "/admin/locations",
+          prefix: <MapPinIcon />,
+        },
+        {
+          title: "Funding stages",
+          href: "/admin/funding-stages",
+          prefix: <LineChartIcon />,
         },
 
         undefined, // Separator

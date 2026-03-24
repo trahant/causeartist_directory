@@ -31,6 +31,8 @@
   "new_category": "New Category",
   "new_tag": "New Tag",
   "new_post": "New Blog Post",
+  "new_company": "New Company",
+  "new_funder": "New Funder",
   "toggle_theme": "Toggle theme",
   "admin_panel": "Admin panel",
   "switch_theme": "Switch to {theme} Mode"

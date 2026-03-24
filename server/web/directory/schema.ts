@@ -1,4 +1,5 @@
 import {
+  createParser,
   createSearchParamsCache,
   type inferParserType,
   parseAsInteger,
@@ -6,14 +7,21 @@ import {
   parseAsStringEnum,
 } from "nuqs/server"
 
-const directoryKindValues = ["all", "companies", "funders"]
+const parseAsDirectoryKind = createParser<"companies" | "funders">({
+  parse: value => {
+    if (value === "companies" || value === "funders") return value
+    if (value === "all") return "companies"
+    return null
+  },
+  serialize: String,
+})
 
-/** URL `sort` param values; keep in sync with `searchDirectory` ordering. */
+/** URL `sort` param values; keep in sync with directory search ordering. */
 export const directorySortValues = ["name.asc", "name.desc", "newest"] as const
 
 export const directoryFilterParams = {
   q: parseAsString.withDefault(""),
-  kind: parseAsStringEnum(directoryKindValues).withDefault("all"),
+  kind: parseAsDirectoryKind.withDefault("companies"),
   sector: parseAsString.withDefault(""),
   location: parseAsString.withDefault(""),
   sort: parseAsStringEnum([...directorySortValues]).withDefault("name.asc"),

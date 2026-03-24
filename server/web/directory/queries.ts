@@ -6,6 +6,8 @@ import {
 } from "~/server/web/companies/payloads"
 import type { DirectoryFilterParams } from "~/server/web/directory/schema"
 import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
+import { activeSectorsWhere } from "~/server/web/sectors/retired"
+import { companyDirectoryWhere, funderDirectoryWhere } from "~/server/web/directory/where"
 import { funderManyPayload, type FunderMany } from "~/server/web/funders/payloads"
 import { db } from "~/services/db"
 
@@ -13,71 +15,13 @@ export type DirectoryListItem =
   | { type: "company"; item: CompanyMany }
   | { type: "funder"; item: FunderMany }
 
-function buildTextFilter(q: string | undefined): Prisma.CompanyWhereInput["OR"] | undefined {
-  if (!q?.trim()) return undefined
-  const t = q.trim()
-  return [
-    { name: { contains: t, mode: "insensitive" } },
-    { tagline: { contains: t, mode: "insensitive" } },
-    { description: { contains: t, mode: "insensitive" } },
-  ]
-}
+export type DirectoryKind = "companies" | "funders"
 
-function companyWhere(
-  sectorSlug: string | undefined,
-  locationSlug: string | undefined,
-  q: string | undefined,
-): Prisma.CompanyWhereInput {
-  const sectorFilter: Prisma.CompanyWhereInput =
-    sectorSlug && sectorSlug.length > 0
-      ? { sectors: { some: { sector: { slug: sectorSlug } } } }
-      : {}
-
-  const locationFilter: Prisma.CompanyWhereInput =
-    locationSlug && locationSlug.length > 0
-      ? { locations: { some: { location: { slug: locationSlug } } } }
-      : {}
-
-  const textOr = buildTextFilter(q)
-
-  return {
-    status: "published",
-    ...sectorFilter,
-    ...locationFilter,
-    ...(textOr ? { OR: textOr } : {}),
-  }
-}
-
-function funderWhere(
-  sectorSlug: string | undefined,
-  locationSlug: string | undefined,
-  q: string | undefined,
-): Prisma.FunderWhereInput {
-  const sectorFilter: Prisma.FunderWhereInput =
-    sectorSlug && sectorSlug.length > 0
-      ? { sectors: { some: { sector: { slug: sectorSlug } } } }
-      : {}
-
-  const locationFilter: Prisma.FunderWhereInput =
-    locationSlug && locationSlug.length > 0
-      ? { locations: { some: { location: { slug: locationSlug } } } }
-      : {}
-
-  const t = q?.trim()
-  const funderOr = t
-    ? ([
-        { name: { contains: t, mode: "insensitive" } },
-        { description: { contains: t, mode: "insensitive" } },
-      ] satisfies Prisma.FunderWhereInput[])
-    : undefined
-
-  return {
-    status: "published",
-    ...sectorFilter,
-    ...locationFilter,
-    ...(funderOr ? { OR: funderOr } : {}),
-  }
-}
+/** Shared shape for `/companies` and `/funders` listing URLs (no `kind`). */
+export type EntityDirectoryListParams = Pick<
+  DirectoryFilterParams,
+  "q" | "sector" | "location" | "sort" | "page" | "perPage"
+>
 
 function listOrderBy(sort: DirectoryFilterParams["sort"]): Prisma.CompanyOrderByWithRelationInput {
   if (sort === "name.desc") return { name: "desc" }
@@ -89,20 +33,6 @@ function funderListOrderBy(sort: DirectoryFilterParams["sort"]): Prisma.FunderOr
   if (sort === "name.desc") return { name: "desc" }
   if (sort === "newest") return { createdAt: "desc" }
   return { name: "asc" }
-}
-
-function compareDirectoryItems(
-  a: DirectoryListItem,
-  b: DirectoryListItem,
-  sort: DirectoryFilterParams["sort"],
-): number {
-  if (sort === "newest") {
-    return b.item.createdAt.getTime() - a.item.createdAt.getTime()
-  }
-  if (sort === "name.desc") {
-    return b.item.name.localeCompare(a.item.name, undefined, { sensitivity: "base" })
-  }
-  return a.item.name.localeCompare(b.item.name, undefined, { sensitivity: "base" })
 }
 
 export async function searchDirectory(params: DirectoryFilterParams): Promise<{
@@ -121,28 +51,8 @@ export async function searchDirectory(params: DirectoryFilterParams): Promise<{
   const locationSlug = location?.trim() || undefined
   const skip = (page - 1) * perPage
 
-  const cWhere = companyWhere(sectorSlug, locationSlug, q)
-  const fWhere = funderWhere(sectorSlug, locationSlug, q)
-
-  if (kind === "companies") {
-    const cOrder = listOrderBy(sort)
-    const [items, total] = await Promise.all([
-      db.company.findMany({
-        where: cWhere,
-        select: companyManyPayload,
-        orderBy: cOrder,
-        skip,
-        take: perPage,
-      }),
-      db.company.count({ where: cWhere }),
-    ])
-    return {
-      items: items.map(item => ({ type: "company" as const, item })),
-      total,
-      page,
-      perPage,
-    }
-  }
+  const cWhere = companyDirectoryWhere(sectorSlug, locationSlug, q)
+  const fWhere = funderDirectoryWhere(sectorSlug, locationSlug, q)
 
   if (kind === "funders") {
     const fOrder = funderListOrderBy(sort)
@@ -164,26 +74,97 @@ export async function searchDirectory(params: DirectoryFilterParams): Promise<{
     }
   }
 
-  const [companies, funders] = await Promise.all([
+  const cOrder = listOrderBy(sort)
+  const [items, total] = await Promise.all([
     db.company.findMany({
       where: cWhere,
       select: companyManyPayload,
+      orderBy: cOrder,
+      skip,
+      take: perPage,
     }),
-    db.funder.findMany({
-      where: fWhere,
-      select: funderManyPayload,
+    db.company.count({ where: cWhere }),
+  ])
+  return {
+    items: items.map(item => ({ type: "company" as const, item })),
+    total,
+    page,
+    perPage,
+  }
+}
+
+export async function searchCompanyDirectory(params: EntityDirectoryListParams): Promise<{
+  items: DirectoryListItem[]
+  total: number
+  page: number
+  perPage: number
+}> {
+  "use cache"
+
+  cacheTag("directory", "companies")
+  cacheLife("infinite")
+
+  const { q, sector, location, sort, page, perPage } = params
+  const sectorSlug = sector?.trim() || undefined
+  const locationSlug = location?.trim() || undefined
+  const skip = (page - 1) * perPage
+  const where = companyDirectoryWhere(sectorSlug, locationSlug, q)
+  const orderBy = listOrderBy(sort)
+
+  const [items, total] = await Promise.all([
+    db.company.findMany({
+      where,
+      select: companyManyPayload,
+      orderBy,
+      skip,
+      take: perPage,
     }),
+    db.company.count({ where }),
   ])
 
-  const merged: DirectoryListItem[] = [
-    ...companies.map(item => ({ type: "company" as const, item })),
-    ...funders.map(item => ({ type: "funder" as const, item })),
-  ].sort((a, b) => compareDirectoryItems(a, b, sort))
+  return {
+    items: items.map(item => ({ type: "company" as const, item })),
+    total,
+    page,
+    perPage,
+  }
+}
 
-  const total = merged.length
-  const items = merged.slice(skip, skip + perPage)
+export async function searchFunderDirectory(params: EntityDirectoryListParams): Promise<{
+  items: DirectoryListItem[]
+  total: number
+  page: number
+  perPage: number
+}> {
+  "use cache"
 
-  return { items, total, page, perPage }
+  cacheTag("directory", "funders")
+  cacheLife("infinite")
+
+  const { q, sector, location, sort, page, perPage } = params
+  const sectorSlug = sector?.trim() || undefined
+  const locationSlug = location?.trim() || undefined
+  const skip = (page - 1) * perPage
+  const where = funderDirectoryWhere(sectorSlug, locationSlug, q)
+  const orderBy = funderListOrderBy(sort)
+
+  const [items, total] = await Promise.all([
+    db.funder.findMany({
+      where,
+      select: funderManyPayload,
+      orderBy,
+      skip,
+      take: perPage,
+    }),
+    db.funder.count({ where }),
+  ])
+
+  return {
+    items: items.map(item => ({ type: "funder" as const, item })),
+    total,
+    page,
+    perPage,
+  }
 }
 
 export async function findDirectorySectors() {
@@ -193,12 +174,13 @@ export async function findDirectorySectors() {
   cacheLife("infinite")
 
   return db.sector.findMany({
+    where: activeSectorsWhere(),
     select: { name: true, slug: true },
     orderBy: { name: "asc" },
   })
 }
 
-export async function findDirectorySectorCounts(): Promise<DirectorySectorFacet[]> {
+export async function findDirectorySectorCounts(kind: DirectoryKind): Promise<DirectorySectorFacet[]> {
   "use cache"
 
   cacheTag("directory-facets")
@@ -206,6 +188,7 @@ export async function findDirectorySectorCounts(): Promise<DirectorySectorFacet[
 
   const [sectors, companyBySector, funderBySector] = await Promise.all([
     db.sector.findMany({
+      where: activeSectorsWhere(),
       select: { id: true, slug: true, name: true },
       orderBy: { name: "asc" },
     }),
@@ -227,11 +210,14 @@ export async function findDirectorySectorCounts(): Promise<DirectorySectorFacet[
   return sectors.map(s => ({
     slug: s.slug,
     name: s.name,
-    count: (companyMap.get(s.id) ?? 0) + (funderMap.get(s.id) ?? 0),
+    count:
+      kind === "companies"
+        ? (companyMap.get(s.id) ?? 0)
+        : (funderMap.get(s.id) ?? 0),
   }))
 }
 
-export async function findDirectoryLocationCounts(): Promise<DirectoryLocationFacet[]> {
+export async function findDirectoryLocationCounts(kind: DirectoryKind): Promise<DirectoryLocationFacet[]> {
   "use cache"
 
   cacheTag("directory-facets")
@@ -262,7 +248,10 @@ export async function findDirectoryLocationCounts(): Promise<DirectoryLocationFa
       slug: l.slug,
       name: l.name,
       countryCode: l.countryCode,
-      count: (companyMap.get(l.id) ?? 0) + (funderMap.get(l.id) ?? 0),
+      count:
+        kind === "companies"
+          ? (companyMap.get(l.id) ?? 0)
+          : (funderMap.get(l.id) ?? 0),
     }))
     .filter(f => f.count > 0)
 }

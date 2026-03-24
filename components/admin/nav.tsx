@@ -16,9 +16,13 @@ type NavLink = ButtonProps & {
   label?: ReactNode
 }
 
+export type NavSection = { type: "section"; title: string }
+
+export type NavEntry = NavLink | NavSection | undefined
+
 type NavProps = ComponentProps<"nav"> & {
   isCollapsed: boolean
-  links: (NavLink | undefined)[]
+  links: NavEntry[]
 }
 
 export const Nav = ({ className, links, isCollapsed, ...props }: NavProps) => {
@@ -47,6 +51,20 @@ export const Nav = ({ className, links, isCollapsed, ...props }: NavProps) => {
       {links.map((link, index) => {
         if (!link) {
           return <Separator key={index} className="my-2 -mx-3 w-auto" />
+        }
+
+        if ("type" in link && link.type === "section") {
+          if (isCollapsed) {
+            return <Separator key={index} className="my-1 -mx-3 w-auto opacity-50" />
+          }
+          return (
+            <p
+              key={index}
+              className="px-3 pt-2 pb-0 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
+            >
+              {link.title}
+            </p>
+          )
         }
 
         const { href, title, label, suffix, ...props } = link

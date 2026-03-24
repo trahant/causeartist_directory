@@ -13,6 +13,7 @@ import { Section } from "~/components/web/ui/section"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { db } from "~/services/db"
+import { activeSectorsWhere, isRetiredSectorSlug } from "~/server/web/sectors/retired"
 import { companyManyPayload } from "~/server/web/companies/payloads"
 import type { CompanyMany } from "~/server/web/companies/payloads"
 
@@ -28,6 +29,10 @@ type Props = { params: Promise<{ slug: string }> }
 
 const getData = cache(async ({ params }: Props) => {
   const { slug } = await params
+
+  if (isRetiredSectorSlug(slug)) {
+    notFound()
+  }
 
   const sector = await db.sector.findUnique({
     where: { slug },
@@ -68,7 +73,10 @@ const getData = cache(async ({ params }: Props) => {
 })
 
 export const generateStaticParams = async () => {
-  const sectors = await db.sector.findMany({ select: { slug: true } })
+  const sectors = await db.sector.findMany({
+    where: activeSectorsWhere(),
+    select: { slug: true },
+  })
   return sectors.map(({ slug }) => ({ slug }))
 }
 

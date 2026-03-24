@@ -15,13 +15,15 @@ export function DashboardStats() {
         <MetricValueSkeleton />
         <MetricValueSkeleton />
         <MetricValueSkeleton />
+        <MetricValueSkeleton />
       </>
     )
   }
 
   const counters = [
-    { label: "Tools", href: "/admin/tools", count: stats.toolCount },
-    { label: "Categories", href: "/admin/categories", count: stats.categoryCount },
+    { label: "Companies", href: "/admin/companies", count: stats.companyCount },
+    { label: "Funders", href: "/admin/funders", count: stats.funderCount },
+    { label: "Blog posts", href: "/admin/blog-posts", count: stats.blogPostCount },
     { label: "Users", href: "/admin/users", count: stats.userCount },
   ]
 

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
@@ -5,11 +6,19 @@ import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { formatFunderType } from "~/lib/format-funder-type"
 import type { DirectoryListItem } from "~/server/web/directory/queries"
 
-export function DirectoryResults({ items }: { items: DirectoryListItem[] }) {
+export async function DirectoryResults({
+  items,
+  listingKind,
+}: {
+  items: DirectoryListItem[]
+  listingKind: "companies" | "funders"
+}) {
+  const t = await getTranslations("directory.results")
+
   if (items.length === 0) {
     return (
       <p className="text-muted-foreground text-sm py-8">
-        No companies or funders match your filters.
+        {listingKind === "companies" ? t("empty_companies") : t("empty_funders")}
       </p>
     )
   }

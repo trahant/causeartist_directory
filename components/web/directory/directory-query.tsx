@@ -18,8 +18,8 @@ export async function DirectoryQuery({ searchParams }: Props) {
   const params = directoryFilterParamsCache.parse(await searchParams)
   const [{ items, total, page, perPage }, sectorFacets, locationFacets] = await Promise.all([
     searchDirectory(params),
-    findDirectorySectorCounts(),
-    findDirectoryLocationCounts(),
+    findDirectorySectorCounts(params.kind),
+    findDirectoryLocationCounts(params.kind),
   ])
 
   const itemList = items.map(row =>
@@ -47,7 +47,7 @@ export async function DirectoryQuery({ searchParams }: Props) {
         locationFacets={locationFacets}
         pagination={{ total, perPage, page }}
       >
-        <DirectoryResults items={items} />
+        <DirectoryResults items={items} listingKind={params.kind} />
       </DirectoryListing>
     </>
   )

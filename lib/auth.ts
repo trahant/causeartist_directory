@@ -70,6 +70,14 @@ export const auth = betterAuth({
 
   plugins: [
     magicLink({
+      // Default allowedAttempts is 1 — email link scanners often consume the first hit; higher limit reduces ATTEMPTS_EXCEEDED.
+      allowedAttempts: isDev ? 10 : 5,
+      rateLimit: isDev
+        ? { window: 60, max: 30 }
+        : {
+            window: 60,
+            max: 10,
+          },
       sendMagicLink: async ({ email, url }) => {
         const to = email
         const subject = `Your ${siteConfig.name} Login Link`

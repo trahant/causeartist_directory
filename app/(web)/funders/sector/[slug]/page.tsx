@@ -12,6 +12,7 @@ import { Section } from "~/components/web/ui/section"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { db } from "~/services/db"
+import { activeSectorsWhere, isRetiredSectorSlug } from "~/server/web/sectors/retired"
 import { funderManyPayload } from "~/server/web/funders/payloads"
 import type { FunderMany } from "~/server/web/funders/payloads"
 
@@ -67,7 +68,10 @@ const getData = cache(async ({ params }: Props) => {
 })
 
 export const generateStaticParams = async () => {
-  const sectors = await db.sector.findMany({ select: { slug: true } })
+  const sectors = await db.sector.findMany({
+    where: activeSectorsWhere(),
+    select: { slug: true },
+  })
   return sectors.map(({ slug }) => ({ slug }))
 }
 

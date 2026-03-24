@@ -18,7 +18,9 @@ const getCounts = async () => {
 
   const since = weekAgo()
 
-  const [companyTotal, funderTotal, companyNew, funderNew] = await db.$transaction([
+  // Parallel counts — no transaction needed (avoids "Unable to start a transaction in the given time"
+  // with PrismaPg + small pools under concurrent cached renders).
+  const [companyTotal, funderTotal, companyNew, funderNew] = await Promise.all([
     db.company.count({ where: publishedWhere }),
     db.funder.count({ where: publishedWhere }),
     db.company.count({
@@ -40,7 +42,11 @@ const CountBadge = async () => {
   const t = await getTranslations("components.count_badge")
 
   return (
-    <Badge prefix={<Ping />} className="order-first" asChild>
+    <Badge
+      prefix={<Ping className="text-brand-navy dark:text-primary" />}
+      className="order-first"
+      asChild
+    >
       <Link href="/#directory">
         {newCount
           ? t("new_entries", { count: formatNumber(newCount) })
@@ -52,7 +58,10 @@ const CountBadge = async () => {
 
 const CountBadgeSkeleton = () => {
   return (
-    <Badge prefix={<Ping />} className="min-w-20 order-first pointer-events-none animate-pulse">
+    <Badge
+      prefix={<Ping className="text-brand-navy dark:text-primary" />}
+      className="min-w-20 order-first pointer-events-none animate-pulse"
+    >
       &nbsp;
     </Badge>
   )

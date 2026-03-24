@@ -8,13 +8,14 @@ import { stripe } from "~/services/stripe"
 // Dashboard stats: resource counts
 // -----------------------------------------------------------------------------
 const stats = withAdmin.handler(async ({ context: { db } }) => {
-  const [toolCount, categoryCount, userCount] = await db.$transaction([
-    db.tool.count(),
-    db.category.count(),
+  const [companyCount, funderCount, blogPostCount, userCount] = await db.$transaction([
+    db.company.count(),
+    db.funder.count(),
+    db.blogPost.count(),
     db.user.count(),
   ])
 
-  return { toolCount, categoryCount, userCount }
+  return { companyCount, funderCount, blogPostCount, userCount }
 })
 
 // -----------------------------------------------------------------------------

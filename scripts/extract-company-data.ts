@@ -18,9 +18,9 @@ const allowedSectors = [
   "health",
   "education",
   "circular-economy",
-  "social-enterprise",
   "community-development",
   "environment",
+  "ai-and-robotics",
 ] as const
 
 const allowedSectorSet = new Set<string>(allowedSectors)
@@ -351,7 +351,7 @@ Return this exact JSON structure:
 }
 
 Rules:
-- sectors must be from this list only: clean-energy, sustainable-food, impact-finance, climate-tech, health, education, circular-economy, social-enterprise, community-development, environment
+- sectors must be from this list only: clean-energy, sustainable-food, impact-finance, climate-tech, health, education, circular-economy, community-development, environment, ai-and-robotics
 - if you cannot find a value leave it as null
 - return ONLY the JSON object, nothing else
 - return ONLY the JSON object, nothing else`
@@ -887,11 +887,11 @@ async function processUrlsAsFunders(funderUrls: FunderCsvRow[]) {
 }
 
 async function main() {
-  const companiesCsvPath = path.join(process.cwd(), "companies.csv")
+  const companiesCsvPath = path.join(process.cwd(), "leaping-bunny-batch.csv")
   const fundersCsvPath = path.join(process.cwd(), "funders.csv")
 
   if (!fs.existsSync(companiesCsvPath)) {
-    throw new Error(`Missing companies.csv at ${companiesCsvPath}`)
+    throw new Error(`Missing leaping-bunny-batch.csv at ${companiesCsvPath}`)
   }
 
   const companiesRaw = fs.readFileSync(companiesCsvPath, "utf8")
