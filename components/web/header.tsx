@@ -23,7 +23,7 @@ import { UserMenu } from "~/components/web/user-menu"
 import { useSearch } from "~/contexts/search-context"
 import { cx } from "~/lib/utils"
 
-const explorePaths = ["/case-studies", "/sectors", "/focus"] as const
+const explorePaths = ["/about", "/case-studies", "/sectors", "/focus"] as const
 
 const Header = ({ className, ...props }: ComponentProps<"div">) => {
   const pathname = usePathname()
@@ -61,8 +61,6 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
           <nav className="flex flex-wrap gap-x-4 gap-y-0.5 flex-1 max-lg:hidden items-center">
             <NavLink href="/companies">{t("navigation.companies")}</NavLink>
             <NavLink href="/funders">{t("navigation.funders")}</NavLink>
-            <NavLink href="/about">{t("navigation.about")}</NavLink>
-            <NavLink href="/contact">{t("navigation.contact_us")}</NavLink>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <button
@@ -107,6 +105,9 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem asChild>
+                  <Link href="/about">{t("navigation.about")}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/case-studies">{t("navigation.case_studies")}</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -140,8 +141,6 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
         >
           <NavLink href="/companies">{t("navigation.companies")}</NavLink>
           <NavLink href="/funders">{t("navigation.funders")}</NavLink>
-          <NavLink href="/about">{t("navigation.about")}</NavLink>
-          <NavLink href="/contact">{t("navigation.contact_us")}</NavLink>
           <div className="col-span-2 flex flex-col gap-3 w-full pt-2 border-t border-border/40">
             <span className="text-xs font-medium text-muted-foreground">{t("navigation.podcasts")}</span>
             <div className="grid grid-cols-2 gap-x-4 gap-y-4 w-full">
@@ -157,6 +156,7 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
           <div className="col-span-2 flex flex-col gap-3 w-full pt-2 border-t border-border/40">
             <span className="text-xs font-medium text-muted-foreground">{t("navigation.explore")}</span>
             <div className="grid grid-cols-2 gap-x-4 gap-y-4 w-full">
+              <NavLink href="/about">{t("navigation.about")}</NavLink>
               <NavLink href="/case-studies">{t("navigation.case_studies")}</NavLink>
               <NavLink href="/sectors">{t("navigation.sectors")}</NavLink>
               <NavLink href="/focus">{t("navigation.focus_areas")}</NavLink>
