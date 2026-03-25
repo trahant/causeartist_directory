@@ -24,75 +24,34 @@ const formatRegionLabel = (region: string) => {
   return map[region] ?? region
 }
 
+/** Tagline only; hero image is rendered separately after primary CTAs. */
 export async function CompanyHeroBand({ company }: { company: CompanyOne }) {
-  if (!company.tagline && !company.heroImageUrl) return null
-
-  if (company.heroImageUrl && !company.tagline) {
-    return (
-      <div className="-mt-fluid-md pt-4">
-        <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={company.heroImageUrl}
-            alt=""
-            className="max-h-80 w-full object-cover"
-          />
-        </div>
-      </div>
-    )
-  }
-
-  if (!company.heroImageUrl && company.tagline) {
-    return (
-      <div className="-mt-fluid-md pt-4">
-        <p className="text-lg leading-relaxed text-muted-foreground">{company.tagline}</p>
-      </div>
-    )
-  }
+  if (!company.tagline) return null
 
   return (
-    <div className="-mt-fluid-md grid gap-6 pt-4 md:grid-cols-2 md:gap-8">
-      <div className="min-w-0 space-y-3">
-        {company.tagline ? (
-          <p className="text-lg leading-relaxed text-muted-foreground">{company.tagline}</p>
-        ) : null}
-      </div>
-      {company.heroImageUrl ? (
-        <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={company.heroImageUrl}
-            alt=""
-            className="max-h-80 w-full object-cover"
-          />
-        </div>
-      ) : null}
+    <div className="-mt-fluid-md pt-4">
+      <p className="text-lg leading-relaxed text-muted-foreground">{company.tagline}</p>
     </div>
   )
 }
 
-export async function CompanySocialRow({ company }: { company: CompanyOne }) {
-  if (!company.linkedin && !company.twitter) return null
-  const t = await getTranslations("profiles")
+export async function CompanyHeroImageBand({ company }: { company: CompanyOne }) {
+  if (!company.heroImageUrl) return null
 
   return (
-    <Stack direction="row" wrap className="items-center gap-2 max-md:order-2">
-      <span className="text-sm font-medium text-muted-foreground">{t("connect")}</span>
-      {company.linkedin ? (
-        <Button variant="secondary" size="sm" asChild>
-          <ExternalLink href={company.linkedin} doFollow>
-            LinkedIn
-          </ExternalLink>
-        </Button>
-      ) : null}
-      {company.twitter ? (
-        <Button variant="secondary" size="sm" asChild>
-          <ExternalLink href={company.twitter} doFollow>
-            X / Twitter
-          </ExternalLink>
-        </Button>
-      ) : null}
-    </Stack>
+    <div className="w-full -mt-fluid-md pt-6 max-md:order-4">
+      <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={company.heroImageUrl}
+          alt=""
+          className="max-h-80 w-full object-cover"
+          loading="eager"
+          decoding="async"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+    </div>
   )
 }
 
@@ -103,7 +62,7 @@ export async function CompanySecondaryCtas({ company }: { company: CompanyOne })
   if (!hasCases && !hasPods) return null
 
   return (
-    <Stack direction="row" wrap className="gap-2 max-md:order-3">
+    <Stack direction="row" wrap className="gap-2 max-md:order-4">
       {hasCases ? (
         <Button variant="secondary" size="lg" asChild>
           <a href="#case-studies">{t("view_case_studies")}</a>
@@ -197,6 +156,48 @@ export async function CompanyProfileLocationsSection({ company }: { company: Com
           </Badge>
         )}
       </Stack>
+    </Stack>
+  )
+}
+
+export async function CompanyRetailLocationsSection({ company }: { company: CompanyOne }) {
+  if (!company.retailLocations.length) return null
+  const t = await getTranslations("profiles")
+
+  return (
+    <Stack direction="column" className="w-full max-md:order-4 gap-3">
+      <H5 as="h2">{t("retail_stores_heading")}</H5>
+      <ul className="list-none space-y-3 p-0">
+        {company.retailLocations.map((store, i) => {
+          const street = [store.addressLine1, store.addressLine2].filter(Boolean).join("\n")
+          const cityParts = [store.city, store.region, store.postalCode].filter(Boolean).join(", ")
+          return (
+            <li key={`retail-${i}`} className="rounded-lg border border-border p-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {store.countryCode ? (
+                      <LocationCountryFlag countryCode={store.countryCode} />
+                    ) : null}
+                    <p className="font-medium">{store.label}</p>
+                  </div>
+                  {street ? (
+                    <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{street}</p>
+                  ) : null}
+                  {cityParts ? <p className="mt-1 text-sm text-muted-foreground">{cityParts}</p> : null}
+                </div>
+                {store.url ? (
+                  <Button variant="secondary" size="sm" asChild>
+                    <ExternalLink href={store.url} doFollow>
+                      {t("retail_open_maps")}
+                    </ExternalLink>
+                  </Button>
+                ) : null}
+              </div>
+            </li>
+          )
+        })}
+      </ul>
     </Stack>
   )
 }
@@ -314,14 +315,5 @@ export async function CompanyPodcastSection({ company }: { company: CompanyOne }
         ))}
       </ul>
     </Stack>
-  )
-}
-
-export async function CompanyFounderMetadata({ company }: { company: CompanyOne }) {
-  if (!company.founderName) return null
-  return (
-    <p className="text-sm text-muted-foreground max-md:order-6">
-      <strong className="text-foreground">Founder:</strong> {company.founderName}
-    </p>
   )
 }

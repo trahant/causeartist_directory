@@ -85,7 +85,7 @@ export default async function (props: Props) {
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
-            <Stack className="@container self-stretch">
+            <Stack className="@container min-w-0 flex-1 self-stretch">
               <Favicon src={tool.faviconUrl} title={tool.name} className="size-8" />
 
               <Stack className="flex-1 min-w-0">
@@ -114,8 +114,6 @@ export default async function (props: Props) {
             </Stack>
           )}
 
-          <ToolPreviewAlert tool={tool} className="self-stretch max-md:order-2" />
-
           {isToolPublished(tool) && tool.screenshotUrl && (
             <OverlayImage
               href={tool.affiliateUrl || tool.websiteUrl}
@@ -132,6 +130,8 @@ export default async function (props: Props) {
               className="self-stretch max-md:order-2"
             />
           )}
+
+          <ToolPreviewAlert tool={tool} className="self-stretch max-md:order-2" />
 
           {tool.content && <Markdown code={tool.content} className="max-md:order-4" />}
 

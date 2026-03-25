@@ -11,7 +11,7 @@ import { TableOfContents } from "~/components/web/table-of-contents"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { Section } from "~/components/web/ui/section"
-import { processContent } from "~/lib/content"
+import { processContent, sanitizeGhostRichHtmlForDisplay } from "~/lib/content"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateArticleSchema } from "~/lib/schema"
 import { findCaseStudy, findCaseStudySlugs } from "~/server/web/case-studies/queries"
@@ -77,7 +77,7 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
 
 export default async function (props: Props) {
   const { caseStudy, breadcrumbs, structuredData } = await getData(props)
-  const content = processContent(caseStudy.content ?? "")
+  const content = processContent(sanitizeGhostRichHtmlForDisplay(caseStudy.content ?? ""))
 
   return (
     <>
@@ -112,11 +112,7 @@ export default async function (props: Props) {
                 />
               )}
 
-              <div
-                className="prose prose-neutral dark:prose-invert max-w-none"
-                suppressHydrationWarning
-                dangerouslySetInnerHTML={{ __html: content }}
-              />
+              <Prose className="max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
             </Section.Content>
 
             <Section.Sidebar className="max-h-(--sidebar-max-height)">

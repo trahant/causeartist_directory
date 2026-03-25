@@ -198,11 +198,18 @@ model Post {
   @@index([publishedAt])
 }
 
+enum CompanyLifecycleStatus {
+  Active
+  Acquired
+  Sunsetted
+}
+
 model Company {
-  id              String            @id @default(cuid())
+  id              String                   @id @default(cuid())
   name            String
-  slug            String            @unique
-  status          String            @default("draft")
+  slug            String                   @unique
+  status          String                   @default("draft")
+  lifecycleStatus CompanyLifecycleStatus   @default(Active)
   tagline         String?
   description     String?
   logoUrl         String?
@@ -225,6 +232,7 @@ model Company {
   podcastEpisodes CompanyEpisode[]
   funders         CompanyFunder[]
   locations       CompanyLocation[]
+  retailLocations CompanyRetailLocation[]
   sectors         CompanySector[]
   subcategories   CompanySubcategory[]
   certifications  CompanyCertification[]
@@ -293,10 +301,11 @@ model Location {
 }
 
 model FundingStage {
-  id      String        @id @default(cuid())
-  name    String
-  slug    String        @unique
-  funders FunderStage[]
+  id        String        @id @default(cuid())
+  name      String
+  slug      String        @unique
+  sortOrder Int           @default(100)
+  funders   FunderStage[]
 }
 
 model CompanySector {
@@ -315,6 +324,26 @@ model CompanyLocation {
   location   Location @relation(fields: [locationId], references: [id])
 
   @@id([companyId, locationId])
+}
+
+/// Physical retail / storefront rows (not directory taxonomy `Location`).
+model CompanyRetailLocation {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  label        String
+  addressLine1 String?
+  addressLine2 String?
+  city         String
+  region       String?
+  postalCode   String?
+  countryCode  String?
+  url          String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 model CompanyFunder {

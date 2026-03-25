@@ -74,8 +74,8 @@ export async function FunderProfileStatsCard({ funder }: { funder: FunderOne }) 
           </p>
           <div className="flex flex-wrap gap-1.5">
             {funder.stages.map(({ fundingStage }) => (
-              <Badge key={fundingStage.slug} size="md" variant="outline">
-                {fundingStage.name}
+              <Badge key={fundingStage.slug} size="md" variant="outline" asChild>
+                <Link href={`/funders/stage/${fundingStage.slug}`}>{fundingStage.name}</Link>
               </Badge>
             ))}
           </div>

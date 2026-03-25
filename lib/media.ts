@@ -1,29 +1,28 @@
 import { DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
 import { getDomain, getErrorMessage, tryCatch } from "@primoui/utils"
-import { fileTypeFromBuffer } from "file-type"
 import wretch from "wretch"
 import { env, isProd } from "~/env"
+import {
+  extAndContentTypeFromValidatedMime,
+  resolveFetchedImageBuffer,
+} from "~/lib/image-upload-format"
+import { isSupabaseStorageConfigured, uploadBytesToSupabase } from "~/lib/supabase-storage"
 import { s3Client } from "~/services/s3"
 
-/**
- * Uploads a file to S3 and returns the S3 location.
- * @param file - The file to upload.
- * @param key - The S3 key to upload the file to (without extension)
- * @returns The S3 location of the uploaded file.
- */
-export const uploadToS3Storage = async (file: Buffer, key: string) => {
-  if (!s3Client) throw new Error("S3 is not configured")
+const uploadToS3WithObjectKey = async (file: Buffer, objectKey: string, contentType: string) => {
+  if (!s3Client || !env.S3_BUCKET) {
+    throw new Error("S3 is not configured (need S3_BUCKET, region, and credentials)")
+  }
   const endpoint = env.S3_PUBLIC_URL ?? `https://${env.S3_BUCKET}.s3.${env.S3_REGION}.amazonaws.com`
-  const fileType = await fileTypeFromBuffer(file)
-  const s3Key = `${key}.${fileType?.ext ?? "png"}`
 
   const upload = new Upload({
     client: s3Client,
     params: {
       Bucket: env.S3_BUCKET,
-      Key: s3Key,
+      Key: objectKey,
       Body: file,
+      ContentType: contentType,
       StorageClass: "STANDARD",
     },
     queueSize: 4,
@@ -34,14 +33,44 @@ export const uploadToS3Storage = async (file: Buffer, key: string) => {
   const { data, error } = await tryCatch(upload.done())
 
   if (error) {
-    throw new Error(`Failed to upload ${key} to S3: ${getErrorMessage(error)}`)
+    throw new Error(`Failed to upload ${objectKey} to S3: ${getErrorMessage(error)}`)
   }
 
   if (!data.Key) {
-    throw new Error(`Failed to upload ${key} to S3`)
+    throw new Error(`Failed to upload ${objectKey} to S3`)
   }
 
   return `${endpoint}/${data.Key}?v=${Date.now()}`
+}
+
+/**
+ * Upload public media: Supabase Storage when configured; otherwise optional S3 (legacy).
+ * @param declaredMime optional client MIME (validated on RPC) when magic-byte sniff is inconclusive.
+ */
+export const uploadPublicMedia = async (file: Buffer, key: string, declaredMime?: string) => {
+  const { ext, contentType } =
+    declaredMime != null && declaredMime.length > 0
+      ? extAndContentTypeFromValidatedMime(declaredMime)
+      : await resolveFetchedImageBuffer(file)
+  const objectKey = `${key}.${ext}`
+
+  if (isSupabaseStorageConfigured()) {
+    return uploadBytesToSupabase(file, objectKey, contentType)
+  }
+  if (s3Client && env.S3_BUCKET) {
+    return uploadToS3WithObjectKey(file, objectKey, contentType)
+  }
+  throw new Error(
+    "Supabase Storage is not configured. In .env.local set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (service_role from Dashboard → Settings → API), and SUPABASE_STORAGE_BUCKET, then restart. Leave S3_* empty. See .env.example.",
+  )
+}
+
+/**
+ * @deprecated Prefer uploadPublicMedia. Kept for direct S3 calls that pass key without extension.
+ */
+export const uploadToS3Storage = async (file: Buffer, key: string) => {
+  const { ext, contentType } = await resolveFetchedImageBuffer(file)
+  return uploadToS3WithObjectKey(file, `${key}.${ext}`, contentType)
 }
 
 /**
@@ -157,5 +186,5 @@ export const fetchAndUploadMedia = async (
     throw new Error(`Failed to fetch ${type} from ${url}: ${getErrorMessage(error)}`)
   }
 
-  return uploadToS3Storage(data, path)
+  return uploadPublicMedia(data, path)
 }

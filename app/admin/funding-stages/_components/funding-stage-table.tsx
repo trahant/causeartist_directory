@@ -63,6 +63,11 @@ const columns: ColumnDef<FundingStageListRow>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Slug" />,
     cell: ({ row }) => <Note className="font-mono text-xs">{row.original.slug}</Note>,
   },
+  {
+    accessorKey: "sortOrder",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Order" />,
+    cell: ({ row }) => row.original.sortOrder,
+  },
 ]
 
 export function FundingStageTable() {

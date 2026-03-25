@@ -5,6 +5,7 @@ import { cache, Suspense } from "react"
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { H2, H5 } from "~/components/common/heading"
+import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
 import { ExternalLink } from "~/components/web/external-link"
@@ -17,7 +18,6 @@ import {
   FunderPortfolioSection,
   FunderProfileLocationsSection,
   FunderSecondaryCtas,
-  FunderSocialRow,
   FunderTaxonomyBand,
 } from "~/components/web/profiles/funder-profile-sections"
 import { FunderProfileStatsCard } from "~/components/web/profiles/funder-profile-stats"
@@ -30,7 +30,7 @@ import { Section } from "~/components/web/ui/section"
 import { Sticky } from "~/components/web/ui/sticky"
 import type { Thing } from "schema-dts"
 import { formatFunderCheckSize } from "~/lib/format-funder-check-size"
-import { formatFunderType } from "~/lib/format-funder-type"
+import { formatFunderType, isFunderTypeSlug } from "~/lib/format-funder-type"
 import type { OpenGraphParams } from "~/lib/opengraph"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateFunderSchema } from "~/lib/schema"
@@ -99,26 +99,29 @@ export default async function (props: Props) {
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
-            <Stack className="@container self-stretch">
+            <Stack className="@container min-w-0 flex-1 self-stretch">
               <Favicon src={funder.logoUrl} title={funder.name} className="size-8" />
 
               <Stack className="min-w-0 flex-1">
-                <Stack className="gap-2" direction="row" wrap>
-                  <H2 as="h1" className="leading-tight! truncate">
+                <Stack className="min-w-0 gap-2" direction="row" wrap={false}>
+                  <H2 as="h1" className="min-w-0 flex-1 leading-tight! truncate">
                     {funder.name}
                   </H2>
-                  <Badge variant="outline" size="lg">
-                    {formatFunderType(funder.type)}
-                  </Badge>
+                  {isFunderTypeSlug(funder.type) ? (
+                    <Badge variant="outline" size="lg" className="shrink-0" asChild>
+                      <Link href={`/funders/type/${funder.type}`}>{formatFunderType(funder.type)}</Link>
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" size="lg" className="shrink-0">
+                      {formatFunderType(funder.type)}
+                    </Badge>
+                  )}
                 </Stack>
               </Stack>
 
               <Backdrop />
             </Stack>
           </Sticky>
-
-          <FunderHeroBand funder={funder} />
-          <FunderSocialRow funder={funder} />
 
           {funder.website ? (
             <Stack className="w-full -mt-fluid-md pt-6 max-md:order-3">
@@ -129,6 +132,8 @@ export default async function (props: Props) {
               </Button>
             </Stack>
           ) : null}
+
+          <FunderHeroBand funder={funder} />
 
           <FunderSecondaryCtas funder={funder} />
           <FunderProfileLocationsSection funder={funder} />

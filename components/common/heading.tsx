@@ -7,7 +7,7 @@ const headingVariants = cva({
 
   variants: {
     size: {
-      h1: "text-3xl tracking-tight text-pretty bg-linear-to-b from-foreground to-foreground/75 bg-clip-text text-transparent md:text-4xl",
+      h1: "text-3xl tracking-tight text-pretty text-foreground md:text-4xl",
       h2: "text-2xl tracking-micro md:text-3xl",
       h3: "text-2xl tracking-micro",
       h4: "text-xl tracking-micro",

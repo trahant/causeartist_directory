@@ -11,9 +11,6 @@ export async function CompanyProfileStatsCard({ company }: { company: CompanyOne
   if (company.foundedYear != null) {
     rows.push({ label: t("founded"), value: String(company.foundedYear) })
   }
-  if (company.totalFunding) {
-    rows.push({ label: t("total_funding"), value: company.totalFunding })
-  }
   if (company.funders.length > 0) {
     rows.push({ label: t("investors_count"), value: String(company.funders.length) })
   }

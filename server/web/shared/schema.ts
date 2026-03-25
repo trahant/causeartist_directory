@@ -49,6 +49,24 @@ export const createNewsletterSchema = (t: TFunction) => {
   })
 }
 
+export const createContactFormSchema = (t: TFunction) => {
+  return z.object({
+    captcha: z.literal("").optional(),
+    name: z
+      .string()
+      .trim()
+      .min(1, { error: t("required") })
+      .max(120, { error: issue => t("maxLength", { length: Number(issue.maximum) }) }),
+    email: z.email({ error: t("invalidEmail") }),
+    message: z
+      .string()
+      .trim()
+      .min(10, { error: issue => t("minLength", { length: Number(issue.minimum) }) })
+      .max(8000, { error: issue => t("maxLength", { length: Number(issue.maximum) }) }),
+    newsletterOptIn: z.boolean().optional().default(false),
+  })
+}
+
 export const createReportToolSchema = (t: TFunction) => {
   return z
     .object({

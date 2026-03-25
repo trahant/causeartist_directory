@@ -48,6 +48,38 @@ const nextConfig: NextConfig = {
           return { protocol: "https" as const, hostname: "localhost", port: "", pathname: "/**" }
         }
       })(),
+      ...(function () {
+        const supabaseUrl = process.env.SUPABASE_URL
+        if (!supabaseUrl) return [] as const
+        try {
+          return [
+            {
+              protocol: "https" as const,
+              hostname: new URL(supabaseUrl).hostname,
+              pathname: "/storage/v1/object/public/**" as const,
+            },
+          ]
+        } catch {
+          return [] as const
+        }
+      })(),
+      ...(function () {
+        const custom = process.env.SUPABASE_STORAGE_PUBLIC_URL
+        if (!custom) return [] as const
+        try {
+          const url = new URL(custom)
+          return [
+            {
+              protocol: "https" as const,
+              hostname: url.hostname,
+              port: url.port || "",
+              pathname: "/**" as const,
+            },
+          ]
+        } catch {
+          return [] as const
+        }
+      })(),
     ],
   },
 

@@ -1,42 +1,41 @@
 "use client"
 
-import { formatNumber } from "@primoui/utils"
-import { AtSignIcon, RssIcon } from "lucide-react"
+import Image from "next/image"
 import { useTranslations } from "next-intl"
 import type { ComponentProps } from "react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/common/dropdown-menu"
+import { Link } from "~/components/common/link"
 import { H5, H6 } from "~/components/common/heading"
-import { BrandGitHubIcon } from "~/components/common/icons/brand-github"
+import { BrandFacebookIcon } from "~/components/common/icons/brand-facebook"
+import { BrandInstagramIcon } from "~/components/common/icons/brand-instagram"
+import { BrandLinkedInIcon } from "~/components/common/icons/brand-linkedin"
+import { BrandXIcon } from "~/components/common/icons/brand-x"
 import { Note } from "~/components/common/note"
 import { Stack } from "~/components/common/stack"
 import { Tooltip } from "~/components/common/tooltip"
-import { BuiltWith } from "~/components/web/built-with"
 import { CTAForm } from "~/components/web/cta-form"
 import { ExternalLink } from "~/components/web/external-link"
+import { FooterAskAI } from "~/components/web/footer-ask-ai"
 import { ThemeSwitcher } from "~/components/web/theme-switcher"
 import { NavLink, navLinkVariants } from "~/components/web/ui/nav-link"
 import { adsConfig } from "~/config/ads"
 import { linksConfig } from "~/config/links"
-import { siteConfig } from "~/config/site"
 import { cx } from "~/lib/utils"
 
 export const Footer = ({ children, className, ...props }: ComponentProps<"div">) => {
   const t = useTranslations()
 
   return (
-    <footer className="flex flex-col gap-y-8 mt-auto pt-fluid-md border-t border-foreground/10">
+    <footer className="mt-auto flex flex-col gap-y-8 border-t border-foreground/10 pt-fluid-md">
       <div
-        className={cx("grid grid-cols-3 gap-y-8 gap-x-4 md:gap-x-6 md:grid-cols-16", className)}
+        className={cx(
+          "grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-12",
+          className,
+        )}
         {...props}
       >
         <Stack
           direction="column"
-          className="flex flex-col items-start gap-4 col-span-full md:col-span-6"
+          className="col-span-full flex flex-col items-start gap-4 sm:col-span-2 xl:col-span-5"
         >
           <Stack size="lg" direction="column" className="min-w-0 max-w-64">
             <H5 as="strong" className="px-0.5">
@@ -44,7 +43,7 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
             </H5>
 
             <Note className="-mt-2 px-0.5 first:mt-0">
-              {t("components.footer.cta_description", { count: formatNumber(5000, "standard") })}
+              {t("components.footer.cta_description")}
             </Note>
 
             <CTAForm />
@@ -55,57 +54,88 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
               <ThemeSwitcher />
             </Tooltip>
 
-            <DropdownMenu modal={false}>
-              <Tooltip tooltip={t("navigation.rss_feed")}>
-                <DropdownMenuTrigger className={navLinkVariants()}>
-                  <RssIcon />
-                </DropdownMenuTrigger>
-              </Tooltip>
-
-              <DropdownMenuContent align="start">
-                {linksConfig.feeds.map(({ title, url }) => (
-                  <DropdownMenuItem key={url} asChild>
-                    <ExternalLink href={url}>{title}</ExternalLink>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Tooltip tooltip={t("navigation.contact_us")}>
-              <ExternalLink href={`mailto:${siteConfig.email}`} className={navLinkVariants()}>
-                <AtSignIcon />
+            <Tooltip tooltip={t("navigation.social_facebook")}>
+              <ExternalLink href={linksConfig.social.facebook} className={navLinkVariants()}>
+                <BrandFacebookIcon />
               </ExternalLink>
             </Tooltip>
 
-            <Tooltip tooltip={t("navigation.source_code")}>
-              <ExternalLink href={linksConfig.github} className={navLinkVariants()}>
-                <BrandGitHubIcon />
+            <Tooltip tooltip={t("navigation.social_x")}>
+              <ExternalLink href={linksConfig.social.x} className={navLinkVariants()}>
+                <BrandXIcon />
+              </ExternalLink>
+            </Tooltip>
+
+            <Tooltip tooltip={t("navigation.social_instagram")}>
+              <ExternalLink href={linksConfig.social.instagram} className={navLinkVariants()}>
+                <BrandInstagramIcon />
+              </ExternalLink>
+            </Tooltip>
+
+            <Tooltip tooltip={t("navigation.social_linkedin")}>
+              <ExternalLink href={linksConfig.social.linkedin} className={navLinkVariants()}>
+                <BrandLinkedInIcon />
               </ExternalLink>
             </Tooltip>
           </Stack>
         </Stack>
 
-        <Stack direction="column" className="text-sm md:col-span-3 md:col-start-8">
+        <nav aria-label={t("navigation.browse")} className="flex flex-col gap-2 text-sm xl:col-span-2">
           <H6 as="strong">{t("navigation.browse")}:</H6>
 
-          <NavLink href="/">{t("navigation.directory")}</NavLink>
           <NavLink href="/companies">{t("navigation.companies")}</NavLink>
           <NavLink href="/funders">{t("navigation.funders")}</NavLink>
+          <NavLink href="/podcast">{t("navigation.podcasts")}</NavLink>
+          <NavLink href="/case-studies">{t("navigation.case_studies")}</NavLink>
+          <NavLink href="/sectors">{t("navigation.sectors")}</NavLink>
+          <NavLink href="/focus">{t("navigation.focus_areas")}</NavLink>
           <NavLink href="/certifications">{t("navigation.certifications")}</NavLink>
           <NavLink href="/blog">{t("navigation.blog")}</NavLink>
-        </Stack>
+        </nav>
 
-        <Stack direction="column" className="text-sm md:col-span-3">
+        <nav
+          aria-label={t("navigation.quick_links")}
+          className="flex flex-col gap-2 text-sm xl:col-span-2"
+        >
           <H6 as="strong">{t("navigation.quick_links")}:</H6>
 
           <NavLink href="/about">{t("navigation.about")}</NavLink>
-          {adsConfig.enabled && <NavLink href="/advertise">{t("navigation.advertise")}</NavLink>}
-        </Stack>
+          <NavLink href="/contact">{t("navigation.contact_us")}</NavLink>
+          {adsConfig.enabled && <NavLink href="/advertise">{t("navigation.sponsor")}</NavLink>}
+        </nav>
+
+        <nav
+          aria-label={t("navigation.resources")}
+          className="flex flex-col gap-2 text-sm sm:col-span-2 xl:col-span-3"
+        >
+          <H6 as="strong">{t("navigation.resources")}:</H6>
+
+          <NavLink href="/newsletter">{t("navigation.newsletter")}</NavLink>
+          <NavLink href="/interviews">{t("navigation.interviews")}</NavLink>
+          <NavLink href="/glossary">{t("navigation.glossary")}</NavLink>
+          <NavLink href="/rss/tools.xml">{t("navigation.rss_feed")}</NavLink>
+        </nav>
       </div>
 
-      <BuiltWith medium="footer" className="self-start" />
+      <FooterAskAI />
 
       {children}
+
+      <div className="border-t border-foreground/10 pt-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:opacity-90"
+        >
+          <Image
+            src="/favicon.png"
+            alt=""
+            width={20}
+            height={20}
+            className="size-5 shrink-0 object-contain"
+          />
+          <span>{t("components.footer.copyright")}</span>
+        </Link>
+      </div>
     </footer>
   )
 }

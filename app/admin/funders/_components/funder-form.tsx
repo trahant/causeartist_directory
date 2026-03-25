@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form, useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { HeroImageUrlField } from "~/components/admin/hero-image-url-field"
 import { Button } from "~/components/common/button"
 import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { H3 } from "~/components/common/heading"
@@ -81,6 +82,7 @@ export function FunderForm({ className, title, funder, taxonomy, ...props }: Fun
       sectorIds: funder.sectors.map(s => s.sectorId),
       locationIds: funder.locations.map(l => l.locationId),
       subcategoryIds: funder.subcategories.map(s => s.subcategoryId),
+      companyIds: funder.portfolio.map(c => c.companyId),
       stageIds: funder.stages.map(s => s.stageId),
     },
   })
@@ -384,11 +386,11 @@ export function FunderForm({ className, title, funder, taxonomy, ...props }: Fun
           control={form.control}
           name="heroImageUrl"
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="col-span-full">
-              <FieldLabel htmlFor={field.name}>Hero image URL</FieldLabel>
-              <Input id={field.name} {...field} value={field.value ?? ""} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+            <HeroImageUrlField
+              field={field}
+              fieldState={fieldState}
+              uploadKeyPrefix={`funders/${funder.id}/hero`}
+            />
           )}
         />
 
@@ -444,6 +446,21 @@ export function FunderForm({ className, title, funder, taxonomy, ...props }: Fun
               <FieldLabel>Focus areas (subcategories)</FieldLabel>
               <RelationSelector
                 relations={taxonomy.subcategories}
+                ids={field.value ?? []}
+                setIds={field.onChange}
+              />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="companyIds"
+          render={({ field }) => (
+            <Field className="col-span-full">
+              <FieldLabel>Companies</FieldLabel>
+              <RelationSelector
+                relations={taxonomy.companies}
                 ids={field.value ?? []}
                 setIds={field.onChange}
               />

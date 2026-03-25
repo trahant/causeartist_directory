@@ -4,7 +4,7 @@
   "total": "Total:",
   "discount_tooltip": "Discount applied based on the order value. Max {discount}% off.",
   "discount_label": "{discount}% off",
-  "select_dates_error": "Please select dates for at least one ad type",
+  "select_dates_error": "Please select dates for at least one sponsorship placement",
   "purchase_button": "Purchase Now",
   "spots": {
     "listing": {
@@ -22,7 +22,7 @@
   },
   "default_ad": {
     "name": "Your brand here",
-    "description": "Reach our audience of professional directory owners and boost your sales.",
-    "button_label": "Advertise on {siteName}"
+    "description": "Reach our audience of impact-driven readers and boost your brand.",
+    "button_label": "Sponsor {siteName}"
   }
 }

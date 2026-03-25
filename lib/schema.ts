@@ -20,7 +20,6 @@ export function generateCompanySchema(
     description: company.description ?? undefined,
     foundingDate: company.foundedYear?.toString(),
     knowsAbout: company.sectors.map(s => s.sector.name),
-    sameAs: [company.linkedin, company.twitter].filter(Boolean) as string[],
   }
 
   const firstLocationName = company.locations[0]?.location?.name ?? "Global"

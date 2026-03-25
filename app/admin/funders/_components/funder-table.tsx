@@ -3,9 +3,11 @@
 import { formatDate } from "@primoui/utils"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ExternalLinkIcon } from "lucide-react"
+import { ExternalLinkIcon, PlusIcon } from "lucide-react"
 import { useQueryStates } from "nuqs"
+import { FunderTableToolbarActions } from "~/app/admin/funders/_components/funder-table-toolbar-actions"
 import { DateRangePicker } from "~/components/admin/date-range-picker"
+import { RowCheckbox } from "~/components/admin/row-checkbox"
 import { Badge } from "~/components/common/badge"
 import { Button } from "~/components/common/button"
 import { Link } from "~/components/common/link"
@@ -25,6 +27,33 @@ import { funderListParams } from "~/server/admin/funders/schema"
 import type { DataTableFilterField } from "~/types"
 
 const columns: ColumnDef<FunderListRow>[] = [
+  {
+    id: "select",
+    enableSorting: false,
+    enableHiding: false,
+    header: ({ table }) => (
+      <RowCheckbox
+        checked={table.getIsAllPageRowsSelected()}
+        ref={input => {
+          if (input) {
+            input.indeterminate =
+              table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()
+          }
+        }}
+        onChange={e => table.toggleAllPageRowsSelected(e.target.checked)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row, table }) => (
+      <RowCheckbox
+        checked={row.getIsSelected()}
+        onChange={e => row.toggleSelected(e.target.checked)}
+        aria-label="Select row"
+        table={table}
+        row={row}
+      />
+    ),
+  },
   {
     accessorKey: "name",
     enableHiding: false,
@@ -105,12 +134,20 @@ export function FunderTable() {
       pagination: { pageIndex: 0, pageSize: params.perPage },
       sorting: params.sort,
     },
-    getRowId: row => row.id,
+    getRowId: (r, i) => `${r.id}-${i}`,
   })
 
   return (
     <DataTable table={table} isLoading={isLoading} isFetching={isFetching && !isLoading}>
-      <DataTableHeader title="Funders" total={data?.fundersTotal}>
+      <DataTableHeader
+        title="Funders"
+        total={data?.fundersTotal}
+        callToAction={
+          <Button variant="primary" size="md" prefix={<PlusIcon />} asChild>
+            <Link href="/admin/funders/new">New funder</Link>
+          </Button>
+        }
+      >
         <DataTableToolbar
           table={table}
           filterFields={filterFields}
@@ -120,6 +157,7 @@ export function FunderTable() {
             void setParams(null)
           }}
         >
+          <FunderTableToolbarActions table={table} />
           <DateRangePicker align="end" />
           <DataTableViewOptions table={table} />
         </DataTableToolbar>

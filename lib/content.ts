@@ -42,6 +42,43 @@ const uniqueId = (base: string, used: Set<string>) => {
  * Adds `id` attributes to all `<h2>` and `<h3>` tags that are missing them.
  * IDs are generated from the heading text.
  */
+/**
+ * Normalizes Ghost-exported HTML so case studies (and similar) match site typography:
+ * strips kg-card comment noise, removes junk leading paragraphs, unwraps mis-nested headings,
+ * and demotes a lone leading &lt;h1&gt; (often duplicates the page title) to &lt;h2&gt;.
+ */
+export const sanitizeGhostRichHtmlForDisplay = (html: string) => {
+  let out = html.trimStart()
+
+  out = out.replaceAll(/<!--\s*kg-card-begin:[\s\S]*?-->\s*/gi, "")
+  out = out.replaceAll(/\s*<!--\s*kg-card-end:[\s\S]*?-->/gi, "")
+
+  let prev = ""
+  while (prev !== out) {
+    prev = out
+    out = out.replace(/^(?:\s*<p>(?:\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>\s*)+/i, "")
+  }
+
+  out = out.replaceAll(/<p>\s*(<(?:h2|h3)\b[^>]*>[\s\S]*?<\/(?:h2|h3)>)\s*<\/p>/gi, "$1")
+  out = out.replace(/^\s*<h1(\b[^>]*)>([\s\S]*?)<\/h1>\s*/i, "<h2$1>$2</h2>\n")
+
+  // Ghost / pasted HTML often ships light-theme inline colors and backgrounds that
+  // clash with our theme (e.g. white spans on a light page, or “holes” over body copy).
+  const stripStyleFromOpenTags = (tag: string, html: string) => {
+    const re = new RegExp(`<${tag}\\b[^>]*>`, "gi")
+    return html.replace(re, open =>
+      open
+        .replaceAll(/\sstyle\s*=\s*"[^"]*"/gi, "")
+        .replaceAll(/\sstyle\s*=\s*'[^']*'/gi, ""),
+    )
+  }
+  for (const tag of ["span", "strong", "em", "b", "i", "p", "a"] as const) {
+    out = stripStyleFromOpenTags(tag, out)
+  }
+
+  return out.trim()
+}
+
 export const addHeadingIdsToHtml = (html: string) => {
   const used = new Set<string>()
 

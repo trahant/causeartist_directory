@@ -10,5 +10,7 @@ export const rateLimitConfig = {
     claim: { points: 5, duration: 60 * 60 },
     // 20 per 1h
     media: { points: 20, duration: 60 * 60 },
+    // 5 per 1h
+    contact: { points: 5, duration: 60 * 60 },
   },
 }

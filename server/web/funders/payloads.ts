@@ -65,7 +65,7 @@ export const funderOnePayload = {
     },
   },
   stages: {
-    orderBy: { fundingStage: { name: "asc" } },
+    orderBy: [{ fundingStage: { sortOrder: "asc" } }, { fundingStage: { name: "asc" } }],
     select: {
       fundingStage: {
         select: {

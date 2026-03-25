@@ -11,14 +11,14 @@ import { ProfileContent } from "~/components/web/profiles/profile-content"
 import { Nav } from "~/components/web/nav"
 import {
   CompanyCaseStudiesSection,
-  CompanyFounderMetadata,
   CompanyHeroBand,
+  CompanyHeroImageBand,
   CompanyInvestorsSection,
   CompanyKeyBenefitsSection,
   CompanyPodcastSection,
   CompanyProfileLocationsSection,
+  CompanyRetailLocationsSection,
   CompanySecondaryCtas,
-  CompanySocialRow,
   CompanyTaxonomyBand,
 } from "~/components/web/profiles/company-profile-sections"
 import { CompanyProfileStatsCard } from "~/components/web/profiles/company-profile-stats"
@@ -96,7 +96,7 @@ export default async function (props: Props) {
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
-            <Stack className="@container self-stretch">
+            <Stack className="@container min-w-0 flex-1 self-stretch">
               <Favicon src={company.logoUrl} title={company.name} className="size-8" />
 
               <Stack className="min-w-0 flex-1">
@@ -110,7 +110,6 @@ export default async function (props: Props) {
           </Sticky>
 
           <CompanyHeroBand company={company} />
-          <CompanySocialRow company={company} />
 
           {company.website ? (
             <Stack className="w-full -mt-fluid-md pt-6 max-md:order-3">
@@ -122,16 +121,17 @@ export default async function (props: Props) {
             </Stack>
           ) : null}
 
+          <CompanyHeroImageBand company={company} />
+
           <CompanySecondaryCtas company={company} />
           <CompanyProfileLocationsSection company={company} />
+          <CompanyRetailLocationsSection company={company} />
 
           <ProfileContent content={company.description} className="max-md:order-4" />
 
           <CompanyKeyBenefitsSection company={company} />
           <CompanyCaseStudiesSection company={company} />
           <CompanyPodcastSection company={company} />
-
-          <CompanyFounderMetadata company={company} />
 
           {company.impactModel ? (
             <Stack direction="column" className="w-full max-md:order-7">

@@ -16,7 +16,7 @@
 import { readdir, readFile } from "node:fs/promises"
 import { basename, extname, join, resolve } from "node:path"
 import { PostStatus } from "~/.generated/prisma/client"
-import { uploadToS3Storage } from "~/lib/media"
+import { uploadPublicMedia } from "~/lib/media"
 import { db } from "~/services/db"
 
 const POSTS_DIR = join(import.meta.dirname, "../content/posts")
@@ -134,7 +134,7 @@ async function uploadLocalImage(imagePath: string, s3Key: string): Promise<strin
   const base = imagePath.startsWith("/") ? join(import.meta.dirname, "../public") : POSTS_DIR
   const absolutePath = resolve(base, imagePath.startsWith("/") ? imagePath.slice(1) : imagePath)
   const buffer = await readFile(absolutePath)
-  return uploadToS3Storage(Buffer.from(buffer), s3Key)
+  return uploadPublicMedia(Buffer.from(buffer), s3Key)
 }
 
 async function main() {

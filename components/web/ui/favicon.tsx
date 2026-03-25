@@ -1,4 +1,3 @@
-import Image from "next/image"
 import type { ComponentProps } from "react"
 import type { VariantProps } from "~/lib/utils"
 import { cva, cx } from "~/lib/utils"
@@ -33,12 +32,13 @@ export const Favicon = ({
   if (!src) return null
 
   return (
-    <Image
+    <img
       src={src}
       alt={title ? `Favicon of ${title}` : "Favicon"}
       loading={loading}
       width={size}
       height={size}
+      decoding="async"
       className={cx(faviconVariants({ contained, className }))}
       {...props}
     />

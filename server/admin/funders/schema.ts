@@ -34,6 +34,12 @@ export type FunderListParams = inferParserType<typeof funderListParams>
 
 const optionalString = z.string().optional().nullable()
 
+export const funderCreateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().optional(),
+  type: optionalString,
+})
+
 export const funderUpdateSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1, "Name is required"),
@@ -57,6 +63,7 @@ export const funderUpdateSchema = z.object({
   sectorIds: z.array(z.string()).optional(),
   locationIds: z.array(z.string()).optional(),
   subcategoryIds: z.array(z.string()).optional(),
+  companyIds: z.array(z.string()).optional(),
   stageIds: z.array(z.string()).optional(),
 })
 

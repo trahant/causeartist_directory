@@ -140,10 +140,14 @@ export const Search = () => {
     commandSections.push({
       name: t("navigation.quick_links"),
       items: [
-        { label: t("navigation.directory"), onSelect: () => navigateTo("/#directory") },
         { label: t("navigation.companies"), onSelect: () => navigateTo("/companies") },
         { label: t("navigation.funders"), onSelect: () => navigateTo("/funders") },
+        { label: t("navigation.podcasts"), onSelect: () => navigateTo("/podcast") },
+        { label: t("navigation.case_studies"), onSelect: () => navigateTo("/case-studies") },
+        { label: t("navigation.sectors"), onSelect: () => navigateTo("/sectors") },
+        { label: t("navigation.focus_areas"), onSelect: () => navigateTo("/focus") },
         { label: t("navigation.certifications"), onSelect: () => navigateTo("/certifications") },
+        { label: t("navigation.blog"), onSelect: () => navigateTo("/blog") },
       ],
     })
   }

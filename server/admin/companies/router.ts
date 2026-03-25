@@ -6,7 +6,12 @@ import {
   findAdminCompanies,
   findTaxonomyForCompanyAdmin,
 } from "~/server/admin/companies/queries"
-import { companyListSchema, companyUpdateSchema } from "~/server/admin/companies/schema"
+import {
+  companyCreateSchema,
+  companyListSchema,
+  companyUpdateSchema,
+} from "~/server/admin/companies/schema"
+import { idsSchema } from "~/server/admin/shared/schema"
 
 function parseKeyBenefits(
   json: string | null | undefined,
@@ -34,6 +39,70 @@ const taxonomy = withAdmin.handler(async () => {
   return findTaxonomyForCompanyAdmin()
 })
 
+const create = withAdmin
+  .input(companyCreateSchema)
+  .handler(async ({ input, context: { db, revalidate } }) => {
+    const { name, slug: slugInput } = input
+    const slug = await generateUniqueSlug(
+      slugInput || name,
+      s => db.company.findFirst({ where: { slug: s }, select: { id: true } }).then(Boolean),
+      undefined,
+    )
+
+    const company = await db.company.create({
+      data: {
+        name,
+        slug,
+        status: "draft",
+        lifecycleStatus: "Active",
+      },
+    })
+
+    revalidate({
+      tags: ["companies", "directory", "directory-facets", "directory-sectors", "certifications"],
+    })
+    revalidate({ paths: ["/companies"] })
+
+    return company
+  })
+
+const remove = withAdmin.input(idsSchema).handler(async ({ input: { ids }, context: { db, revalidate } }) => {
+  const deletedSlugs: string[] = []
+
+  for (const id of ids) {
+    const row = await db.company.findUnique({ where: { id }, select: { slug: true } })
+    if (!row) continue
+
+    await db.$transaction(async tx => {
+      await tx.companyEpisode.deleteMany({ where: { companyId: id } })
+      await tx.companyFunder.deleteMany({ where: { companyId: id } })
+      await tx.companyLocation.deleteMany({ where: { companyId: id } })
+      await tx.companySector.deleteMany({ where: { companyId: id } })
+      await tx.companySubcategory.deleteMany({ where: { companyId: id } })
+      await tx.companyCertification.deleteMany({ where: { companyId: id } })
+      await tx.caseStudy.updateMany({ where: { companyId: id }, data: { companyId: null } })
+      await tx.company.delete({ where: { id } })
+    })
+
+    deletedSlugs.push(row.slug)
+  }
+
+  const tags = [
+    "companies",
+    "directory",
+    "directory-facets",
+    "directory-sectors",
+    "certifications",
+    "related-companies",
+    ...deletedSlugs.flatMap(s => [`company-${s}` as const]),
+  ]
+
+  revalidate({ tags: [...new Set(tags)] })
+  revalidate({ paths: ["/companies", ...deletedSlugs.map(s => `/companies/${s}`)] })
+
+  return true
+})
+
 const update = withAdmin
   .input(companyUpdateSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
@@ -42,25 +111,25 @@ const update = withAdmin
       sectorIds,
       locationIds,
       subcategoryIds,
+      funderIds,
       certificationIds,
       keyBenefitsJson,
       slug: slugInput,
       name,
       status,
+      lifecycleStatus,
       tagline,
       description,
       logoUrl,
       website,
       foundedYear,
       totalFunding,
-      linkedin,
-      twitter,
-      founderName,
       impactModel,
       impactMetrics,
       seoTitle,
       seoDescription,
       heroImageUrl,
+      retailLocations,
     } = input
 
     const existing = await db.company.findUnique({ where: { id }, select: { slug: true } })
@@ -74,21 +143,21 @@ const update = withAdmin
       existing.slug,
     )
 
+    const retailStores = (retailLocations ?? []).filter(r => r.label.trim() !== "" && r.city.trim() !== "")
+
     await db.company.update({
       where: { id },
       data: {
         name,
         slug,
         status,
+        lifecycleStatus,
         tagline: emptyToNull(tagline ?? undefined),
         description: emptyToNull(description ?? undefined),
         logoUrl: emptyToNull(logoUrl ?? undefined),
         website: emptyToNull(website ?? undefined),
         foundedYear: foundedYear ?? null,
         totalFunding: emptyToNull(totalFunding ?? undefined),
-        linkedin: emptyToNull(linkedin ?? undefined),
-        twitter: emptyToNull(twitter ?? undefined),
-        founderName: emptyToNull(founderName ?? undefined),
         impactModel: emptyToNull(impactModel ?? undefined),
         impactMetrics: emptyToNull(impactMetrics ?? undefined),
         seoTitle: emptyToNull(seoTitle ?? undefined),
@@ -107,9 +176,31 @@ const update = withAdmin
           deleteMany: {},
           create: (subcategoryIds ?? []).map(subcategoryId => ({ subcategoryId })),
         },
+        funders: {
+          deleteMany: {},
+          create: (funderIds ?? []).map(funderId => ({ funderId })),
+        },
         certifications: {
           deleteMany: {},
           create: (certificationIds ?? []).map(certificationId => ({ certificationId })),
+        },
+        retailLocations: {
+          deleteMany: {},
+          create: retailStores.map((row, index) => {
+            const ccRaw = row.countryCode.trim().toUpperCase()
+            const countryCode = ccRaw.length === 2 ? ccRaw : null
+            return {
+              label: row.label.trim(),
+              addressLine1: emptyToNull(row.addressLine1 ?? undefined),
+              addressLine2: emptyToNull(row.addressLine2 ?? undefined),
+              city: row.city.trim(),
+              region: emptyToNull(row.region ?? undefined),
+              postalCode: emptyToNull(row.postalCode ?? undefined),
+              countryCode,
+              url: emptyToNull(row.url ?? undefined),
+              sortOrder: index,
+            }
+          }),
         },
       },
     })
@@ -135,5 +226,7 @@ const update = withAdmin
 export const companyRouter = {
   list,
   taxonomy,
+  create,
+  remove,
   update,
 }

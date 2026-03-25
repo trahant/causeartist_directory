@@ -56,6 +56,7 @@ export const findFunderByIdForAdmin = async (id: string) => {
   return db.funder.findUnique({
     where: { id },
     include: {
+      portfolio: { select: { companyId: true } },
       sectors: { select: { sectorId: true } },
       locations: { select: { locationId: true } },
       subcategories: { select: { subcategoryId: true } },
@@ -65,11 +66,19 @@ export const findFunderByIdForAdmin = async (id: string) => {
 }
 
 export const findTaxonomyForFunderAdmin = async () => {
-  const [sectors, locations, subcategories, fundingStages] = await Promise.all([
+  const [companies, sectors, locations, subcategories, fundingStages] = await Promise.all([
+    db.company.findMany({
+      where: { status: "published" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
     db.sector.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.location.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.subcategory.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    db.fundingStage.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    db.fundingStage.findMany({
+      select: { id: true, name: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    }),
   ])
-  return { sectors, locations, subcategories, fundingStages }
+  return { companies, sectors, locations, subcategories, fundingStages }
 }

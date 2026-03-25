@@ -25,7 +25,7 @@ export const CTAProof = ({ className, ...props }: ComponentProps<typeof Stack>) 
         ))}
       </div>
 
-      <Note className="text-xs">{t("message", { count: formatNumber(5000, "standard") })}</Note>
+      <Note className="text-xs">{t("message", { count: formatNumber(20000, "standard") })}</Note>
     </Stack>
   )
 }

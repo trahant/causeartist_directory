@@ -25,7 +25,7 @@ export const findAdminFundingStages = async (
       orderBy: [...orderBy, { name: "asc" }],
       take: perPage,
       skip: offset,
-      select: { id: true, name: true, slug: true },
+      select: { id: true, name: true, slug: true, sortOrder: true },
     }),
     db.fundingStage.count({ where: { ...whereQuery, ...where } }),
   ])

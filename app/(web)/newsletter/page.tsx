@@ -1,8 +1,13 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { cache, Suspense } from "react"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
+import { H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { Note } from "~/components/common/note"
+import { Stack } from "~/components/common/stack"
 import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
+import { CTAForm } from "~/components/web/cta-form"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
@@ -67,6 +72,7 @@ function NewsletterCard({ item }: { item: NewsletterMany }) {
 
 export default async function NewsletterPage() {
   const { newsletters, metadata, breadcrumbs, structuredData } = await getData()
+  const t = await getTranslations()
 
   return (
     <>
@@ -90,6 +96,15 @@ export default async function NewsletterPage() {
         </Section.Content>
 
         <Section.Sidebar className="max-h-(--sidebar-max-height)">
+          <Stack direction="column" className="gap-4 mb-6">
+            <H5 as="strong" className="px-0.5">
+              {t("components.footer.cta_title")}
+            </H5>
+            <Note className="px-0.5 -mt-2">
+              {t("components.footer.cta_description")}
+            </Note>
+            <CTAForm />
+          </Stack>
           <Suspense fallback={<AdCardSkeleton />}>
             <AdCard type="BlogPost" />
           </Suspense>

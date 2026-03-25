@@ -90,7 +90,7 @@ export default async function (props: Props) {
       <Section>
         <Section.Content className="max-md:contents">
           <Sticky isOverlay>
-            <Stack className="@container self-stretch">
+            <Stack className="@container min-w-0 flex-1 self-stretch">
               <Stack className="flex-1 min-w-0">
                 <H2 as="h1" className="leading-tight!">
                   {episode.title}
@@ -112,6 +112,32 @@ export default async function (props: Props) {
             </IntroDescription>
           )}
 
+          {(episode.spotifyUrl || episode.appleUrl || episode.youtubeUrl) && (
+            <Stack className="w-full -mt-fluid-md pt-6 gap-2" direction="row" wrap>
+              {episode.spotifyUrl && (
+                <Button variant="primary" suffix={<ArrowUpRightIcon />} asChild>
+                  <ExternalLink href={episode.spotifyUrl} doFollow doTrack>
+                    Listen on Spotify
+                  </ExternalLink>
+                </Button>
+              )}
+              {episode.appleUrl && (
+                <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
+                  <ExternalLink href={episode.appleUrl} doFollow doTrack>
+                    Apple Podcasts
+                  </ExternalLink>
+                </Button>
+              )}
+              {episode.youtubeUrl && (
+                <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
+                  <ExternalLink href={episode.youtubeUrl} doFollow doTrack>
+                    YouTube
+                  </ExternalLink>
+                </Button>
+              )}
+            </Stack>
+          )}
+
           {episode.heroImageUrl && (
             <Image
               src={episode.heroImageUrl}
@@ -122,30 +148,6 @@ export default async function (props: Props) {
               className="w-full h-auto aspect-video object-cover rounded-lg mt-6"
             />
           )}
-
-          <Stack className="w-full -mt-fluid-md pt-8 gap-2" direction="row" wrap>
-            {episode.spotifyUrl && (
-              <Button variant="primary" suffix={<ArrowUpRightIcon />} asChild>
-                <ExternalLink href={episode.spotifyUrl} doFollow doTrack>
-                  Listen on Spotify
-                </ExternalLink>
-              </Button>
-            )}
-            {episode.appleUrl && (
-              <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
-                <ExternalLink href={episode.appleUrl} doFollow doTrack>
-                  Apple Podcasts
-                </ExternalLink>
-              </Button>
-            )}
-            {episode.youtubeUrl && (
-              <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
-                <ExternalLink href={episode.youtubeUrl} doFollow doTrack>
-                  YouTube
-                </ExternalLink>
-              </Button>
-            )}
-          </Stack>
 
           {content && (
             <Prose

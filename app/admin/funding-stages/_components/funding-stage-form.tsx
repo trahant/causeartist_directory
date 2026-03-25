@@ -36,6 +36,7 @@ export function FundingStageForm({ className, title, fundingStage, ...props }: P
       id,
       name: fundingStage?.name ?? "",
       slug: fundingStage?.slug ?? "",
+      sortOrder: fundingStage?.sortOrder ?? 100,
     },
   })
 
@@ -90,6 +91,26 @@ export function FundingStageForm({ className, title, fundingStage, ...props }: P
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>Slug</FieldLabel>
               <Input {...field} id={field.name} className="font-mono text-sm" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="sortOrder"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Sort order</FieldLabel>
+              <Input
+                id={field.name}
+                type="number"
+                min={0}
+                name={field.name}
+                ref={field.ref}
+                onBlur={field.onBlur}
+                value={field.value}
+                onChange={e => field.onChange(e.target.value === "" ? 100 : Number(e.target.value))}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

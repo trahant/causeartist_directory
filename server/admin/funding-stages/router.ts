@@ -16,7 +16,7 @@ const list = withAdmin.input(fundingStageListSchema).handler(async ({ input }) =
 const upsert = withAdmin
   .input(fundingStageUpsertSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
-    const { id, name, slug: slugInput } = input
+    const { id, name, slug: slugInput, sortOrder } = input
     const existing = await db.fundingStage.findUnique({ where: { id }, select: { slug: true } })
 
     const slug = await generateUniqueSlug(
@@ -30,8 +30,8 @@ const upsert = withAdmin
 
     await db.fundingStage.upsert({
       where: { id },
-      create: { id, name, slug },
-      update: { name, slug },
+      create: { id, name, slug, sortOrder },
+      update: { name, slug, sortOrder },
     })
 
     revalidateDirectoryTaxonomy(revalidate)

@@ -27,6 +27,7 @@ const limiters = {
   newsletter: createLimiter("newsletter"),
   claim: createLimiter("claim"),
   media: createLimiter("media"),
+  contact: createLimiter("contact"),
 }
 
 /**

@@ -3,9 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useHotkeys } from "@mantine/hooks"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { PlusIcon, Trash2Icon } from "lucide-react"
 import type { ComponentProps } from "react"
-import { Controller, FormProvider as Form, useForm } from "react-hook-form"
+import { Controller, FormProvider as Form, useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { HeroImageUrlField } from "~/components/admin/hero-image-url-field"
 import { Button } from "~/components/common/button"
 import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { H3 } from "~/components/common/heading"
@@ -26,6 +28,17 @@ import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findCompanyByIdForAdmin, findTaxonomyForCompanyAdmin } from "~/server/admin/companies/queries"
 import { companyUpdateSchema } from "~/server/admin/companies/schema"
+
+const emptyRetailLocation = {
+  label: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  region: "",
+  postalCode: "",
+  countryCode: "",
+  url: "",
+}
 
 function keyBenefitsToString(v: unknown): string {
   if (v == null) return ""
@@ -52,15 +65,13 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
       name: company.name,
       slug: company.slug,
       status: company.status as "draft" | "published",
+      lifecycleStatus: company.lifecycleStatus,
       tagline: company.tagline ?? "",
       description: company.description ?? "",
       logoUrl: company.logoUrl ?? "",
       website: company.website ?? "",
       foundedYear: company.foundedYear ?? null,
       totalFunding: company.totalFunding ?? "",
-      linkedin: company.linkedin ?? "",
-      twitter: company.twitter ?? "",
-      founderName: company.founderName ?? "",
       impactModel: company.impactModel ?? "",
       impactMetrics: company.impactMetrics ?? "",
       seoTitle: company.seoTitle ?? "",
@@ -70,8 +81,27 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
       sectorIds: company.sectors.map(s => s.sectorId),
       locationIds: company.locations.map(l => l.locationId),
       subcategoryIds: company.subcategories.map(s => s.subcategoryId),
+      funderIds: company.funders.map(f => f.funderId),
       certificationIds: company.certifications.map(c => c.certificationId),
+      retailLocations:
+        company.retailLocations.length > 0
+          ? company.retailLocations.map(r => ({
+              label: r.label,
+              addressLine1: r.addressLine1 ?? "",
+              addressLine2: r.addressLine2 ?? "",
+              city: r.city,
+              region: r.region ?? "",
+              postalCode: r.postalCode ?? "",
+              countryCode: r.countryCode ?? "",
+              url: r.url ?? "",
+            }))
+          : [],
     },
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "retailLocations",
   })
 
   const mutation = useMutation(
@@ -132,25 +162,47 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
           />
         </div>
 
-        <Controller
-          control={form.control}
-          name="status"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Status</FieldLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">draft</SelectItem>
-                  <SelectItem value="published">published</SelectItem>
-                </SelectContent>
-              </Select>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <div className="grid gap-4 @lg:grid-cols-2 col-span-full">
+          <Controller
+            control={form.control}
+            name="status"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Publish status</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">draft</SelectItem>
+                    <SelectItem value="published">published</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="lifecycleStatus"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Company lifecycle</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Acquired">Acquired</SelectItem>
+                    <SelectItem value="Sunsetted">Sunsetted</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+        </div>
 
         <Controller
           control={form.control}
@@ -204,31 +256,6 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
         <div className="grid gap-4 @lg:grid-cols-2 col-span-full">
           <Controller
             control={form.control}
-            name="linkedin"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>LinkedIn</FieldLabel>
-                <Input id={field.name} {...field} value={field.value ?? ""} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="twitter"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Twitter / X</FieldLabel>
-                <Input id={field.name} {...field} value={field.value ?? ""} />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        </div>
-
-        <div className="grid gap-4 @lg:grid-cols-2 col-span-full">
-          <Controller
-            control={form.control}
             name="foundedYear"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
@@ -265,18 +292,6 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
             )}
           />
         </div>
-
-        <Controller
-          control={form.control}
-          name="founderName"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Founder name</FieldLabel>
-              <Input id={field.name} {...field} value={field.value ?? ""} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
 
         <Controller
           control={form.control}
@@ -331,11 +346,11 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
           control={form.control}
           name="heroImageUrl"
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="col-span-full">
-              <FieldLabel htmlFor={field.name}>Hero image URL</FieldLabel>
-              <Input id={field.name} {...field} value={field.value ?? ""} />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+            <HeroImageUrlField
+              field={field}
+              fieldState={fieldState}
+              uploadKeyPrefix={`companies/${company.id}/hero`}
+            />
           )}
         />
 
@@ -384,6 +399,147 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
           )}
         />
 
+        <Field className="col-span-full">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <FieldLabel>Retail / store locations</FieldLabel>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              prefix={<PlusIcon className="size-4" />}
+              onClick={() => append({ ...emptyRetailLocation })}
+            >
+              Add store
+            </Button>
+          </div>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Directory locations above are for site filters. Add street-level or store listings here (optional,
+            multiple).
+          </p>
+          {fields.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No retail locations yet.</p>
+          ) : (
+            <Stack direction="column" className="gap-4">
+              {fields.map((row, index) => (
+                <div
+                  key={row.id}
+                  className="rounded-lg border border-border bg-card/40 p-4 @lg:col-span-2"
+                >
+                  <div className="mb-3 flex justify-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2Icon className="size-4" />
+                      <span className="sr-only">Remove store</span>
+                    </Button>
+                  </div>
+                  <div className="grid gap-3 @lg:grid-cols-2">
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.label`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+                          <FieldLabel htmlFor={field.name}>Store label</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.addressLine1`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+                          <FieldLabel htmlFor={field.name}>Address line 1</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.addressLine2`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+                          <FieldLabel htmlFor={field.name}>Address line 2</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.city`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>City</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.region`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>State / region</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.postalCode`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>Postal code</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.countryCode`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor={field.name}>Country code</FieldLabel>
+                          <Input
+                            id={field.name}
+                            {...field}
+                            value={field.value ?? ""}
+                            maxLength={2}
+                            className="uppercase"
+                            placeholder="US"
+                          />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name={`retailLocations.${index}.url`}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+                          <FieldLabel htmlFor={field.name}>Maps or store URL</FieldLabel>
+                          <Input id={field.name} {...field} value={field.value ?? ""} />
+                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
+            </Stack>
+          )}
+        </Field>
+
         <Controller
           control={form.control}
           name="subcategoryIds"
@@ -395,6 +551,17 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
                 ids={field.value ?? []}
                 setIds={field.onChange}
               />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="funderIds"
+          render={({ field }) => (
+            <Field className="col-span-full">
+              <FieldLabel>Funders</FieldLabel>
+              <RelationSelector relations={taxonomy.funders} ids={field.value ?? []} setIds={field.onChange} />
             </Field>
           )}
         />

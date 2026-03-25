@@ -28,32 +28,19 @@ export async function FunderHeroBand({ funder }: { funder: FunderOne }) {
   if (!funder.heroImageUrl) return null
 
   return (
-    <div className="-mt-fluid-md pt-4">
+    <div className="w-full -mt-fluid-md pt-6 max-md:order-4">
       <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={funder.heroImageUrl}
           alt=""
           className="max-h-80 w-full object-cover"
+          loading="eager"
+          decoding="async"
+          referrerPolicy="no-referrer"
         />
       </div>
     </div>
-  )
-}
-
-export async function FunderSocialRow({ funder }: { funder: FunderOne }) {
-  if (!funder.linkedin) return null
-  const t = await getTranslations("profiles")
-
-  return (
-    <Stack direction="row" wrap className="items-center gap-2 max-md:order-2">
-      <span className="text-sm font-medium text-muted-foreground">{t("connect")}</span>
-      <Button variant="secondary" size="sm" asChild>
-        <ExternalLink href={funder.linkedin} doFollow>
-          LinkedIn
-        </ExternalLink>
-      </Button>
-    </Stack>
   )
 }
 
@@ -64,7 +51,7 @@ export async function FunderSecondaryCtas({ funder }: { funder: FunderOne }) {
   if (!hasPortfolio && !hasPods && !funder.applicationUrl) return null
 
   return (
-    <Stack direction="row" wrap className="gap-2 max-md:order-3">
+    <Stack direction="row" wrap className="gap-2 max-md:order-4">
       {funder.applicationUrl ? (
         <Button variant="secondary" size="lg" suffix={<ArrowUpRightIcon />} asChild>
           <ExternalLink href={funder.applicationUrl} doFollow doTrack>
@@ -125,8 +112,8 @@ export async function FunderTaxonomyBand({ funder }: { funder: FunderOne }) {
               {t("investment_stages_heading")}
             </span>
             {funder.stages.map(({ fundingStage }) => (
-              <Badge key={fundingStage.slug} size="lg" variant="outline">
-                {fundingStage.name}
+              <Badge key={fundingStage.slug} size="lg" variant="outline" asChild>
+                <Link href={`/funders/stage/${fundingStage.slug}`}>{fundingStage.name}</Link>
               </Badge>
             ))}
           </>

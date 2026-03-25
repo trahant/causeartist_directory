@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl"
 import type { ChangeEvent } from "react"
 import type { FieldPath, FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
+import { arrayBufferToBase64 } from "~/lib/file-to-base64"
 import { orpc } from "~/lib/orpc-query"
 import { createFileSchema } from "~/server/web/shared/schema"
 
@@ -70,7 +71,7 @@ export const useMediaAction = <T extends FieldValues>({
 
     form.clearErrors(fieldName)
 
-    const base64 = Buffer.from(await data.arrayBuffer()).toString("base64")
+    const base64 = arrayBufferToBase64(await data.arrayBuffer())
     uploadMutation.mutate({ path, base64, mimeType: data.type })
   }
 

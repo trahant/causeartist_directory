@@ -57,6 +57,13 @@ export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">)
         `${siteUrl}/blog`,
         `${siteUrl}/advertise`,
         `${siteUrl}/submit`,
+        `${siteUrl}/companies`,
+        `${siteUrl}/funders`,
+        `${siteUrl}/podcast`,
+        `${siteUrl}/case-studies`,
+        `${siteUrl}/sectors`,
+        `${siteUrl}/focus`,
+        `${siteUrl}/certifications`,
       ]
 
       entries = pages.map(url => ({

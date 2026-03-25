@@ -12,7 +12,8 @@ const subscribe = withRateLimit("newsletter")
     if (error) {
       console.error("Failed to create resend contact:", error)
       throw new ORPCError("INTERNAL_SERVER_ERROR", {
-        message: "Failed to subscribe. Please try again later.",
+        message:
+          error instanceof Error ? error.message : "Failed to subscribe. Please try again later.",
       })
     }
 

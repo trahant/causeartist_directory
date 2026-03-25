@@ -11,14 +11,28 @@
   },
   "footer": {
     "cta_title": "Subscribe to our newsletter",
-    "cta_description": "Join {count}+ other members and get updates straight to your inbox."
+    "cta_description": "Join 20,000+ people building and funding a better economy. Weekly signal, no noise.",
+    "ask_ai_title": "Ask AI about Causeartist",
+    "ask_ai_nav_label": "Ask AI assistants about Causeartist",
+    "ask_ai_chatgpt": "Open ChatGPT with a prompt about Causeartist",
+    "ask_ai_perplexity": "Open Perplexity with a prompt about Causeartist",
+    "ask_ai_gemini": "Open Google Gemini with a prompt about Causeartist",
+    "ask_ai_grok": "Open Grok with a prompt about Causeartist",
+    "ask_ai_claude": "Open Claude with a prompt about Causeartist",
+    "copyright": "© 2026 Causeartist",
+    "discovery_sectors_heading": "Popular sectors",
+    "discovery_sectors_nav": "Companies by sector",
+    "discovery_locations_heading": "Popular locations",
+    "discovery_locations_nav": "Companies by location",
+    "view_all_sectors": "View all sectors",
+    "view_all_locations": "Browse all companies"
   },
   "count_badge": {
     "new_entries": "{count} new {count, plural, =0 {entries} =1 {entry} other {entries}} added",
     "total_entries": "{count} {count, plural, =0 {entries} =1 {entry} other {entries}} listed"
   },
   "cta_proof": {
-    "message": "Join {count}+ directory enthusiasts"
+    "message": "Join {count}+ Causeartists"
   },
   "feature_nudge": {
     "message": "{name} has already been published on {siteName}. Upgrade its listing for extra exposure.",

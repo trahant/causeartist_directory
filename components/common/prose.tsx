@@ -12,16 +12,35 @@ export const proseContentClasses = [
   "prose-headings:mt-[1.5em] prose-headings:mb-[0.75em] prose-headings:first:mt-0 prose-headings:last:mb-0 prose-headings:scroll-mt-(--header-outer-offset)",
   "prose-h1:text-3xl md:prose-h1:text-4xl prose-h2:text-2xl md:prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-base prose-h5:font-medium prose-h5:tracking-micro prose-h6:text-sm prose-h6:font-medium prose-h6:tracking-normal",
   "prose-table:border prose-table:border-border prose-table:border-collapse prose-th:border prose-th:border-border prose-th:bg-muted prose-th:font-medium prose-th:p-2 prose-th:px-3 prose-th:text-left prose-td:border prose-td:border-border prose-td:p-2 prose-td:px-3 prose-td:text-left prose-td:align-top",
+  // Ghost kg-embed / iframes: full column width, consistent vertical rhythm with prose
+  "[&_iframe]:max-w-full [&_iframe]:w-full [&_iframe]:rounded-lg",
+  "[&_figure]:mx-0 [&_figure]:max-w-full",
+  "[&_.kg-card]:max-w-full [&_.kg-card]:w-full",
+  "[&_.kg-embed-card]:my-6",
+  // Ghost highlights / marks: keep legible in light and dark
+  "[&_mark]:bg-amber-200/50 [&_mark]:text-foreground dark:[&_mark]:bg-amber-400/25 dark:[&_mark]:text-foreground",
 ]
 
-export const Prose = ({ className, ...props }: ComponentProps<"div">) => {
+export const Prose = ({
+  className,
+  dangerouslySetInnerHTML,
+  suppressHydrationWarning,
+  ...props
+}: ComponentProps<"div">) => {
+  // CMS HTML (iframes, embeds) is often rewritten by the browser so innerHTML
+  // differs between server render and client hydration — safe to ignore on this wrapper.
+  const suppressInnerHtmlMismatch =
+    suppressHydrationWarning ?? dangerouslySetInnerHTML !== undefined
+
   return (
     <div
       className={cx(
-        "w-full text-secondary-foreground text-pretty leading-relaxed",
+        "w-full text-pretty leading-relaxed text-foreground/90 prose-p:text-foreground/90",
         ...proseContentClasses,
         className,
       )}
+      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
+      suppressHydrationWarning={suppressInnerHtmlMismatch}
       {...props}
     />
   )

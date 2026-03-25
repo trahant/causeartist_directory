@@ -26,9 +26,31 @@ const decodeHtmlEntities = (text: string) => {
     .replaceAll("&nbsp;", " ")
 }
 
+/** Headings copied from newsletter signup embeds across posts — not article sections. */
+const NEWSLETTER_CTA_HEADING_NORMALIZED =
+  "join the leading newsletter for impact founders and operators"
+
+const isNewsletterSignupHeading = (text: string) => {
+  const normalized = text.trim().replace(/\s+/g, " ").toLowerCase()
+  if (normalized === NEWSLETTER_CTA_HEADING_NORMALIZED) return true
+  // Same CTA with minor copy edits still shouldn’t appear in TOC
+  if (
+    normalized.startsWith("join the leading newsletter") &&
+    normalized.includes("impact founders")
+  ) {
+    return true
+  }
+  // Newsletter product CTAs embedded as section headings (Ghost / marketing blocks)
+  if (normalized.includes("causeartist weekly")) return true
+
+  return false
+}
+
 const isMainSectionHeading = (text: string) => {
   const t = text.trim()
   if (!t) return false
+
+  if (isNewsletterSignupHeading(t)) return false
 
   // Filter out Q&A-style headings that tend to be nested under a section
   if (/^(q:|q\.)\s*/i.test(t)) return false
@@ -103,14 +125,14 @@ export const TableOfContents = (props: TableOfContentsProps) => {
             key={heading.id}
             href={`#${heading.id}`}
             className={cx(
-              "relative py-1 text-sm leading-relaxed border-l-2 border-accent",
+              "relative py-1 text-sm leading-relaxed border-l-2 border-border",
               // Indentation based on absolute level
               indentLevel === 0 && "pl-4",
               indentLevel === 1 && "pl-8",
               indentLevel === 2 && "pl-10",
               indentLevel >= 3 && "pl-12",
               // Active state
-              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+              isActive ? "text-foreground" : "text-foreground/70 hover:text-foreground",
             )}
           >
             {heading.text}

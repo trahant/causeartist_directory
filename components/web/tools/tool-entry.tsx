@@ -34,9 +34,9 @@ const ToolEntry = async ({ children, className, tool, ...props }: ToolEntryProps
       {...props}
     >
       <Sticky isOverlay>
-        <Stack size="lg" className="not-prose justify-between">
+        <Stack size="lg" className="not-prose min-w-0 w-full flex-1 justify-between">
           <Stack
-            className="self-start before:content-['#'_counter(entries)] before:font-semibold before:text-3xl before:opacity-25 xl:before:absolute xl:before:right-full xl:before:mr-2"
+            className="min-w-0 self-start before:content-['#'_counter(entries)] before:font-semibold before:text-3xl before:opacity-25 xl:before:absolute xl:before:right-full xl:before:mr-2"
             asChild
           >
             <Link href={href} className="group">
@@ -60,6 +60,19 @@ const ToolEntry = async ({ children, className, tool, ...props }: ToolEntryProps
         </p>
       )}
 
+      <Stack className="w-full not-prose">
+        {isToolPremiumTier(tool) && <ToolButton tool={tool} />}
+
+        <Button
+          variant={isToolPremiumTier(tool) ? "secondary" : "primary"}
+          suffix={<ArrowRightIcon />}
+          className="self-start"
+          asChild
+        >
+          <Link href={href}>{t("common.read_more")}</Link>
+        </Button>
+      </Stack>
+
       {tool.screenshotUrl && (
         <OverlayImage
           href={href}
@@ -81,19 +94,6 @@ const ToolEntry = async ({ children, className, tool, ...props }: ToolEntryProps
           />
         )
       )}
-
-      <Stack className="w-full not-prose">
-        {isToolPremiumTier(tool) && <ToolButton tool={tool} />}
-
-        <Button
-          variant={isToolPremiumTier(tool) ? "secondary" : "primary"}
-          suffix={<ArrowRightIcon />}
-          className="self-start"
-          asChild
-        >
-          <Link href={href}>{t("common.read_more")}</Link>
-        </Button>
-      </Stack>
     </div>
   )
 }
@@ -104,8 +104,8 @@ const ToolEntrySkeleton = async () => {
   return (
     <div className="relative flex flex-col gap-6 scroll-mt-(--header-outer-offset) md:gap-8">
       <Sticky isOverlay>
-        <Stack size="lg" className="not-prose justify-between">
-          <Stack className="self-start w-full">
+        <Stack size="lg" className="not-prose min-w-0 w-full flex-1 justify-between">
+          <Stack className="min-w-0 self-start w-full">
             <Favicon src="/favicon.png" className="size-8 animate-pulse opacity-50" />
 
             <H2 className="w-24">
@@ -122,6 +122,10 @@ const ToolEntrySkeleton = async () => {
         <Skeleton className="w-3/4">&nbsp;</Skeleton>
       </Stack>
 
+      <Button className="pointer-events-none opacity-10 text-transparent self-start">
+        {t("common.read_more")}
+      </Button>
+
       <Skeleton className="w-full aspect-video" />
 
       <Stack direction="column">
@@ -129,10 +133,6 @@ const ToolEntrySkeleton = async () => {
         <Skeleton className="w-full h-24" />
         <Skeleton className="w-2/3 h-12" />
       </Stack>
-
-      <Button className="pointer-events-none opacity-10 text-transparent self-start">
-        {t("common.read_more")}
-      </Button>
     </div>
   )
 }

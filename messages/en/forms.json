@@ -20,12 +20,12 @@
   },
   "ad_details": {
     "create": {
-      "success_message": "Advertisement created successfully",
-      "button_label": "Create Ad"
+      "success_message": "Sponsorship created successfully",
+      "button_label": "Create sponsorship"
     },
     "update": {
-      "success_message": "Advertisement updated successfully",
-      "button_label": "Update Ad"
+      "success_message": "Sponsorship updated successfully",
+      "button_label": "Update sponsorship"
     },
     "name_label": "Name",
     "name_placeholder": "Product name",
@@ -39,8 +39,19 @@
     "errors": {
       "session_incomplete": "The checkout session has not finished yet. Refresh the page and try again.",
       "invalid_session": "We couldn't process this checkout session. Please start over.",
-      "generic": "Something went wrong while saving the advertisement. Please try again."
+      "generic": "Something went wrong while saving your sponsorship. Please try again."
     }
+  },
+  "contact": {
+    "name_label": "Name",
+    "name_placeholder": "Your name",
+    "email_label": "Email",
+    "email_placeholder": "you@example.com",
+    "message_label": "Message",
+    "message_placeholder": "How can we help?",
+    "newsletter_label": "Subscribe to our newsletter",
+    "submit_button": "Send message",
+    "success_message": "Thanks — we received your message and will get back to you soon."
   },
   "subscribe": {
     "email_placeholder": "Enter your email",

@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react"
 import { toast } from "sonner"
+import { fileToBase64 } from "~/lib/file-to-base64"
 import { client } from "~/lib/orpc-client"
 
 type UploadedFile = {
@@ -12,7 +13,12 @@ type UploadedFile = {
   type: string
 }
 
-export const useMediaUpload = (mediaPath: string) => {
+type UseMediaUploadOptions = {
+  /** When set, object key is `${keyPrefix}/${uniqueId}` (no `/content/` segment). For hero images: `companies/{id}/hero`. */
+  keyPrefix?: string
+}
+
+export const useMediaUpload = (mediaPath: string, options?: UseMediaUploadOptions) => {
   const [isUploading, setIsUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +29,9 @@ export const useMediaUpload = (mediaPath: string) => {
   const uploadFile = useCallback(
     async (file: File, onUploadComplete?: (file: UploadedFile) => void) => {
       const uniqueId = crypto.randomUUID().slice(0, 8)
-      const s3Key = `${mediaPath}/content/${uniqueId}`
+      const s3Key = options?.keyPrefix
+        ? `${options.keyPrefix}/${uniqueId}`
+        : `${mediaPath}/content/${uniqueId}`
 
       // Prevent duplicate uploads
       if (activeUploads.current.has(s3Key)) return
@@ -34,8 +42,21 @@ export const useMediaUpload = (mediaPath: string) => {
       setError(null)
 
       try {
-        const base64 = Buffer.from(await file.arrayBuffer()).toString("base64")
-        const url = await client.web.media.upload({ path: s3Key, base64, mimeType: file.type })
+        const base64 = await fileToBase64(file)
+        const mimeType =
+          file.type ||
+          (() => {
+            const ext = file.name.split(".").pop()?.toLowerCase()
+            if (ext === "jpg" || ext === "jpeg") return "image/jpeg"
+            if (ext === "png") return "image/png"
+            if (ext === "webp") return "image/webp"
+            if (ext === "avif") return "image/avif"
+            return ""
+          })()
+        if (!mimeType) {
+          throw new Error("Could not determine image type (add a file extension or use JPEG/PNG/WebP/AVIF)")
+        }
+        const url = await client.web.media.upload({ path: s3Key, base64, mimeType })
 
         setProgress(100)
 
@@ -64,7 +85,7 @@ export const useMediaUpload = (mediaPath: string) => {
         setProgress(0)
       }
     },
-    [mediaPath],
+    [mediaPath, options?.keyPrefix],
   )
 
   return { isUploading, progress, uploadFile, uploadedFile, uploadingFile, error }

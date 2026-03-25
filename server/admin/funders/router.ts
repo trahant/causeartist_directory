@@ -3,7 +3,12 @@ import { Prisma } from "~/.generated/prisma/client"
 import { withAdmin } from "~/lib/orpc"
 import { generateUniqueSlug } from "~/lib/slugs"
 import { findAdminFunders, findTaxonomyForFunderAdmin } from "~/server/admin/funders/queries"
-import { funderListSchema, funderUpdateSchema } from "~/server/admin/funders/schema"
+import {
+  funderCreateSchema,
+  funderListSchema,
+  funderUpdateSchema,
+} from "~/server/admin/funders/schema"
+import { idsSchema } from "~/server/admin/shared/schema"
 
 function parseKeyBenefits(
   json: string | null | undefined,
@@ -31,6 +36,66 @@ const taxonomy = withAdmin.handler(async () => {
   return findTaxonomyForFunderAdmin()
 })
 
+const create = withAdmin
+  .input(funderCreateSchema)
+  .handler(async ({ input, context: { db, revalidate } }) => {
+    const { name, slug: slugInput, type } = input
+    const slug = await generateUniqueSlug(
+      slugInput || name,
+      s => db.funder.findFirst({ where: { slug: s }, select: { id: true } }).then(Boolean),
+      undefined,
+    )
+
+    const funder = await db.funder.create({
+      data: {
+        name,
+        slug,
+        status: "draft",
+        type: emptyToNull(type ?? undefined),
+      },
+    })
+
+    revalidate({ tags: ["funders", "directory", "directory-facets", "directory-sectors"] })
+    revalidate({ paths: ["/funders"] })
+
+    return funder
+  })
+
+const remove = withAdmin.input(idsSchema).handler(async ({ input: { ids }, context: { db, revalidate } }) => {
+  const deletedSlugs: string[] = []
+
+  for (const id of ids) {
+    const row = await db.funder.findUnique({ where: { id }, select: { slug: true } })
+    if (!row) continue
+
+    await db.$transaction(async tx => {
+      await tx.funderEpisode.deleteMany({ where: { funderId: id } })
+      await tx.companyFunder.deleteMany({ where: { funderId: id } })
+      await tx.funderLocation.deleteMany({ where: { funderId: id } })
+      await tx.funderSector.deleteMany({ where: { funderId: id } })
+      await tx.funderSubcategory.deleteMany({ where: { funderId: id } })
+      await tx.funderStage.deleteMany({ where: { funderId: id } })
+      await tx.funder.delete({ where: { id } })
+    })
+
+    deletedSlugs.push(row.slug)
+  }
+
+  const tags = [
+    "funders",
+    "directory",
+    "directory-facets",
+    "directory-sectors",
+    "related-funders",
+    ...deletedSlugs.flatMap(s => [`funder-${s}` as const]),
+  ]
+
+  revalidate({ tags: [...new Set(tags)] })
+  revalidate({ paths: ["/funders", ...deletedSlugs.map(s => `/funders/${s}`)] })
+
+  return true
+})
+
 const update = withAdmin
   .input(funderUpdateSchema)
   .handler(async ({ input, context: { db, revalidate } }) => {
@@ -39,6 +104,7 @@ const update = withAdmin
       sectorIds,
       locationIds,
       subcategoryIds,
+      companyIds,
       stageIds,
       keyBenefitsJson,
       slug: slugInput,
@@ -104,6 +170,10 @@ const update = withAdmin
           deleteMany: {},
           create: (subcategoryIds ?? []).map(subcategoryId => ({ subcategoryId })),
         },
+        portfolio: {
+          deleteMany: {},
+          create: (companyIds ?? []).map(companyId => ({ companyId })),
+        },
         stages: {
           deleteMany: {},
           create: (stageIds ?? []).map(stageId => ({ stageId })),
@@ -131,5 +201,7 @@ const update = withAdmin
 export const funderRouter = {
   list,
   taxonomy,
+  create,
+  remove,
   update,
 }

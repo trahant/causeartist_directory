@@ -28,6 +28,11 @@ const typeDisplay: Record<string, string> = {
   corporate: "Corporate",
 }
 
+/** Visible page title (H1); accelerator uses bespoke copy instead of "{label} Funders". */
+const typePageHeading: Partial<Record<string, string>> = {
+  accelerator: "Impact Accelerators",
+}
+
 type Props = { params: Promise<{ type: string }> }
 
 const getData = cache(async ({ params }: Props) => {
@@ -48,18 +53,25 @@ const getData = cache(async ({ params }: Props) => {
 
   const typeName = typeDisplay[typeSlug] ?? formatFunderType(typeSlug)
   const url = `/funders/type/${typeSlug}`
-  const title = `${typeName} Impact Funders | Causeartist`
-  const description = `Discover ${typeName} investors and funders in the impact economy.`
+  const heading = typePageHeading[typeSlug] ?? `${typeName} Funders`
+  const title =
+    typeSlug === "accelerator"
+      ? "Impact Accelerators | Causeartist"
+      : `${typeName} Impact Funders | Causeartist`
+  const description =
+    typeSlug === "accelerator"
+      ? "Discover impact accelerators supporting startups in the impact economy."
+      : `Discover ${typeName} investors and funders in the impact economy.`
 
   const data = getPageData(url, title, description, {
     breadcrumbs: [
       { url: "/funders", title: "Funders" },
-      { url, title: typeName },
+      { url, title: heading },
     ],
     structuredData: [generateCollectionPage(url, title, description)],
   })
 
-  return { typeSlug, typeName, funders, ...data }
+  return { typeSlug, typeName, heading, funders, ...data }
 })
 
 export const generateStaticParams = async () => {
@@ -127,14 +139,14 @@ function FunderCard({ funder }: { funder: FunderMany }) {
 }
 
 export default async function FundersByTypePage(props: Props) {
-  const { typeName, funders, breadcrumbs, structuredData } = await getData(props)
+  const { heading, funders, breadcrumbs, structuredData } = await getData(props)
 
   return (
     <>
       <Breadcrumbs items={breadcrumbs} />
 
       <Intro>
-        <H2 as="h1">{typeName} Funders</H2>
+        <H2 as="h1">{heading}</H2>
         <IntroDescription>
           {funders.length} {funders.length === 1 ? "Funder" : "Funders"}
         </IntroDescription>

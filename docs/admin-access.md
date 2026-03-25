@@ -38,7 +38,7 @@ The email you type on the login form must match the **`User.email`** row that ha
 - `BETTER_AUTH_URL` — must match the site origin you open in the browser (scheme + host + port), e.g. `http://localhost:3000` for local dev on port 3000
 - `NEXT_PUBLIC_SITE_URL` — should match **`BETTER_AUTH_URL`** so the browser auth client calls the same origin as the server-generated magic links
 - `ANTHROPIC_API_KEY` — optional; only for AI features in admin
-- Resend vars — see “Magic link email” above
+- Resend vars — see “Magic link email” above (`RESEND_API_KEY`, `RESEND_SENDER_EMAIL`). For the public **contact** form, set **`CONTACT_INBOX_EMAIL`** (where submissions are delivered). Optional: **`RESEND_NEWSLETTER_SEGMENT_ID`** to add subscribers to a Resend segment.
 
 ## Troubleshooting
 

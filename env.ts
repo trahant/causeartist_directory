@@ -18,6 +18,10 @@ export const env = createEnv({
     REDIS_URL: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     RESEND_SENDER_EMAIL: z.string().optional(),
+    /** Inbox for contact form notifications (Resend `sendEmail` “to” address) */
+    CONTACT_INBOX_EMAIL: z.string().email().optional(),
+    /** Optional Resend segment id — new contacts are added to this segment when set */
+    RESEND_NEWSLETTER_SEGMENT_ID: z.string().optional(),
     S3_ENDPOINT: z.string().optional(),
     S3_REGION: z.string().optional(),
     S3_BUCKET: z.string().optional(),
@@ -32,6 +36,12 @@ export const env = createEnv({
     AI_CHAT_MODEL: z.string().default("openai/gpt-4o"),
     AI_COMPLETION_MODEL: z.string().default("openai/gpt-4o-mini"),
     JINA_API_KEY: z.string().optional(),
+    /** Supabase Storage (optional). When all three are set, uploads prefer this over S3. */
+    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    SUPABASE_STORAGE_BUCKET: z.string().optional(),
+    /** Optional CDN/base URL for public objects (append `/{objectPath}`). Omit to use Supabase project URL. */
+    SUPABASE_STORAGE_PUBLIC_URL: z.string().url().optional(),
   },
 
   /**

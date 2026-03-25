@@ -1,14 +1,12 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import { getFormatter, getTranslations } from "next-intl/server"
-import { cache, Suspense } from "react"
-import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
-import { Link } from "~/components/common/link"
-import { AdCard, AdCardSkeleton } from "~/components/web/ads/ad-card"
+import { cache } from "react"
+import { Wrapper } from "~/components/common/wrapper"
+import { BlogFeaturedPost, BlogPostIndexCard } from "~/components/web/blog/blog-post-index-cards"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
+import { H3 } from "~/components/common/heading"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
-import { Section } from "~/components/web/ui/section"
 import { siteConfig } from "~/config/site"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
@@ -18,13 +16,12 @@ import { findBlogPosts } from "~/server/web/blog/queries"
 // I18n page namespace
 const namespace = "pages.blog"
 
-const formatDate = (date: Date | null | undefined) => {
-  if (!date) return ""
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  })
+const postDateParts = (format: Awaited<ReturnType<typeof getFormatter>>, date: Date | null | undefined) => {
+  if (!date) return { label: "" as const }
+  return {
+    label: format.dateTime(date, { dateStyle: "medium" }),
+    iso: date.toISOString(),
+  }
 }
 
 // Get page data
@@ -51,6 +48,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 export default async function () {
   const { posts, metadata, breadcrumbs, structuredData } = await getData()
+  const t = await getTranslations(namespace)
+  const format = await getFormatter()
+
+  const [featured, ...rest] = posts
 
   return (
     <>
@@ -61,35 +62,28 @@ export default async function () {
         <IntroDescription>{metadata.description}</IntroDescription>
       </Intro>
 
-      <Section>
-        <Section.Content>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-            {posts.map((post: BlogPostMany) => (
-              <Card key={post.id} asChild>
-                <Link href={`/blog/${post.slug}`}>
-                  <CardHeader wrap={false}>
-                    <span className="font-semibold text-sm line-clamp-2">{post.title}</span>
-                  </CardHeader>
-                  <CardDescription>{post.excerpt}</CardDescription>
-                  <CardFooter>
-                    <span>{formatDate(post.publishedAt)}</span>
-                  </CardFooter>
-                </Link>
-              </Card>
-            ))}
-          </div>
+      <Wrapper gap="lg" className="w-full">
+        {posts.length > 0 ? (
+          <>
+            {featured ? <BlogFeaturedPost post={featured} date={postDateParts(format, featured.publishedAt)} /> : null}
 
-          {posts.length === 0 && (
-            <p className="text-muted-foreground">No posts found.</p>
-          )}
-        </Section.Content>
-
-        <Section.Sidebar className="max-h-(--sidebar-max-height)">
-          <Suspense fallback={<AdCardSkeleton />}>
-            <AdCard type="BlogPost" />
-          </Suspense>
-        </Section.Sidebar>
-      </Section>
+            {rest.length > 0 ? (
+              <>
+                <H3 as="h3" className="scroll-mt-20">
+                  {t("latest_heading")}
+                </H3>
+                <div className="grid grid-cols-1 gap-5 w-full md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+                  {rest.map((post: BlogPostMany) => (
+                    <BlogPostIndexCard key={post.id} post={post} date={postDateParts(format, post.publishedAt)} />
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </>
+        ) : (
+          <p className="text-muted-foreground">No posts found.</p>
+        )}
+      </Wrapper>
 
       <StructuredData data={structuredData} />
     </>

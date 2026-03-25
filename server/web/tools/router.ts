@@ -27,12 +27,16 @@ const submit = withAuthRateLimit("submission")
     if (newsletterOptIn) {
       const [firstName, ...restOfName] = user.name.trim().split(/\s+/)
       const lastName = restOfName.join(" ")
-
-      await createResendContact({
-        email: user.email,
-        firstName,
-        lastName,
-      })
+      const { error: newsletterError } = await tryCatch(
+        createResendContact({
+          email: user.email,
+          firstName,
+          lastName,
+        }),
+      )
+      if (newsletterError) {
+        console.warn("Tool submit: newsletter signup skipped:", newsletterError)
+      }
     }
 
     const domain = getDomain(data.websiteUrl)
