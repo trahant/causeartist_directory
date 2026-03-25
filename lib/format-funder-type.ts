@@ -1,4 +1,4 @@
-const FUNDER_TYPE_SLUGS = [
+export const FUNDER_TYPE_SLUGS = [
   "vc",
   "foundation",
   "accelerator",

@@ -8,9 +8,14 @@ import { Button } from "~/components/common/button"
 import { Input } from "~/components/common/input"
 import { useFilters } from "~/contexts/filter-context"
 import { isDefaultState } from "~/lib/parsers"
+import { formatFunderType } from "~/lib/format-funder-type"
 import { cx } from "~/lib/utils"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
-import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
+import type {
+  DirectoryFunderTypeFacet,
+  DirectoryLocationFacet,
+  DirectorySectorFacet,
+} from "~/server/web/directory/types"
 import { companyListFilterParams } from "~/server/web/companies/list-schema"
 import { directoryFilterParams, directorySortValues } from "~/server/web/directory/schema"
 import { funderListFilterParams } from "~/server/web/funders/list-schema"
@@ -26,6 +31,7 @@ const selectTriggerClass = cx(
 type DirectoryFilterBarProps = {
   sectorFacets: DirectorySectorFacet[]
   locationFacets: DirectoryLocationFacet[]
+  funderTypeFacets?: DirectoryFunderTypeFacet[]
   /** When true, show Companies | Funders control (home directory only). */
   enableKindToggle?: boolean
   variant?: "home" | "companies" | "funders"
@@ -34,6 +40,7 @@ type DirectoryFilterBarProps = {
 export function DirectoryFilterBar({
   sectorFacets,
   locationFacets,
+  funderTypeFacets = [],
   enableKindToggle = false,
   variant = "home",
 }: DirectoryFilterBarProps) {
@@ -82,9 +89,15 @@ export function DirectoryFilterBar({
 
   const kind = enableKindToggle && "kind" in filters ? filters.kind : undefined
 
+  const showFunderTypeColumn =
+    variant === "funders" || (enableKindToggle && kind === "funders")
+
   const setKind = (next: (typeof kindOptions)[number]) => {
     if (enableKindToggle) {
-      ;(updateFilters as (v: { kind: (typeof kindOptions)[number] }) => void)({ kind: next })
+      ;(updateFilters as (v: { kind: (typeof kindOptions)[number]; funderType?: string }) => void)({
+        kind: next,
+        ...(next === "companies" ? { funderType: "" } : {}),
+      })
     }
   }
 
@@ -197,7 +210,12 @@ export function DirectoryFilterBar({
 
       {filtersOpen && (
         <div className="overflow-hidden rounded-lg border border-input bg-background shadow-sm">
-          <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-2 lg:divide-x lg:divide-y-0">
+          <div
+            className={cx(
+              "grid grid-cols-1 divide-y divide-border lg:divide-x lg:divide-y-0",
+              showFunderTypeColumn ? "lg:grid-cols-3" : "lg:grid-cols-2",
+            )}
+          >
             <div className="flex flex-col gap-3 p-4 md:p-5">
               <h3 className="text-sm font-semibold text-foreground">{t("sector_label")}</h3>
               <Input
@@ -307,6 +325,54 @@ export function DirectoryFilterBar({
                 ))}
               </ul>
             </div>
+
+            {showFunderTypeColumn && (
+              <div className="flex flex-col gap-3 p-4 md:p-5">
+                <h3 className="text-sm font-semibold text-foreground">{t("funder_type_label")}</h3>
+                <ul
+                  className="max-h-64 space-y-1 overflow-y-auto pr-1"
+                  role="radiogroup"
+                  aria-label={t("funder_type_label")}
+                >
+                  <li>
+                    <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md py-1 text-sm hover:bg-muted/50">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <input
+                          type="radio"
+                          name="directory-funder-type"
+                          className="size-4 shrink-0 border-input text-primary accent-primary"
+                          checked={!filters.funderType}
+                          onChange={() => updateFilters({ funderType: "" })}
+                        />
+                        <span className="truncate">{t("funder_type_all")}</span>
+                      </span>
+                      <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                        {tToolbar("all_funder_types_count")}
+                      </span>
+                    </label>
+                  </li>
+                  {funderTypeFacets.map(ft => (
+                    <li key={ft.slug}>
+                      <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md py-1 text-sm hover:bg-muted/50">
+                        <span className="flex min-w-0 items-center gap-2">
+                          <input
+                            type="radio"
+                            name="directory-funder-type"
+                            className="size-4 shrink-0 border-input text-primary accent-primary"
+                            checked={filters.funderType === ft.slug}
+                            onChange={() => updateFilters({ funderType: ft.slug })}
+                          />
+                          <span className="truncate">{formatFunderType(ft.slug)}</span>
+                        </span>
+                        <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                          {ft.count}
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {!isDefault && (

@@ -5,6 +5,7 @@ import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2, H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { FunderCardHeader } from "~/components/web/funders/funder-card-header"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
@@ -103,13 +104,15 @@ function CompanyCard({ company }: { company: CompanyMany }) {
         className="flex flex-col gap-4 w-full min-w-0 text-left"
       >
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 w-full gap-3">
             <img
               src={company.logoUrl ?? undefined}
               alt={company.name}
-              className="size-8 rounded object-contain"
+              className="size-8 shrink-0 rounded object-contain"
             />
-            <span className="font-semibold text-sm truncate">{company.name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>
+            </div>
           </div>
         </CardHeader>
         <CardDescription>{cardTitle}</CardDescription>
@@ -155,14 +158,11 @@ function FunderCard({ funder }: { funder: FunderMany }) {
         className="flex flex-col gap-4 w-full min-w-0 text-left"
       >
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <img
-              src={funder.logoUrl ?? undefined}
-              alt={funder.name}
-              className="size-8 rounded object-contain"
-            />
-            <span className="font-semibold text-sm truncate">{funder.name}</span>
-          </div>
+          <FunderCardHeader
+            logoUrl={funder.logoUrl}
+            name={funder.name}
+            typeLabel={formatFunderType(funder.type)}
+          />
         </CardHeader>
         <CardDescription>{desc}</CardDescription>
       </Link>
@@ -170,9 +170,6 @@ function FunderCard({ funder }: { funder: FunderMany }) {
         {funder.sectors.slice(0, 3).map(s => (
           <Badge key={s.sector.slug}>{s.sector.name}</Badge>
         ))}
-        <Badge className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 font-medium shrink-0">
-          {formatFunderType(funder.type)}
-        </Badge>
         {funder.locations[0] && (
           <Link href={`/funders/location/${funder.locations[0].location.slug}`}>
             <Badge variant="outline" className="text-xs inline-flex items-center gap-1.5 max-w-full min-w-0">

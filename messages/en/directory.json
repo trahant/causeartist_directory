@@ -8,7 +8,9 @@
     "sector_search_placeholder": "Search sector",
     "location_label": "Location",
     "location_all": "All locations",
-    "location_search_placeholder": "Search location"
+    "location_search_placeholder": "Search location",
+    "funder_type_label": "Funder type",
+    "funder_type_all": "All types"
   },
   "results": {
     "empty_companies": "No companies match your filters.",
@@ -29,6 +31,7 @@
     "sort_newest": "Newest",
     "clear_all": "Clear filters",
     "all_sectors_count": "—",
-    "all_locations_count": "—"
+    "all_locations_count": "—",
+    "all_funder_types_count": "—"
   }
 }

@@ -4,6 +4,7 @@ import { DirectoryListing } from "~/components/web/directory/directory-listing"
 import { DirectoryResults } from "~/components/web/directory/directory-results"
 import { createGraph, generateItemList } from "~/lib/structured-data"
 import {
+  findDirectoryFunderTypeCounts,
   findDirectoryLocationCounts,
   findDirectorySectorCounts,
   searchDirectory,
@@ -16,11 +17,13 @@ type Props = {
 
 export async function DirectoryQuery({ searchParams }: Props) {
   const params = directoryFilterParamsCache.parse(await searchParams)
-  const [{ items, total, page, perPage }, sectorFacets, locationFacets] = await Promise.all([
-    searchDirectory(params),
-    findDirectorySectorCounts(params.kind),
-    findDirectoryLocationCounts(params.kind),
-  ])
+  const [{ items, total, page, perPage }, sectorFacets, locationFacets, funderTypeFacets] =
+    await Promise.all([
+      searchDirectory(params),
+      findDirectorySectorCounts(params.kind),
+      findDirectoryLocationCounts(params.kind),
+      findDirectoryFunderTypeCounts(),
+    ])
 
   const itemList = items.map(row =>
     row.type === "company"
@@ -45,6 +48,7 @@ export async function DirectoryQuery({ searchParams }: Props) {
       <DirectoryListing
         sectorFacets={sectorFacets}
         locationFacets={locationFacets}
+        funderTypeFacets={funderTypeFacets}
         pagination={{ total, perPage, page }}
       >
         <DirectoryResults items={items} listingKind={params.kind} />

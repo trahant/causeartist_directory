@@ -7,7 +7,11 @@ import { Pagination, type PaginationProps } from "~/components/web/pagination"
 import { DirectoryFilterBar } from "~/components/web/directory/directory-filter-bar"
 import { companyListFilterParams } from "~/server/web/companies/list-schema"
 import { directoryFilterParams } from "~/server/web/directory/schema"
-import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
+import type {
+  DirectoryFunderTypeFacet,
+  DirectoryLocationFacet,
+  DirectorySectorFacet,
+} from "~/server/web/directory/types"
 import { funderListFilterParams } from "~/server/web/funders/list-schema"
 import { useTranslations } from "next-intl"
 
@@ -23,6 +27,7 @@ type EntityDirectoryListingProps = PropsWithChildren & {
   pagination: PaginationProps
   sectorFacets: DirectorySectorFacet[]
   locationFacets: DirectoryLocationFacet[]
+  funderTypeFacets?: DirectoryFunderTypeFacet[]
   /** Pick nuqs schema inside the client bundle (do not pass parsers from RSC). */
   listingVariant: DirectoryListingVariant
   listingId?: string
@@ -33,6 +38,7 @@ export function EntityDirectoryListing({
   pagination,
   sectorFacets,
   locationFacets,
+  funderTypeFacets = [],
   listingVariant,
   listingId,
 }: EntityDirectoryListingProps) {
@@ -45,6 +51,7 @@ export function EntityDirectoryListing({
         <DirectoryFilterBar
           sectorFacets={sectorFacets}
           locationFacets={locationFacets}
+          funderTypeFacets={funderTypeFacets}
           enableKindToggle={enableKindToggle}
           variant={listingVariant}
         />

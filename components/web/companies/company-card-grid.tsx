@@ -14,13 +14,15 @@ function CompanyDirectoryCard({ company }: { company: CompanyMany }) {
         className="flex min-w-0 w-full flex-col gap-4 text-left"
       >
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 w-full gap-3">
             <img
               src={company.logoUrl ?? undefined}
               alt={company.name}
-              className="size-8 rounded object-contain"
+              className="size-8 shrink-0 rounded object-contain"
             />
-            <span className="truncate text-sm font-semibold">{company.name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>
+            </div>
           </div>
         </CardHeader>
 

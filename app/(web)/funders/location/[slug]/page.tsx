@@ -5,10 +5,12 @@ import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { FunderCardHeader } from "~/components/web/funders/funder-card-header"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription } from "~/components/web/ui/intro"
 import { Section } from "~/components/web/ui/section"
+import { formatFunderType } from "~/lib/format-funder-type"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateCollectionPage } from "~/lib/structured-data"
 import { db } from "~/services/db"
@@ -16,29 +18,6 @@ import { funderManyPayload } from "~/server/web/funders/payloads"
 import type { FunderMany } from "~/server/web/funders/payloads"
 
 type Props = { params: Promise<{ slug: string }> }
-
-function formatFunderType(type: string | null): string {
-  switch (type) {
-    case "vc":
-      return "Venture Capital"
-    case "foundation":
-      return "Foundation"
-    case "accelerator":
-      return "Accelerator"
-    case "family-office":
-      return "Family Office"
-    case "cdfi":
-      return "CDFI"
-    case "impact-fund":
-      return "Impact Fund"
-    case "fellowship":
-      return "Fellowship"
-    case "corporate":
-      return "Corporate"
-    default:
-      return "Impact Fund"
-  }
-}
 
 const getData = cache(async ({ params }: Props) => {
   const { slug } = await params
@@ -106,17 +85,11 @@ function FunderCard({ funder }: { funder: FunderMany }) {
     <Card asChild>
       <Link href={`/funders/${funder.slug}`}>
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <img
-              src={funder.logoUrl ?? undefined}
-              alt={funder.name}
-              className="size-8 rounded object-contain"
-            />
-            <span className="font-semibold text-sm truncate">{funder.name}</span>
-            <Badge className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 font-medium shrink-0">
-              {formatFunderType(funder.type)}
-            </Badge>
-          </div>
+          <FunderCardHeader
+            logoUrl={funder.logoUrl}
+            name={funder.name}
+            typeLabel={formatFunderType(funder.type)}
+          />
         </CardHeader>
 
         <CardDescription>{cardTitle}</CardDescription>

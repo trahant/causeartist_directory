@@ -5,7 +5,12 @@ import {
   type CompanyMany,
 } from "~/server/web/companies/payloads"
 import type { DirectoryFilterParams } from "~/server/web/directory/schema"
-import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
+import { FUNDER_TYPE_SLUGS } from "~/lib/format-funder-type"
+import type {
+  DirectoryFunderTypeFacet,
+  DirectoryLocationFacet,
+  DirectorySectorFacet,
+} from "~/server/web/directory/types"
 import { activeSectorsWhere } from "~/server/web/sectors/retired"
 import { companyDirectoryWhere, funderDirectoryWhere } from "~/server/web/directory/where"
 import { funderManyPayload, type FunderMany } from "~/server/web/funders/payloads"
@@ -20,7 +25,7 @@ export type DirectoryKind = "companies" | "funders"
 /** Shared shape for `/companies` and `/funders` listing URLs (no `kind`). */
 export type EntityDirectoryListParams = Pick<
   DirectoryFilterParams,
-  "q" | "sector" | "location" | "sort" | "page" | "perPage"
+  "q" | "sector" | "location" | "funderType" | "sort" | "page" | "perPage"
 >
 
 function listOrderBy(sort: DirectoryFilterParams["sort"]): Prisma.CompanyOrderByWithRelationInput {
@@ -46,13 +51,19 @@ export async function searchDirectory(params: DirectoryFilterParams): Promise<{
   cacheTag("directory")
   cacheLife("infinite")
 
-  const { q, kind, sector, location, sort, page, perPage } = params
+  const { q, kind, sector, location, funderType, sort, page, perPage } = params
   const sectorSlug = sector?.trim() || undefined
   const locationSlug = location?.trim() || undefined
+  const funderTypeSlug = funderType?.trim() || undefined
   const skip = (page - 1) * perPage
 
   const cWhere = companyDirectoryWhere(sectorSlug, locationSlug, q)
-  const fWhere = funderDirectoryWhere(sectorSlug, locationSlug, q)
+  const fWhere = funderDirectoryWhere(
+    sectorSlug,
+    locationSlug,
+    q,
+    kind === "funders" ? funderTypeSlug : undefined,
+  )
 
   if (kind === "funders") {
     const fOrder = funderListOrderBy(sort)
@@ -141,11 +152,12 @@ export async function searchFunderDirectory(params: EntityDirectoryListParams): 
   cacheTag("directory", "funders")
   cacheLife("infinite")
 
-  const { q, sector, location, sort, page, perPage } = params
+  const { q, sector, location, funderType, sort, page, perPage } = params
   const sectorSlug = sector?.trim() || undefined
   const locationSlug = location?.trim() || undefined
+  const funderTypeSlug = funderType?.trim() || undefined
   const skip = (page - 1) * perPage
-  const where = funderDirectoryWhere(sectorSlug, locationSlug, q)
+  const where = funderDirectoryWhere(sectorSlug, locationSlug, q, funderTypeSlug)
   const orderBy = funderListOrderBy(sort)
 
   const [items, total] = await Promise.all([
@@ -165,6 +177,31 @@ export async function searchFunderDirectory(params: EntityDirectoryListParams): 
     page,
     perPage,
   }
+}
+
+export async function findDirectoryFunderTypeCounts(): Promise<DirectoryFunderTypeFacet[]> {
+  "use cache"
+
+  cacheTag("directory-facets")
+  cacheLife("directoryStats")
+
+  const rows = await db.funder.groupBy({
+    by: ["type"],
+    where: { status: "published" },
+    _count: { _all: true },
+  })
+
+  const countByType = new Map<string, number>()
+  for (const r of rows) {
+    if (r.type != null && r.type !== "") {
+      countByType.set(r.type, r._count._all)
+    }
+  }
+
+  return FUNDER_TYPE_SLUGS.map(slug => ({
+    slug,
+    count: countByType.get(slug) ?? 0,
+  }))
 }
 
 export async function findDirectorySectors() {

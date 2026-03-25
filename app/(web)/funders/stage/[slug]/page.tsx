@@ -80,13 +80,15 @@ function FunderCard({ funder }: { funder: FunderMany }) {
     <Card asChild>
       <Link href={`/funders/${funder.slug}`}>
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 w-full gap-3">
             <img
               src={funder.logoUrl ?? undefined}
               alt={funder.name}
-              className="size-8 rounded object-contain"
+              className="size-8 shrink-0 rounded object-contain"
             />
-            <span className="truncate text-sm font-semibold">{funder.name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-pretty text-sm font-semibold wrap-break-word">{funder.name}</span>
+            </div>
           </div>
         </CardHeader>
         <CardDescription>{funder.description}</CardDescription>

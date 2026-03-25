@@ -1,4 +1,5 @@
 import type { Prisma } from "~/.generated/prisma/client"
+import { isFunderTypeSlug } from "~/lib/format-funder-type"
 
 export function buildCompanyTextFilter(q: string | undefined): Prisma.CompanyWhereInput["OR"] | undefined {
   if (!q?.trim()) return undefined
@@ -39,6 +40,7 @@ export function funderDirectoryWhere(
   sectorSlug: string | undefined,
   locationSlug: string | undefined,
   q: string | undefined,
+  funderTypeSlug?: string | null,
 ): Prisma.FunderWhereInput {
   const sectorFilter: Prisma.FunderWhereInput =
     sectorSlug && sectorSlug.length > 0
@@ -49,6 +51,9 @@ export function funderDirectoryWhere(
     locationSlug && locationSlug.length > 0
       ? { locations: { some: { location: { slug: locationSlug } } } }
       : {}
+
+  const typeFilter: Prisma.FunderWhereInput =
+    funderTypeSlug && isFunderTypeSlug(funderTypeSlug) ? { type: funderTypeSlug } : {}
 
   const t = q?.trim()
   const funderOr = t
@@ -62,6 +67,7 @@ export function funderDirectoryWhere(
     status: "published",
     ...sectorFilter,
     ...locationFilter,
+    ...typeFilter,
     ...(funderOr ? { OR: funderOr } : {}),
   }
 }

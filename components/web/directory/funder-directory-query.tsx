@@ -2,6 +2,7 @@ import type { SearchParams } from "nuqs"
 import { DirectoryResults } from "~/components/web/directory/directory-results"
 import { EntityDirectoryListing } from "~/components/web/directory/entity-directory-listing"
 import {
+  findDirectoryFunderTypeCounts,
   findDirectoryLocationCounts,
   findDirectorySectorCounts,
   searchFunderDirectory,
@@ -14,11 +15,13 @@ type Props = {
 
 export async function FunderDirectoryQuery({ searchParams }: Props) {
   const params = funderListFilterParamsCache.parse(await searchParams)
-  const [{ items, total, page, perPage }, sectorFacets, locationFacets] = await Promise.all([
-    searchFunderDirectory(params),
-    findDirectorySectorCounts("funders"),
-    findDirectoryLocationCounts("funders"),
-  ])
+  const [{ items, total, page, perPage }, sectorFacets, locationFacets, funderTypeFacets] =
+    await Promise.all([
+      searchFunderDirectory(params),
+      findDirectorySectorCounts("funders"),
+      findDirectoryLocationCounts("funders"),
+      findDirectoryFunderTypeCounts(),
+    ])
 
   return (
     <EntityDirectoryListing
@@ -26,6 +29,7 @@ export async function FunderDirectoryQuery({ searchParams }: Props) {
       pagination={{ total, perPage, page }}
       sectorFacets={sectorFacets}
       locationFacets={locationFacets}
+      funderTypeFacets={funderTypeFacets}
     >
       <DirectoryResults items={items} listingKind="funders" />
     </EntityDirectoryListing>

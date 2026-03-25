@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server"
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { FunderCardHeader } from "~/components/web/funders/funder-card-header"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { formatFunderType } from "~/lib/format-funder-type"
 import type { DirectoryListItem } from "~/server/web/directory/queries"
@@ -50,13 +51,15 @@ function CompanyDirectoryCard({
         className="flex flex-col gap-4 w-full min-w-0 text-left"
       >
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 w-full gap-3">
             <img
               src={company.logoUrl ?? undefined}
               alt={company.name}
-              className="size-8 rounded object-contain"
+              className="size-8 shrink-0 rounded object-contain"
             />
-            <span className="font-semibold text-sm truncate">{company.name}</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>
+            </div>
           </div>
         </CardHeader>
         <CardDescription>{title}</CardDescription>
@@ -106,17 +109,11 @@ function FunderDirectoryCard({
         className="flex flex-col gap-4 w-full min-w-0 text-left"
       >
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <img
-              src={funder.logoUrl ?? undefined}
-              alt={funder.name}
-              className="size-8 rounded object-contain"
-            />
-            <span className="font-semibold text-sm truncate">{funder.name}</span>
-            <Badge className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 font-medium shrink-0">
-              {formatFunderType(funder.type)}
-            </Badge>
-          </div>
+          <FunderCardHeader
+            logoUrl={funder.logoUrl}
+            name={funder.name}
+            typeLabel={formatFunderType(funder.type)}
+          />
         </CardHeader>
         <CardDescription>{desc}</CardDescription>
       </Link>

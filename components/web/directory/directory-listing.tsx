@@ -3,12 +3,17 @@
 import type { PropsWithChildren } from "react"
 import { EntityDirectoryListing, EntityDirectoryListingSkeleton } from "~/components/web/directory/entity-directory-listing"
 import type { PaginationProps } from "~/components/web/pagination"
-import type { DirectoryLocationFacet, DirectorySectorFacet } from "~/server/web/directory/types"
+import type {
+  DirectoryFunderTypeFacet,
+  DirectoryLocationFacet,
+  DirectorySectorFacet,
+} from "~/server/web/directory/types"
 
 type DirectoryListingProps = PropsWithChildren & {
   pagination: PaginationProps
   sectorFacets: DirectorySectorFacet[]
   locationFacets: DirectoryLocationFacet[]
+  funderTypeFacets: DirectoryFunderTypeFacet[]
 }
 
 export function DirectoryListing({
@@ -16,6 +21,7 @@ export function DirectoryListing({
   pagination,
   sectorFacets,
   locationFacets,
+  funderTypeFacets,
 }: DirectoryListingProps) {
   return (
     <EntityDirectoryListing
@@ -24,6 +30,7 @@ export function DirectoryListing({
       pagination={pagination}
       sectorFacets={sectorFacets}
       locationFacets={locationFacets}
+      funderTypeFacets={funderTypeFacets}
     >
       {children}
     </EntityDirectoryListing>

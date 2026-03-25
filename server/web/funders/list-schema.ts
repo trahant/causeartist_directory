@@ -11,6 +11,7 @@ export const funderListFilterParams = {
   q: parseAsString.withDefault(""),
   sector: parseAsString.withDefault(""),
   location: parseAsString.withDefault(""),
+  funderType: parseAsString.withDefault(""),
   sort: parseAsStringEnum([...directorySortValues]).withDefault("name.asc"),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(24),

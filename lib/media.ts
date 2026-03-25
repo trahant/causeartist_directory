@@ -7,7 +7,11 @@ import {
   extAndContentTypeFromValidatedMime,
   resolveFetchedImageBuffer,
 } from "~/lib/image-upload-format"
-import { isSupabaseStorageConfigured, uploadBytesToSupabase } from "~/lib/supabase-storage"
+import {
+  isSupabaseStorageConfigured,
+  missingSupabaseStorageEnvVars,
+  uploadBytesToSupabase,
+} from "~/lib/supabase-storage"
 import { s3Client } from "~/services/s3"
 
 const uploadToS3WithObjectKey = async (file: Buffer, objectKey: string, contentType: string) => {
@@ -60,8 +64,9 @@ export const uploadPublicMedia = async (file: Buffer, key: string, declaredMime?
   if (s3Client && env.S3_BUCKET) {
     return uploadToS3WithObjectKey(file, objectKey, contentType)
   }
+  const missing = missingSupabaseStorageEnvVars()
   throw new Error(
-    "Supabase Storage is not configured. In .env.local set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (service_role from Dashboard → Settings → API), and SUPABASE_STORAGE_BUCKET, then restart. Leave S3_* empty. See .env.example.",
+    `Supabase Storage is not configured. Missing or empty: ${missing.join(", ")}. In .env.local set real values (blank lines are ignored). Use service_role from Dashboard → Settings → API for SUPABASE_SERVICE_ROLE_KEY; restart the dev server. Leave S3_* empty unless using S3. See .env.example.`,
   )
 }
 
