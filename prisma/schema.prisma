@@ -198,18 +198,11 @@ model Post {
   @@index([publishedAt])
 }
 
-enum CompanyLifecycleStatus {
-  Active
-  Acquired
-  Sunsetted
-}
-
 model Company {
-  id              String                   @id @default(cuid())
+  id              String                  @id @default(cuid())
   name            String
-  slug            String                   @unique
-  status          String                   @default("draft")
-  lifecycleStatus CompanyLifecycleStatus   @default(Active)
+  slug            String                  @unique
+  status          String                  @default("draft")
   tagline         String?
   description     String?
   logoUrl         String?
@@ -223,26 +216,27 @@ model Company {
   impactMetrics   String?
   seoTitle        String?
   seoDescription  String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
   heroImageUrl    String?
   /// JSON array of `{ "title": string, "body": string }` for structured “key benefits” on the profile.
   keyBenefits     Json?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  lifecycleStatus CompanyLifecycleStatus  @default(Active)
   caseStudies     CaseStudy[]
+  certifications  CompanyCertification[]
   podcastEpisodes CompanyEpisode[]
   funders         CompanyFunder[]
   locations       CompanyLocation[]
   retailLocations CompanyRetailLocation[]
   sectors         CompanySector[]
   subcategories   CompanySubcategory[]
-  certifications  CompanyCertification[]
 }
 
 model Funder {
-  id               String           @id @default(cuid())
+  id               String              @id @default(cuid())
   name             String
-  slug             String           @unique
-  status           String           @default("draft")
+  slug             String              @unique
+  status           String              @default("draft")
   type             String?
   description      String?
   logoUrl          String?
@@ -256,17 +250,17 @@ model Funder {
   linkedin         String?
   seoTitle         String?
   seoDescription   String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
   heroImageUrl     String?
   /// JSON array of `{ "title": string, "body": string }` for structured “key benefits” on the profile.
   keyBenefits      Json?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
   portfolio        CompanyFunder[]
   podcastEpisodes  FunderEpisode[]
   locations        FunderLocation[]
   sectors          FunderSector[]
-  subcategories    FunderSubcategory[]
   stages           FunderStage[]
+  subcategories    FunderSubcategory[]
 }
 
 model Sector {
@@ -280,10 +274,10 @@ model Sector {
 }
 
 model Subcategory {
-  id        String              @id @default(cuid())
+  id        String               @id @default(cuid())
   name      String
-  slug      String              @unique
-  createdAt DateTime            @default(now())
+  slug      String               @unique
+  createdAt DateTime             @default(now())
   companies CompanySubcategory[]
   funders   FunderSubcategory[]
 }
@@ -294,8 +288,8 @@ model Location {
   slug        String            @unique
   createdAt   DateTime          @default(now())
   country     String?
+  countryCode String?
   region      String?
-  countryCode String? // ISO 2-letter code e.g. "US", "GB", "DE"
   companies   CompanyLocation[]
   funders     FunderLocation[]
 }
@@ -330,7 +324,6 @@ model CompanyLocation {
 model CompanyRetailLocation {
   id           String   @id @default(cuid())
   companyId    String
-  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   label        String
   addressLine1 String?
   addressLine2 String?
@@ -342,6 +335,7 @@ model CompanyRetailLocation {
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
@@ -500,6 +494,32 @@ model Author {
   posts     BlogPost[]
 }
 
+model Certification {
+  id          String                 @id @default(cuid())
+  name        String
+  slug        String                 @unique
+  description String?
+  logoUrl     String?
+  website     String?
+  createdAt   DateTime               @default(now())
+  companies   CompanyCertification[]
+}
+
+model CompanyCertification {
+  companyId       String
+  certificationId String
+  certification   Certification @relation(fields: [certificationId], references: [id])
+  company         Company       @relation(fields: [companyId], references: [id])
+
+  @@id([companyId, certificationId])
+}
+
+enum CompanyLifecycleStatus {
+  Active
+  Acquired
+  Sunsetted
+}
+
 enum AdType {
   Banner
   Tools
@@ -533,24 +553,4 @@ enum PostStatus {
   Draft
   Scheduled
   Published
-}
-
-model Certification {
-  id          String                @id @default(cuid())
-  name        String
-  slug        String                @unique
-  description String?
-  logoUrl     String?
-  website     String?
-  createdAt   DateTime              @default(now())
-  companies   CompanyCertification[]
-}
-
-model CompanyCertification {
-  company         Company       @relation(fields: [companyId], references: [id])
-  companyId       String
-  certification   Certification @relation(fields: [certificationId], references: [id])
-  certificationId String
-
-  @@id([companyId, certificationId])
 }
