@@ -4,6 +4,7 @@ import { useMediaQuery } from "@mantine/hooks"
 import { cx } from "cva"
 import {
   AwardIcon,
+  BookOpenTextIcon,
   Building2Icon,
   CrosshairIcon,
   DockIcon,
@@ -79,6 +80,11 @@ export const Sidebar = () => {
           title: "Blog",
           href: "/admin/blog-posts",
           prefix: <FileTextIcon />,
+        },
+        {
+          title: "Case Studies",
+          href: "/admin/case-studies",
+          prefix: <BookOpenTextIcon />,
         },
         {
           title: "Authors",

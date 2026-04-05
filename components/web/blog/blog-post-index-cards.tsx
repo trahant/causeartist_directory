@@ -1,7 +1,7 @@
 import Image from "next/image"
+import NextLink from "next/link"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2, H4 } from "~/components/common/heading"
-import { Link } from "~/components/common/link"
 import { Stack } from "~/components/common/stack"
 import type { BlogPostMany } from "~/server/web/blog/payloads"
 
@@ -28,10 +28,10 @@ type BlogFeaturedPostProps = {
 
 export const BlogFeaturedPost = ({ post, date }: BlogFeaturedPostProps) => {
   return (
-    <Card asChild className="p-0 overflow-hidden">
-      <Link
+    <Card className="gap-0 p-0 overflow-hidden">
+      <NextLink
         href={`/blog/${post.slug}`}
-        className="grid w-full min-w-0 grid-cols-1 text-start md:grid-cols-2 md:gap-0 md:items-stretch group"
+        className="grid w-full min-w-0 grid-cols-1 text-start md:grid-cols-2 md:gap-0 md:items-stretch group rounded-lg"
       >
         <div className="md:contents">
           {heroImage(
@@ -53,7 +53,7 @@ export const BlogFeaturedPost = ({ post, date }: BlogFeaturedPostProps) => {
             </p>
           ) : null}
         </Stack>
-      </Link>
+      </NextLink>
     </Card>
   )
 }
@@ -65,8 +65,11 @@ type BlogPostIndexCardProps = {
 
 export const BlogPostIndexCard = ({ post, date }: BlogPostIndexCardProps) => {
   return (
-    <Card asChild className="p-0 overflow-hidden">
-      <Link href={`/blog/${post.slug}`} className="flex flex-col w-full min-w-0 text-start">
+    <Card className="gap-0 p-0 overflow-hidden">
+      <NextLink
+        href={`/blog/${post.slug}`}
+        className="flex flex-col w-full min-w-0 text-start rounded-lg"
+      >
         {post.heroImageUrl ? (
           <div className="relative w-full aspect-video bg-muted shrink-0">
             <Image
@@ -97,7 +100,7 @@ export const BlogPostIndexCard = ({ post, date }: BlogPostIndexCardProps) => {
             ) : null}
           </CardFooter>
         </Stack>
-      </Link>
+      </NextLink>
     </Card>
   )
 }

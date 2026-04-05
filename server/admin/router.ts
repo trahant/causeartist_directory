@@ -1,6 +1,7 @@
 import { adRouter } from "~/server/admin/ads/router"
 import { authorRouter } from "~/server/admin/authors/router"
 import { blogPostRouter } from "~/server/admin/blog-posts/router"
+import { caseStudyRouter } from "~/server/admin/case-studies/router"
 import { categoryRouter } from "~/server/admin/categories/router"
 import { certificationAdminRouter } from "~/server/admin/certifications/router"
 import { companyRouter } from "~/server/admin/companies/router"
@@ -33,6 +34,7 @@ export const adminRouter = {
   locations: locationRouter,
   fundingStages: fundingStageRouter,
   blogPosts: blogPostRouter,
+  caseStudies: caseStudyRouter,
   authors: authorRouter,
 }
 
