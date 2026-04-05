@@ -40,7 +40,12 @@ const getData = cache(async ({ params }: Props) => {
         { url: "/case-studies", title: "Case Studies" },
         { url, title: caseStudy.title },
       ],
-      structuredData: [generateArticleSchema(caseStudy)] as Thing[],
+      structuredData: [
+        generateArticleSchema({
+          ...caseStudy,
+          path: `/case-studies/${caseStudy.slug}`,
+        }),
+      ] as Thing[],
     },
   )
 

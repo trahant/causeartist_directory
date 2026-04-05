@@ -33,6 +33,7 @@ import { formatFunderCheckSize } from "~/lib/format-funder-check-size"
 import { formatFunderType, isFunderTypeSlug } from "~/lib/format-funder-type"
 import type { OpenGraphParams } from "~/lib/opengraph"
 import { getPageData, getPageMetadata } from "~/lib/pages"
+import { siteConfig } from "~/config/site"
 import { generateFunderSchema } from "~/lib/schema"
 import { findFunder, findFunderSlugs } from "~/server/web/funders/queries"
 
@@ -137,6 +138,15 @@ export default async function (props: Props) {
 
           <FunderSecondaryCtas funder={funder} />
           <FunderProfileLocationsSection funder={funder} />
+
+          {!funder.description?.trim() ? (
+            <p className="text-muted-foreground mb-4 max-w-prose text-sm leading-relaxed -mt-fluid-md pt-4 max-md:order-4">
+              <strong className="text-foreground">{funder.name}</strong>
+              {funder.type && isFunderTypeSlug(funder.type) ?
+                ` is a ${formatFunderType(funder.type)} investor listed on ${siteConfig.name}.`
+              : ` is an impact investor listed on ${siteConfig.name}.`}
+            </p>
+          ) : null}
 
           <ProfileContent
             content={funder.description}

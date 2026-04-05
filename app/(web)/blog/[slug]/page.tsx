@@ -14,7 +14,9 @@ import { Section } from "~/components/web/ui/section"
 import { blogConfig } from "~/config/blog"
 import { addHeadingIdsToHtml } from "~/lib/content"
 import { getPageData, getPageMetadata } from "~/lib/pages"
+import { generateArticleSchema } from "~/lib/schema"
 import { findBlogPost, findBlogPostSlugs } from "~/server/web/blog/queries"
+import type { Thing } from "schema-dts"
 
 type Props = PageProps<"/blog/[slug]">
 
@@ -35,7 +37,7 @@ const getData = cache(async ({ params }: Props) => {
       { url: "/blog", title: t("navigation.blog") },
       { url, title: post.title },
     ],
-    structuredData: [],
+    structuredData: [generateArticleSchema(post)] as Thing[],
   })
 
   return { post, ...data }

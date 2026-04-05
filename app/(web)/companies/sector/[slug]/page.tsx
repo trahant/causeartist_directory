@@ -5,6 +5,7 @@ import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { CompanyLogo } from "~/components/web/company-logo"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
@@ -16,14 +17,6 @@ import { db } from "~/services/db"
 import { activeSectorsWhere, isRetiredSectorSlug } from "~/server/web/sectors/retired"
 import { companyManyPayload } from "~/server/web/companies/payloads"
 import type { CompanyMany } from "~/server/web/companies/payloads"
-
-function getInitials(name: string) {
-  const cleaned = name.trim().replace(/[^a-zA-Z0-9\s]/g, "")
-  const parts = cleaned.split(/\s+/).filter(Boolean)
-  const first = parts[0]?.[0] ?? ""
-  const second = parts[1]?.[0] ?? parts[0]?.[1] ?? ""
-  return `${first}${second}`.toUpperCase() || "??"
-}
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -94,10 +87,10 @@ function CompanyCard({ company }: { company: CompanyMany }) {
       >
         <CardHeader>
           <div className="flex min-w-0 w-full gap-3">
-            <img
-              src={company.logoUrl ?? undefined}
-              alt={company.name}
-              className="size-8 shrink-0 rounded object-contain"
+            <CompanyLogo
+              logoUrl={company.logoUrl}
+              name={company.name}
+              className="size-8 rounded object-contain"
             />
             <div className="min-w-0 flex-1">
               <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>

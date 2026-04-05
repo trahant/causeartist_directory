@@ -32,6 +32,7 @@ import { Sticky } from "~/components/web/ui/sticky"
 import type { Thing } from "schema-dts"
 import type { OpenGraphParams } from "~/lib/opengraph"
 import { getPageData, getPageMetadata } from "~/lib/pages"
+import { siteConfig } from "~/config/site"
 import { generateCompanySchema } from "~/lib/schema"
 import { findCompany, findCompanySlugs } from "~/server/web/companies/queries"
 
@@ -126,6 +127,17 @@ export default async function (props: Props) {
           <CompanySecondaryCtas company={company} />
           <CompanyProfileLocationsSection company={company} />
           <CompanyRetailLocationsSection company={company} />
+
+          {!company.description?.trim() ? (
+            <p className="text-muted-foreground mb-4 max-w-prose text-sm leading-relaxed max-md:order-4">
+              <strong className="text-foreground">{company.name}</strong>
+              {company.sectors[0] ?
+                ` is an impact company in ${company.sectors[0].sector.name}${
+                  company.locations[0] ? `, with presence in ${company.locations[0].location.name}` : ""
+                }, listed on ${siteConfig.name}.`
+              : ` is listed in the ${siteConfig.name} impact directory.`}
+            </p>
+          ) : null}
 
           <ProfileContent content={company.description} className="max-md:order-4" />
 

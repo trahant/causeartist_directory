@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import type { Thing } from "schema-dts"
 import { metadataConfig } from "~/config/metadata"
+import { siteConfig } from "~/config/site"
 import { getOpenGraphImageUrl, type OpenGraphParams } from "~/lib/opengraph"
+import { normalizeMetaDescription } from "~/lib/meta-description"
 import {
   createGraph,
   generateBreadcrumbs,
@@ -56,16 +58,43 @@ type GetPageMetadataProps = {
  * @param description - The description of the page
  * @param metadata - The metadata for the page
  */
+function metadataTitleString(title: Metadata["title"]): string {
+  if (typeof title === "string") return title
+  if (title && typeof title === "object" && "default" in title && title.default) {
+    return String(title.default)
+  }
+  return siteConfig.name
+}
+
 export const getPageMetadata = ({ url, ogImage, metadata }: GetPageMetadataProps) => {
   const defaultMetadata = Object.assign({}, metadataConfig, metadata)
-  const { title, description, alternates, openGraph, ...rest } = defaultMetadata
-  const ogImageUrl = getOpenGraphImageUrl(ogImage ?? { title: String(title), description })
+  const { title, description, alternates, openGraph, twitter, ...rest } = defaultMetadata
+
+  const titleStr = metadataTitleString(title)
+  const descRaw = typeof description === "string" ? description : ""
+  const normalizedDescription = normalizeMetaDescription(descRaw, titleStr)
+
+  const ogImageUrl = getOpenGraphImageUrl(
+    ogImage ?? { title: titleStr, description: normalizedDescription },
+  )
 
   return {
     title,
-    description,
+    description: normalizedDescription,
     alternates: { ...alternates, canonical: url },
-    openGraph: { ...openGraph, url, images: [{ url: ogImageUrl }] },
+    openGraph: {
+      ...openGraph,
+      title: titleStr,
+      description: normalizedDescription,
+      url,
+      images: [{ url: ogImageUrl }],
+    },
+    twitter: {
+      ...twitter,
+      card: "summary_large_image",
+      title: titleStr,
+      description: normalizedDescription,
+    },
     ...rest,
   }
 }

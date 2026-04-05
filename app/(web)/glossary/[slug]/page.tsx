@@ -11,7 +11,7 @@ import { Section } from "~/components/web/ui/section"
 import { TableOfContents } from "~/components/web/table-of-contents"
 import { addHeadingIdsToHtml } from "~/lib/content"
 import { getPageData, getPageMetadata } from "~/lib/pages"
-import { generateGlossarySchema } from "~/lib/schema"
+import { generateGlossaryStructuredData } from "~/lib/schema"
 import {
   findGlossaryTerm,
   findGlossaryTermSlugs,
@@ -37,7 +37,7 @@ const getData = cache(async ({ params }: Props) => {
       { url: "/glossary", title: "Glossary" },
       { url, title: term.term },
     ],
-    structuredData: [generateGlossarySchema(term)] as Thing[],
+    structuredData: generateGlossaryStructuredData(term) as Thing[],
   })
 
   return { term, ...data }

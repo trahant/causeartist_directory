@@ -1,6 +1,7 @@
 import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { Link } from "~/components/common/link"
+import { CompanyLogo } from "~/components/web/company-logo"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import type { CompanyMany } from "~/server/web/companies/payloads"
 
@@ -15,10 +16,10 @@ function CompanyDirectoryCard({ company }: { company: CompanyMany }) {
       >
         <CardHeader>
           <div className="flex min-w-0 w-full gap-3">
-            <img
-              src={company.logoUrl ?? undefined}
-              alt={company.name}
-              className="size-8 shrink-0 rounded object-contain"
+            <CompanyLogo
+              logoUrl={company.logoUrl}
+              name={company.name}
+              className="size-8 rounded object-contain"
             />
             <div className="min-w-0 flex-1">
               <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>

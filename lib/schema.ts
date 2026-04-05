@@ -116,14 +116,17 @@ export function generateArticleSchema(post: {
   excerpt?: string | null
   publishedAt?: Date | null
   slug: string
+  /** Defaults to /blog/[slug] */
+  path?: string
 }): { "@context": string; "@type": string; [key: string]: unknown } {
+  const path = post.path ?? `/blog/${post.slug}`
   return {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
     description: post.excerpt ?? undefined,
     datePublished: post.publishedAt?.toISOString(),
-    url: toAbsoluteUrl(`/blog/${post.slug}`),
+    url: toAbsoluteUrl(path),
   }
 }
 
@@ -155,18 +158,68 @@ export function generatePodcastSchema(episode: {
 }
 
 /**
- * Glossary term JSON-LD (DefinedTerm)
+ * Plain-text excerpt from HTML definition for FAQ answers
  */
-export function generateGlossarySchema(term: {
+function glossaryPlainDefinition(html: string | null | undefined): string {
+  if (!html?.trim()) return ""
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 600)
+}
+
+/**
+ * Glossary term JSON-LD: DefinedTerm + FAQPage
+ */
+export function generateGlossaryStructuredData(term: {
   term: string
   definition?: string | null
   slug: string
-}): { "@context": string; "@type": string; [key: string]: unknown } {
-  return {
+}): Array<{ "@context": string; "@type": string; [key: string]: unknown }> {
+  const plain = glossaryPlainDefinition(term.definition ?? null)
+  const definedTerm = {
     "@context": "https://schema.org",
     "@type": "DefinedTerm",
     name: term.term,
     description: term.definition ?? undefined,
     url: toAbsoluteUrl(`/glossary/${term.slug}`),
   }
+
+  const faqPage = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What does “${term.term}” mean?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            plain ||
+            `A glossary term used in impact investing and social enterprise, defined on ${siteConfig.name}.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Why does “${term.term}” matter in the impact economy?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            plain ||
+            `Understanding ${term.term} helps navigate sustainable business and impact investing.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Where can I learn more about ${term.term}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Read the full definition and related resources on ${siteConfig.name} at ${toAbsoluteUrl(`/glossary/${term.slug}`)}.`,
+        },
+      },
+    ],
+  }
+
+  return [definedTerm, faqPage]
 }

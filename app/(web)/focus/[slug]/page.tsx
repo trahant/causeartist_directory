@@ -5,6 +5,7 @@ import { Badge } from "~/components/common/badge"
 import { Card, CardDescription, CardFooter, CardHeader } from "~/components/common/card"
 import { H2, H5 } from "~/components/common/heading"
 import { Link } from "~/components/common/link"
+import { CompanyLogo } from "~/components/web/company-logo"
 import { FunderCardHeader } from "~/components/web/funders/funder-card-header"
 import { LocationCountryFlag } from "~/components/web/location-country-flag"
 import { StructuredData } from "~/components/web/structured-data"
@@ -105,10 +106,10 @@ function CompanyCard({ company }: { company: CompanyMany }) {
       >
         <CardHeader>
           <div className="flex min-w-0 w-full gap-3">
-            <img
-              src={company.logoUrl ?? undefined}
-              alt={company.name}
-              className="size-8 shrink-0 rounded object-contain"
+            <CompanyLogo
+              logoUrl={company.logoUrl}
+              name={company.name}
+              className="size-8 rounded object-contain"
             />
             <div className="min-w-0 flex-1">
               <span className="text-pretty text-sm font-semibold wrap-break-word">{company.name}</span>

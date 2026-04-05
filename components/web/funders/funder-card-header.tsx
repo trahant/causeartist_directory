@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "~/components/common/badge"
+import { FunderLogo } from "~/components/web/funder-logo"
 import { useLayoutEffect, useRef, useState } from "react"
 
 const GAP_ICON = 12 // gap-3 between icon and text block
@@ -16,7 +17,7 @@ type FunderCardHeaderProps = {
 
 export function FunderCardHeader({ logoUrl, name, typeLabel }: FunderCardHeaderProps) {
   const rowRef = useRef<HTMLDivElement>(null)
-  const iconRef = useRef<HTMLImageElement>(null)
+  const iconRef = useRef<HTMLDivElement>(null)
   const probeRef = useRef<HTMLDivElement>(null)
   const probeBadgeRef = useRef<HTMLSpanElement>(null)
   const [stacked, setStacked] = useState(false)
@@ -64,10 +65,11 @@ export function FunderCardHeader({ logoUrl, name, typeLabel }: FunderCardHeaderP
   if (!typeLabel) {
     return (
       <div className="flex w-full min-w-0 gap-3">
-        <img
-          src={logoUrl ?? undefined}
-          alt={name}
-          className="size-8 shrink-0 rounded object-contain"
+        <FunderLogo
+          ref={iconRef}
+          logoUrl={logoUrl}
+          name={name}
+          className="size-8 rounded object-contain"
         />
         <span className="text-pretty min-w-0 flex-1 text-sm font-semibold wrap-break-word">{name}</span>
       </div>
@@ -91,11 +93,11 @@ export function FunderCardHeader({ logoUrl, name, typeLabel }: FunderCardHeaderP
 
       {stacked ? (
         <div className="flex w-full min-w-0 flex-col gap-2">
-          <img
+          <FunderLogo
             ref={iconRef}
-            src={logoUrl ?? undefined}
-            alt={name}
-            className="size-8 shrink-0 rounded object-contain"
+            logoUrl={logoUrl}
+            name={name}
+            className="size-8 rounded object-contain"
           />
           <div className="flex min-w-0 w-full flex-col gap-1.5">
             <span className="text-pretty w-full text-sm font-semibold wrap-break-word">{name}</span>
@@ -106,11 +108,11 @@ export function FunderCardHeader({ logoUrl, name, typeLabel }: FunderCardHeaderP
         </div>
       ) : (
         <div className="flex w-full min-w-0 gap-3">
-          <img
+          <FunderLogo
             ref={iconRef}
-            src={logoUrl ?? undefined}
-            alt={name}
-            className="size-8 shrink-0 rounded object-contain"
+            logoUrl={logoUrl}
+            name={name}
+            className="size-8 rounded object-contain"
           />
           <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
             <span className="text-pretty min-w-0 flex-1 text-sm font-semibold wrap-break-word">{name}</span>
