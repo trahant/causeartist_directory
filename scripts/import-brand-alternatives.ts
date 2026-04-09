@@ -31,7 +31,11 @@ function summaryFor(target: string, category: Row["category"]) {
   return `Curated responsible alternatives to ${target} across ${labels[category]}.`
 }
 
-async function upsertCompany(name: string, role: "Target" | "Alternative" | "Both") {
+async function upsertCompany(
+  name: string,
+  role: "Target" | "Alternative" | "Both",
+  isTraditionalCompany: boolean,
+) {
   const baseSlug = slugify(name)
   const existingBySlug = await db.company.findUnique({
     where: { slug: baseSlug },
@@ -50,6 +54,7 @@ async function upsertCompany(name: string, role: "Target" | "Alternative" | "Bot
         name,
         status: "draft",
         alternativeRole: role,
+        isTraditionalCompany,
       },
     })
     return { id: existing.id, created: false }
@@ -68,6 +73,7 @@ async function upsertCompany(name: string, role: "Target" | "Alternative" | "Bot
       slug,
       status: "draft",
       alternativeRole: role,
+      isTraditionalCompany,
     },
     select: { id: true },
   })
@@ -101,7 +107,11 @@ async function main() {
   }
 
   for (const row of rows) {
-    const target = await upsertCompany(row.target, desiredRoleByName.get(row.target) ?? "Target")
+    const target = await upsertCompany(
+      row.target,
+      desiredRoleByName.get(row.target) ?? "Target",
+      targetSet.has(row.target),
+    )
     if (target.created) stats.createdTargets.push(row.target)
     else stats.updatedTargets.push(row.target)
 
@@ -115,6 +125,7 @@ async function main() {
       const alternative = await upsertCompany(
         altName,
         desiredRoleByName.get(altName) ?? "Alternative",
+        targetSet.has(altName),
       )
       if (alternative.created) stats.createdAlternatives.push(altName)
       else stats.updatedAlternatives.push(altName)

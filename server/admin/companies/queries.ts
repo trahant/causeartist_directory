@@ -81,7 +81,10 @@ export const findTaxonomyForCompanyAdmin = async () => {
     db.subcategory.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
       db.certification.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
       db.company.findMany({
-        where: { alternativeRole: { in: ["Alternative", "Both"] } },
+        where: {
+          isTraditionalCompany: true,
+          alternativeRole: { not: "Hidden" },
+        },
         select: { id: true, name: true },
         orderBy: { name: "asc" },
       }),

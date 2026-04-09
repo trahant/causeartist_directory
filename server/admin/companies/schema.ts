@@ -78,6 +78,7 @@ export const companyUpdateSchema = z
     status: z.enum(["draft", "published"]),
     lifecycleStatus: z.enum(companyLifecycleStatuses),
     alternativeRole: z.enum(companyAlternativeRoles),
+    isTraditionalCompany: z.boolean(),
     alternativesSummary: optionalString,
     tagline: optionalString,
     description: optionalString,

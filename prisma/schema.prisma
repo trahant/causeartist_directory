@@ -224,6 +224,8 @@ model Company {
   /// JSON array of `{ "title": string, "body": string }` for structured “key benefits” on the profile.
   keyBenefits     Json?
   lifecycleStatus CompanyLifecycleStatus  @default(Active)
+  /// Traditional / incumbent brand — appears in admin “Alternatives (ordered)” picker for impact companies.
+  isTraditionalCompany Boolean              @default(false)
   caseStudies     CaseStudy[]
   certifications  CompanyCertification[]
   podcastEpisodes CompanyEpisode[]

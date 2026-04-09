@@ -11,6 +11,7 @@ import { HeroImageUrlField } from "~/components/admin/hero-image-url-field"
 import { Button } from "~/components/common/button"
 import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { H3 } from "~/components/common/heading"
+import { Checkbox } from "~/components/common/checkbox"
 import { Input } from "~/components/common/input"
 import { Kbd } from "~/components/common/kbd"
 import { Link } from "~/components/common/link"
@@ -67,6 +68,7 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
       status: company.status as "draft" | "published",
       lifecycleStatus: company.lifecycleStatus,
       alternativeRole: company.alternativeRole,
+      isTraditionalCompany: company.isTraditionalCompany ?? false,
       alternativesSummary: company.alternativesSummary ?? "",
       tagline: company.tagline ?? "",
       description: company.description ?? "",
@@ -244,6 +246,33 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
             )}
           />
         </div>
+
+        <Controller
+          control={form.control}
+          name="isTraditionalCompany"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="col-span-full">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id={field.name}
+                  checked={field.value}
+                  onCheckedChange={v => field.onChange(v === true)}
+                  className="mt-0.5"
+                />
+                <div className="grid gap-1">
+                  <FieldLabel htmlFor={field.name} className="font-medium leading-none">
+                    Traditional company
+                  </FieldLabel>
+                  <p className="text-xs text-muted-foreground">
+                    Incumbent brands that can be selected in the “Alternatives (ordered)” field on other company
+                    profiles.
+                  </p>
+                </div>
+              </div>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         <Controller
           control={form.control}
@@ -454,7 +483,8 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
                 preserveSelectionOrder
               />
               <p className="text-xs text-muted-foreground">
-                Selection order is saved as ranking. Only available for role Target or Both.
+                Selection order is saved as ranking. Options are companies marked Traditional company. Only available
+                for role Target or Both.
               </p>
               {!canHaveAlternatives ? (
                 <p className="text-xs text-muted-foreground">
