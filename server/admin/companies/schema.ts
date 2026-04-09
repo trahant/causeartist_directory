@@ -38,6 +38,7 @@ export type CompanyListParams = inferParserType<typeof companyListParams>
 const optionalString = z.string().optional().nullable()
 
 export const companyLifecycleStatuses = ["Active", "Acquired", "Sunsetted"] as const
+export const companyAlternativeRoles = ["Target", "Alternative", "Both", "Hidden"] as const
 
 export const companyCreateSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -76,6 +77,8 @@ export const companyUpdateSchema = z
     slug: z.string().optional(),
     status: z.enum(["draft", "published"]),
     lifecycleStatus: z.enum(companyLifecycleStatuses),
+    alternativeRole: z.enum(companyAlternativeRoles),
+    alternativesSummary: optionalString,
     tagline: optionalString,
     description: optionalString,
     logoUrl: optionalString,
@@ -94,6 +97,7 @@ export const companyUpdateSchema = z
     subcategoryIds: z.array(z.string()).optional(),
     funderIds: z.array(z.string()).optional(),
     certificationIds: z.array(z.string()).optional(),
+    alternativeCompanyIds: z.array(z.string()).optional(),
     retailLocations: z.array(companyRetailLocationFormRowSchema).default([]),
   })
   .superRefine((data, ctx) => {

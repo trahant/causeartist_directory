@@ -63,12 +63,14 @@ export const findCompanyByIdForAdmin = async (id: string) => {
       locations: { select: { locationId: true } },
       subcategories: { select: { subcategoryId: true } },
       certifications: { select: { certificationId: true } },
+      alternatives: { select: { alternativeCompanyId: true }, orderBy: { sortOrder: "asc" } },
     },
   })
 }
 
 export const findTaxonomyForCompanyAdmin = async () => {
-  const [funders, sectors, locations, subcategories, certifications] = await Promise.all([
+  const [funders, sectors, locations, subcategories, certifications, alternativeCandidates] =
+    await Promise.all([
     db.funder.findMany({
       where: { status: "published" },
       select: { id: true, name: true },
@@ -77,7 +79,12 @@ export const findTaxonomyForCompanyAdmin = async () => {
     db.sector.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.location.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
     db.subcategory.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-    db.certification.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
-  ])
-  return { funders, sectors, locations, subcategories, certifications }
+      db.certification.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+      db.company.findMany({
+        where: { alternativeRole: { in: ["Alternative", "Both"] } },
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      }),
+    ])
+  return { funders, sectors, locations, subcategories, certifications, alternativeCandidates }
 }

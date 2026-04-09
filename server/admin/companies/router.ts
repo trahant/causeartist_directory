@@ -59,9 +59,9 @@ const create = withAdmin
     })
 
     revalidate({
-      tags: ["companies", "directory", "directory-facets", "directory-sectors", "certifications"],
+      tags: ["companies", "alternatives", "directory", "directory-facets", "directory-sectors", "certifications"],
     })
-    revalidate({ paths: ["/companies"] })
+    revalidate({ paths: ["/companies", "/alternatives"] })
 
     return company
   })
@@ -89,6 +89,7 @@ const remove = withAdmin.input(idsSchema).handler(async ({ input: { ids }, conte
 
   const tags = [
     "companies",
+      "alternatives",
     "directory",
     "directory-facets",
     "directory-sectors",
@@ -98,7 +99,13 @@ const remove = withAdmin.input(idsSchema).handler(async ({ input: { ids }, conte
   ]
 
   revalidate({ tags: [...new Set(tags)] })
-  revalidate({ paths: ["/companies", ...deletedSlugs.map(s => `/companies/${s}`)] })
+  revalidate({
+    paths: [
+      "/companies",
+      "/alternatives",
+      ...deletedSlugs.flatMap(s => [`/companies/${s}`, `/alternatives/${s}`]),
+    ],
+  })
 
   return true
 })
@@ -113,11 +120,14 @@ const update = withAdmin
       subcategoryIds,
       funderIds,
       certificationIds,
+      alternativeCompanyIds,
       keyBenefitsJson,
       slug: slugInput,
       name,
       status,
       lifecycleStatus,
+      alternativeRole,
+      alternativesSummary,
       tagline,
       description,
       logoUrl,
@@ -144,6 +154,8 @@ const update = withAdmin
     )
 
     const retailStores = (retailLocations ?? []).filter(r => r.label.trim() !== "" && r.city.trim() !== "")
+    const cleanAlternativeCompanyIds = [...new Set((alternativeCompanyIds ?? []).filter(v => v !== id))]
+    const canHaveAlternatives = alternativeRole === "Target" || alternativeRole === "Both"
 
     await db.company.update({
       where: { id },
@@ -152,6 +164,8 @@ const update = withAdmin
         slug,
         status,
         lifecycleStatus,
+        alternativeRole,
+        alternativesSummary: emptyToNull(alternativesSummary ?? undefined),
         tagline: emptyToNull(tagline ?? undefined),
         description: emptyToNull(description ?? undefined),
         logoUrl: emptyToNull(logoUrl ?? undefined),
@@ -184,6 +198,15 @@ const update = withAdmin
           deleteMany: {},
           create: (certificationIds ?? []).map(certificationId => ({ certificationId })),
         },
+        alternatives: {
+          deleteMany: {},
+          create: canHaveAlternatives
+            ? cleanAlternativeCompanyIds.map((alternativeCompanyId, sortOrder) => ({
+                alternativeCompanyId,
+                sortOrder,
+              }))
+            : [],
+        },
         retailLocations: {
           deleteMany: {},
           create: retailStores.map((row, index) => {
@@ -207,9 +230,12 @@ const update = withAdmin
 
     const tags = [
       "companies",
+      "alternatives",
       "company",
       `company-${existing.slug}`,
       `company-${slug}`,
+      `alternative-${existing.slug}`,
+      `alternative-${slug}`,
       "related-companies",
       "directory",
       "directory-facets",
@@ -218,7 +244,9 @@ const update = withAdmin
     ]
 
     revalidate({ tags: [...new Set(tags)] })
-    revalidate({ paths: ["/companies", `/companies/${slug}`] })
+    revalidate({
+      paths: ["/companies", "/alternatives", `/companies/${slug}`, `/alternatives/${slug}`],
+    })
 
     return db.company.findUnique({ where: { id } })
   })

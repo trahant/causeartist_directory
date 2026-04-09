@@ -27,7 +27,7 @@ import { TextArea } from "~/components/common/textarea"
 import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findCompanyByIdForAdmin, findTaxonomyForCompanyAdmin } from "~/server/admin/companies/queries"
-import { companyUpdateSchema } from "~/server/admin/companies/schema"
+import { companyAlternativeRoles, companyUpdateSchema } from "~/server/admin/companies/schema"
 
 const emptyRetailLocation = {
   label: "",
@@ -66,6 +66,8 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
       slug: company.slug,
       status: company.status as "draft" | "published",
       lifecycleStatus: company.lifecycleStatus,
+      alternativeRole: company.alternativeRole,
+      alternativesSummary: company.alternativesSummary ?? "",
       tagline: company.tagline ?? "",
       description: company.description ?? "",
       logoUrl: company.logoUrl ?? "",
@@ -83,6 +85,7 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
       subcategoryIds: company.subcategories.map(s => s.subcategoryId),
       funderIds: company.funders.map(f => f.funderId),
       certificationIds: company.certifications.map(c => c.certificationId),
+      alternativeCompanyIds: company.alternatives.map(a => a.alternativeCompanyId),
       retailLocations:
         company.retailLocations.length > 0
           ? company.retailLocations.map(r => ({
@@ -117,6 +120,8 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
   )
 
   const onSubmit = form.handleSubmit(data => mutation.mutate(data))
+  const alternativeRole = form.watch("alternativeRole")
+  const canHaveAlternatives = alternativeRole === "Target" || alternativeRole === "Both"
 
   useHotkeys([["mod+enter", () => onSubmit()]], [], true)
 
@@ -198,6 +203,42 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
                     <SelectItem value="Sunsetted">Sunsetted</SelectItem>
                   </SelectContent>
                 </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+        </div>
+
+        <div className="grid gap-4 @lg:grid-cols-2 col-span-full">
+          <Controller
+            control={form.control}
+            name="alternativeRole"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Alternatives role</FieldLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companyAlternativeRoles.map(role => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+          <Controller
+            control={form.control}
+            name="alternativesSummary"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Alternatives intro summary</FieldLabel>
+                <Input id={field.name} {...field} value={field.value ?? ""} />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -395,6 +436,31 @@ export function CompanyForm({ className, title, company, taxonomy, ...props }: C
                 ids={field.value ?? []}
                 setIds={field.onChange}
               />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="alternativeCompanyIds"
+          render={({ field }) => (
+            <Field className="col-span-full">
+              <FieldLabel>Alternatives (ordered)</FieldLabel>
+              <RelationSelector
+                relations={taxonomy.alternativeCandidates.filter(row => row.id !== company.id)}
+                ids={field.value ?? []}
+                setIds={field.onChange}
+                disabled={!canHaveAlternatives}
+                preserveSelectionOrder
+              />
+              <p className="text-xs text-muted-foreground">
+                Selection order is saved as ranking. Only available for role Target or Both.
+              </p>
+              {!canHaveAlternatives ? (
+                <p className="text-xs text-muted-foreground">
+                  Switch role to Target or Both to use alternatives.
+                </p>
+              ) : null}
             </Field>
           )}
         />

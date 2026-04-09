@@ -56,7 +56,7 @@ export const findAdWithFallback = async ({
     websiteUrl: `${siteConfig.url}/advertise`,
     name: t("default_ad.name"),
     description: t("default_ad.description"),
-    buttonLabel: t("default_ad.button_label", { siteName: siteConfig.name }),
+    buttonLabel: t("default_ad.button_label"),
     faviconUrl: "/favicon.png",
     bannerUrl: null,
   } satisfies AdOne

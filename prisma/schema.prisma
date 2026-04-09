@@ -203,6 +203,8 @@ model Company {
   name            String
   slug            String                  @unique
   status          String                  @default("draft")
+  alternativeRole CompanyAlternativeRole  @default(Hidden)
+  alternativesSummary String?
   tagline         String?
   description     String?
   logoUrl         String?
@@ -228,6 +230,8 @@ model Company {
   funders         CompanyFunder[]
   locations       CompanyLocation[]
   retailLocations CompanyRetailLocation[]
+  alternatives    CompanyAlternative[]    @relation("CompanyAlternatives")
+  alternativeOf   CompanyAlternative[]    @relation("CompanyAlternativeTargets")
   sectors         CompanySector[]
   subcategories   CompanySubcategory[]
 }
@@ -356,6 +360,18 @@ model CompanySubcategory {
   subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
 
   @@id([companyId, subcategoryId])
+}
+
+model CompanyAlternative {
+  companyId            String
+  alternativeCompanyId String
+  sortOrder            Int      @default(0)
+  company              Company  @relation("CompanyAlternatives", fields: [companyId], references: [id], onDelete: Cascade)
+  alternativeCompany   Company  @relation("CompanyAlternativeTargets", fields: [alternativeCompanyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, alternativeCompanyId])
+  @@index([companyId, sortOrder])
+  @@index([alternativeCompanyId])
 }
 
 model FunderSector {
@@ -518,6 +534,13 @@ enum CompanyLifecycleStatus {
   Active
   Acquired
   Sunsetted
+}
+
+enum CompanyAlternativeRole {
+  Target
+  Alternative
+  Both
+  Hidden
 }
 
 enum AdType {

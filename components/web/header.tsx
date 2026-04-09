@@ -60,6 +60,7 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
 
           <nav className="flex flex-wrap gap-x-4 gap-y-0.5 flex-1 max-lg:hidden items-center">
             <NavLink href="/companies">{t("navigation.companies")}</NavLink>
+            <NavLink href="/alternatives">{t("navigation.alternatives")}</NavLink>
             <NavLink href="/funders">{t("navigation.funders")}</NavLink>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
@@ -140,6 +141,7 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
           )}
         >
           <NavLink href="/companies">{t("navigation.companies")}</NavLink>
+          <NavLink href="/alternatives">{t("navigation.alternatives")}</NavLink>
           <NavLink href="/funders">{t("navigation.funders")}</NavLink>
           <div className="col-span-2 flex flex-col gap-3 w-full pt-2 border-t border-border/40">
             <span className="text-xs font-medium text-muted-foreground">{t("navigation.podcasts")}</span>

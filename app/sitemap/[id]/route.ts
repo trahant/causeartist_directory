@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server"
 import { siteConfig } from "~/config/site"
+import { findAlternativeTargetSlugs } from "~/server/web/alternatives/queries"
 import { findCategorySlugs } from "~/server/web/categories/queries"
 import { findPostSlugs } from "~/server/web/posts/queries"
 import { findTagSlugs } from "~/server/web/tags/queries"
 import { findToolSlugs } from "~/server/web/tools/queries"
 
-export const sitemaps = ["pages", "tools", "categories", "tags", "posts"] as const
+export const sitemaps = ["pages", "tools", "categories", "tags", "posts", "alternatives"] as const
 
 type SitemapEntry = {
   url: string
@@ -58,6 +59,7 @@ export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">)
         `${siteUrl}/advertise`,
         `${siteUrl}/submit`,
         `${siteUrl}/companies`,
+        `${siteUrl}/alternatives`,
         `${siteUrl}/funders`,
         `${siteUrl}/podcast`,
         `${siteUrl}/case-studies`,
@@ -118,6 +120,18 @@ export async function GET(_: Request, { params }: RouteContext<"/sitemap/[id]">)
         url: `${siteUrl}/blog/${post.slug}`,
         lastModified: post.updatedAt,
         changeFrequency: "monthly",
+        priority: 0.7,
+      }))
+      break
+    }
+
+    case "alternatives": {
+      const targets = await findAlternativeTargetSlugs()
+
+      entries = targets.map(target => ({
+        url: `${siteUrl}/alternatives/${target.slug}`,
+        lastModified: target.updatedAt,
+        changeFrequency: "weekly",
         priority: 0.7,
       }))
       break

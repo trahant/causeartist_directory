@@ -24,6 +24,8 @@ export type RelationSelectorProps<T> = PropsWithChildren<{
   relations: T[]
   ids: string[]
   setIds: (ids: string[]) => void
+  disabled?: boolean
+  preserveSelectionOrder?: boolean
   mapFunction?: (relation: T) => Relation
   sortFunction?: (a: T, b: T) => number
 }>
@@ -33,10 +35,16 @@ export const RelationSelector = <T extends Relation>({
   relations,
   ids,
   setIds,
+  disabled = false,
+  preserveSelectionOrder = false,
   mapFunction,
   sortFunction,
 }: RelationSelectorProps<T>) => {
-  const selectedRelations = relations?.filter(({ id }) => ids.includes(id))
+  const selectedRelations = preserveSelectionOrder
+    ? ids
+        .map(id => relations.find(relation => relation.id === id))
+        .filter((relation): relation is T => Boolean(relation))
+    : relations?.filter(({ id }) => ids.includes(id))
 
   const handleFilter = (value: string, search: string) => {
     const normalizedValue = value.toLowerCase()
@@ -56,6 +64,7 @@ export const RelationSelector = <T extends Relation>({
           <Button
             variant="secondary"
             size="md"
+            disabled={disabled}
             className="justify-start w-full px-3 gap-2.5"
             prefix={<MousePointerClickIcon />}
             suffix={
@@ -94,6 +103,7 @@ export const RelationSelector = <T extends Relation>({
                     <CommandItem
                       key={relation.id}
                       onSelect={() => {
+                        if (disabled) return
                         setIds(
                           isSelected ? ids.filter(id => id !== relation.id) : [...ids, relation.id],
                         )
@@ -114,7 +124,7 @@ export const RelationSelector = <T extends Relation>({
                 })}
               </CommandGroup>
 
-              {!!ids.length && (
+              {!!ids.length && !disabled && (
                 <div className="p-1 border-t sticky -bottom-px bg-background">
                   <Button size="md" variant="ghost" onClick={() => setIds([])} className="w-full">
                     Clear selection
