@@ -19,6 +19,8 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
     "db:seed:causeartist": "bun prisma/seed-causeartist.ts",
+    "alternatives:import:brands": "bun scripts/import-brand-alternatives.ts",
+    "alternatives:validate:brands": "bun scripts/validate-brand-alternatives.ts",
     "build:redirects": "bun scripts/build-redirects.ts",
     "postinstall": "node -e \"if(process.env.DATABASE_URL){require('child_process').execSync('npx prisma generate --no-hints',{stdio:'inherit'})}\""
   },

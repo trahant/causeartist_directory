@@ -1,0 +1,322 @@
+{
+  "generatedAt": "2026-04-09T15:53:11.319Z",
+  "totals": {
+    "targets": 50,
+    "draftTargets": 50,
+    "publishedTargets": 0,
+    "targetsWithNoSummary": 0,
+    "targetsWithLessThan5Alternatives": 0
+  },
+  "weakMappings": [],
+  "brokenAlternativeLinks": [],
+  "editorialQueue": {
+    "phase1": [
+      {
+        "name": "Adidas",
+        "slug": "adidas",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Gap",
+        "slug": "gap",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "H&M",
+        "slug": "h-and-m",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Levi's",
+        "slug": "levis",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Nike",
+        "slug": "nike",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Old Navy",
+        "slug": "old-navy",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Puma",
+        "slug": "puma",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Reebok",
+        "slug": "reebok",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Under Armour",
+        "slug": "under-armour",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Zara",
+        "slug": "zara",
+        "status": "draft",
+        "alternativesCount": 5
+      }
+    ],
+    "phase2": [
+      {
+        "name": "Columbia",
+        "slug": "columbia",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Converse",
+        "slug": "converse",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Lululemon",
+        "slug": "lululemon",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "New Balance",
+        "slug": "new-balance",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Patagonia",
+        "slug": "patagonia",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Shein",
+        "slug": "shein",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Skechers",
+        "slug": "skechers",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "The North Face",
+        "slug": "the-north-face",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Uniqlo",
+        "slug": "uniqlo",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Vans",
+        "slug": "vans",
+        "status": "draft",
+        "alternativesCount": 5
+      }
+    ],
+    "phase3": [
+      {
+        "name": "Coca-Cola",
+        "slug": "coca-cola",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Doritos",
+        "slug": "doritos",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Gatorade",
+        "slug": "gatorade",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "KitKat",
+        "slug": "kitkat",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Lay's",
+        "slug": "lays",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "M&M's",
+        "slug": "m-and-ms",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Mountain Dew",
+        "slug": "mountain-dew",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Nescafé",
+        "slug": "nescafe",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Oreo",
+        "slug": "oreo",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Pepsi",
+        "slug": "pepsi",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Pringles",
+        "slug": "pringles",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Red Bull",
+        "slug": "red-bull",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Snickers",
+        "slug": "snickers",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Starbucks",
+        "slug": "starbucks",
+        "status": "draft",
+        "alternativesCount": 5
+      }
+    ],
+    "phase4": [
+      {
+        "name": "Ariel",
+        "slug": "ariel",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Axe",
+        "slug": "axe",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "CeraVe",
+        "slug": "cerave",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Cetaphil",
+        "slug": "cetaphil",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Colgate",
+        "slug": "colgate",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Crest",
+        "slug": "crest",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Dawn",
+        "slug": "dawn",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Dove",
+        "slug": "dove",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Gillette",
+        "slug": "gillette",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Head & Shoulders",
+        "slug": "head-and-shoulders",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Neutrogena",
+        "slug": "neutrogena",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Nivea",
+        "slug": "nivea",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Oral-B",
+        "slug": "oral-b",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Pantene",
+        "slug": "pantene",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Persil",
+        "slug": "persil",
+        "status": "draft",
+        "alternativesCount": 5
+      },
+      {
+        "name": "Tide",
+        "slug": "tide",
+        "status": "draft",
+        "alternativesCount": 5
+      }
+    ]
+  }
+}

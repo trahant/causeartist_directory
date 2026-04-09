@@ -1,0 +1,252 @@
+[
+  {
+    "target": "Nike",
+    "category": "fashion",
+    "alternatives": ["Allbirds", "Veja", "Cariuma", "Saola", "Norda"]
+  },
+  {
+    "target": "Adidas",
+    "category": "fashion",
+    "alternatives": ["Veja", "Allbirds", "Thousand Fell", "Cariuma", "Nae Vegan Shoes"]
+  },
+  {
+    "target": "Puma",
+    "category": "fashion",
+    "alternatives": ["Veja", "Ethletic", "Po-Zu", "Groundies", "Saola"]
+  },
+  {
+    "target": "Reebok",
+    "category": "fashion",
+    "alternatives": ["Allbirds", "Ethletic", "Cariuma", "Native Shoes", "Pearlz"]
+  },
+  {
+    "target": "Under Armour",
+    "category": "fashion",
+    "alternatives": ["Patagonia", "Outerknown", "Picture Organic Clothing", "Norrona", "Artilect"]
+  },
+  {
+    "target": "H&M",
+    "category": "fashion",
+    "alternatives": ["Thought Clothing", "Pact", "Quince", "Tentree", "People Tree"]
+  },
+  {
+    "target": "Zara",
+    "category": "fashion",
+    "alternatives": ["Reformation", "Eileen Fisher", "Amour Vert", "Thought Clothing", "Tradlands"]
+  },
+  {
+    "target": "Old Navy",
+    "category": "fashion",
+    "alternatives": ["Pact", "Organic Basics", "Thought Clothing", "Quince", "Known Supply"]
+  },
+  {
+    "target": "Gap",
+    "category": "fashion",
+    "alternatives": ["Eileen Fisher", "Pact", "Everlane", "United By Blue", "Amour Vert"]
+  },
+  {
+    "target": "Levi's",
+    "category": "fashion",
+    "alternatives": ["Nudie Jeans", "Mud Jeans", "Boyish Jeans", "Dearborn Denim", "Kings of Indigo"]
+  },
+  {
+    "target": "Uniqlo",
+    "category": "fashion",
+    "alternatives": ["Organic Basics", "Quince", "Pact", "Thought Clothing", "Kotn"]
+  },
+  {
+    "target": "Shein",
+    "category": "fashion",
+    "alternatives": ["ThredUp", "Depop", "Pact", "Thought Clothing", "Swap.com"]
+  },
+  {
+    "target": "Lululemon",
+    "category": "fashion",
+    "alternatives": ["Girlfriend Collective", "Outdoor Voices", "Patagonia", "Organic Basics", "Noli Yoga"]
+  },
+  {
+    "target": "The North Face",
+    "category": "fashion",
+    "alternatives": ["Patagonia", "Picture Organic Clothing", "Norrona", "Cotopaxi", "Topo Designs"]
+  },
+  {
+    "target": "Patagonia",
+    "category": "fashion",
+    "alternatives": ["Cotopaxi", "Norrona", "Picture Organic Clothing", "Anian", "Klattermusen"]
+  },
+  {
+    "target": "Columbia",
+    "category": "fashion",
+    "alternatives": ["Cotopaxi", "Patagonia", "Topo Designs", "Finisterre", "Norrona"]
+  },
+  {
+    "target": "Converse",
+    "category": "fashion",
+    "alternatives": ["Veja", "Cariuma", "Ethletic", "Thousand Fell", "Groundies"]
+  },
+  {
+    "target": "Vans",
+    "category": "fashion",
+    "alternatives": ["Ethletic", "Veja", "Nae Vegan Shoes", "Saola", "Cariuma"]
+  },
+  {
+    "target": "New Balance",
+    "category": "fashion",
+    "alternatives": ["Allbirds", "Norda", "Veja", "Cariuma", "Saola"]
+  },
+  {
+    "target": "Skechers",
+    "category": "fashion",
+    "alternatives": ["Allbirds", "Vivobarefoot", "Softstar Shoes", "Xero Shoes", "Cariuma"]
+  },
+  {
+    "target": "Coca-Cola",
+    "category": "beverage",
+    "alternatives": ["Rebbl", "Lakewood Organic", "GT's Synergy", "Harmless Harvest", "Nixie"]
+  },
+  {
+    "target": "Pepsi",
+    "category": "beverage",
+    "alternatives": ["Rebbl", "GoodBelly", "Brew Dr. Kombucha", "Nixie", "Numi Teas"]
+  },
+  {
+    "target": "Mountain Dew",
+    "category": "beverage",
+    "alternatives": ["Waterloo Sparkling Water", "Olipop", "Poppi", "Spindrift", "Nixie"]
+  },
+  {
+    "target": "Gatorade",
+    "category": "beverage",
+    "alternatives": ["Gnarly Nutrition", "Skratch Labs", "Maurten", "Nuun", "Liquid I.V."]
+  },
+  {
+    "target": "Red Bull",
+    "category": "beverage",
+    "alternatives": ["Runa", "Hiball Energy", "Guru", "Mati", "Chameleon Cold Brew"]
+  },
+  {
+    "target": "Nescafé",
+    "category": "food",
+    "alternatives": ["Café Mam", "Equal Exchange", "Driftaway Coffee", "Thrive Farmers", "Cafedirect"]
+  },
+  {
+    "target": "Starbucks",
+    "category": "food",
+    "alternatives": ["Equator Coffees", "Intelligentsia", "Verve Coffee", "Driftaway Coffee", "Cafedirect"]
+  },
+  {
+    "target": "Lay's",
+    "category": "food",
+    "alternatives": ["Deep River Snacks", "Late July", "Good Health", "Jackson's Honest", "Rhythm Superfoods"]
+  },
+  {
+    "target": "Doritos",
+    "category": "food",
+    "alternatives": ["Late July", "Siete Family Foods", "Barnana", "Quinn Snacks", "Off the Eaten Path"]
+  },
+  {
+    "target": "Oreo",
+    "category": "food",
+    "alternatives": ["Newman-O's", "Back to Nature", "Goodie Girl", "Simple Mills", "Enjoy Life Foods"]
+  },
+  {
+    "target": "KitKat",
+    "category": "food",
+    "alternatives": ["Alter Eco", "Theo Chocolate", "Tony's Chocolonely", "Divine Chocolate", "Endangered Species Chocolate"]
+  },
+  {
+    "target": "Snickers",
+    "category": "food",
+    "alternatives": ["Tony's Chocolonely", "Hu Chocolate", "Unreal Candy", "Rawmio", "Lärabar"]
+  },
+  {
+    "target": "M&M's",
+    "category": "food",
+    "alternatives": ["Unreal Candy", "YumEarth", "Endangered Species Chocolate", "Alter Eco", "Theo Chocolate"]
+  },
+  {
+    "target": "Pringles",
+    "category": "food",
+    "alternatives": ["Late July", "Quinn Snacks", "Good Health", "Rhythm Superfoods", "Hippeas"]
+  },
+  {
+    "target": "Colgate",
+    "category": "personal-care",
+    "alternatives": ["David's Natural Toothpaste", "Bite Toothpaste Bits", "Risewell", "Unpaste", "Dr. Bronner's"]
+  },
+  {
+    "target": "Crest",
+    "category": "personal-care",
+    "alternatives": ["David's Natural Toothpaste", "Bite Toothpaste Bits", "Burt's Bees", "Tom's of Maine", "Hello Oral Care"]
+  },
+  {
+    "target": "Oral-B",
+    "category": "personal-care",
+    "alternatives": ["Bamkiki", "Truthbrush", "Bite Toothpaste Bits", "Bambooth", "Radius"]
+  },
+  {
+    "target": "Dove",
+    "category": "personal-care",
+    "alternatives": ["Dr. Bronner's", "Meow Meow Tweet", "Plaine Products", "Ethique", "Ursa Major"]
+  },
+  {
+    "target": "Axe",
+    "category": "personal-care",
+    "alternatives": ["Nécessaire", "Ursa Major", "Everist", "Dr. Bronner's", "Corpus Naturals"]
+  },
+  {
+    "target": "Head & Shoulders",
+    "category": "personal-care",
+    "alternatives": ["Ethique", "Plaine Products", "Odele", "Prose", "HiBar"]
+  },
+  {
+    "target": "Pantene",
+    "category": "personal-care",
+    "alternatives": ["Ethique", "HiBar", "Plaine Products", "Odele", "Seed Phytonutrients"]
+  },
+  {
+    "target": "Gillette",
+    "category": "personal-care",
+    "alternatives": ["Leaf Shave", "Albatross Designs", "Henson Shaving", "Supply", "Preserve"]
+  },
+  {
+    "target": "Nivea",
+    "category": "personal-care",
+    "alternatives": ["Weleda", "Dr. Hauschka", "Ursa Major", "Nécessaire", "Cocokind"]
+  },
+  {
+    "target": "Neutrogena",
+    "category": "personal-care",
+    "alternatives": ["Versed", "Cocokind", "Acure", "Honest Beauty", "Ursa Major"]
+  },
+  {
+    "target": "Cetaphil",
+    "category": "personal-care",
+    "alternatives": ["Vanicream", "Pipette", "Everyone", "Burt's Bees", "Acure"]
+  },
+  {
+    "target": "CeraVe",
+    "category": "personal-care",
+    "alternatives": ["Pipette", "Cocokind", "Versed", "Vanicream", "Everyone"]
+  },
+  {
+    "target": "Tide",
+    "category": "household",
+    "alternatives": ["Seventh Generation", "Molly's Suds", "Dropps", "Blueland", "Earth Breeze"]
+  },
+  {
+    "target": "Ariel",
+    "category": "household",
+    "alternatives": ["Seventh Generation", "Dropps", "Ecover", "Method", "Blueland"]
+  },
+  {
+    "target": "Persil",
+    "category": "household",
+    "alternatives": ["Blueland", "Molly's Suds", "Ecover", "Dropps", "Earth Breeze"]
+  },
+  {
+    "target": "Dawn",
+    "category": "household",
+    "alternatives": ["Blueland", "Ecover", "Seventh Generation", "Puracy", "Better Life"]
+  }
+]
