@@ -44,9 +44,7 @@ const getData = cache(async ({ params }: Props) => {
 })
 
 export const generateStaticParams = async () => {
-  const terms = await findGlossaryTermSlugs({
-    where: { status: { in: ["draft", "published"] } },
-  })
+  const terms = await findGlossaryTermSlugs({})
   return terms.map(({ slug }) => ({ slug }))
 }
 

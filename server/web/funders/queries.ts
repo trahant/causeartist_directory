@@ -31,7 +31,7 @@ export const findFunderSlugs = async ({ where, orderBy, ...args }: Prisma.Funder
   })
 }
 
-export const findFunder = async ({ where, ...args }: Prisma.FunderFindFirstArgs) => {
+export const findFunder = async ({ where, ...args }: Prisma.FunderFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("funder", `funder-${where?.slug}`)
@@ -39,7 +39,7 @@ export const findFunder = async ({ where, ...args }: Prisma.FunderFindFirstArgs)
 
   return db.funder.findFirst({
     ...args,
-    where,
+    where: { status: "published", ...where },
     select: funderOnePayload,
   })
 }

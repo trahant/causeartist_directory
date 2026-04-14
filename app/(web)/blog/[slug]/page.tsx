@@ -32,7 +32,7 @@ type Props = PageProps<"/blog/[slug]">
 // Get page data
 const getData = cache(async ({ params }: Props) => {
   const { slug } = await params
-  const post = await findBlogPost({ where: { slug, status: { in: ["draft", "published"] } } })
+  const post = await findBlogPost({ where: { slug } })
 
   if (!post) {
     notFound()
@@ -65,7 +65,7 @@ const getData = cache(async ({ params }: Props) => {
 })
 
 export const generateStaticParams = async () => {
-  const posts = await findBlogPostSlugs({ where: { status: { in: ["draft", "published"] } } })
+  const posts = await findBlogPostSlugs({})
   return posts.map(({ slug }) => ({ slug }))
 }
 

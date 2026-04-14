@@ -45,7 +45,7 @@ export const findBlogPostSlugs = async ({
 export const findBlogPost = async ({
   where,
   ...args
-}: Prisma.BlogPostFindFirstArgs) => {
+}: Prisma.BlogPostFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("blog-post", `blog-post-${where?.slug}`)

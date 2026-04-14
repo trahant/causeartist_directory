@@ -45,7 +45,7 @@ export const findPodcastEpisodeSlugs = async ({
 export const findPodcastEpisode = async ({
   where,
   ...args
-}: Prisma.PodcastEpisodeFindFirstArgs) => {
+}: Prisma.PodcastEpisodeFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("podcast-episode", `podcast-episode-${where?.slug}`)
@@ -53,7 +53,7 @@ export const findPodcastEpisode = async ({
 
   return db.podcastEpisode.findFirst({
     ...args,
-    where,
+    where: { status: "published", ...where },
     select: podcastEpisodeOnePayload,
   })
 }

@@ -26,7 +26,7 @@ const postDateParts = (format: Awaited<ReturnType<typeof getFormatter>>, date: D
 
 // Get page data
 const getData = cache(async () => {
-  const posts = await findBlogPosts({ where: { status: { in: ["draft", "published"] } } })
+  const posts = await findBlogPosts({})
 
   const t = await getTranslations()
   const url = "/blog"

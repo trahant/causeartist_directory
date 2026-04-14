@@ -31,7 +31,7 @@ export const findCompanySlugs = async ({ where, orderBy, ...args }: Prisma.Compa
   })
 }
 
-export const findCompany = async ({ where, ...args }: Prisma.CompanyFindFirstArgs) => {
+export const findCompany = async ({ where, ...args }: Prisma.CompanyFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("company", `company-${where?.slug}`)
@@ -39,7 +39,7 @@ export const findCompany = async ({ where, ...args }: Prisma.CompanyFindFirstArg
 
   return db.company.findFirst({
     ...args,
-    where,
+    where: { status: "published", ...where },
     select: companyOnePayload,
   })
 }

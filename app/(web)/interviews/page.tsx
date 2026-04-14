@@ -54,7 +54,6 @@ const getData = cache(async () => {
       ? []
       : await findBlogPosts({
           where: {
-            status: { in: ["draft", "published"] },
             slug: { in: interviewSlugs },
           },
         })

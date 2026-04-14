@@ -23,16 +23,7 @@ const description =
   "Weekly roundup of impact funding, social entrepreneurship, and sustainable business news."
 
 const getData = cache(async () => {
-  const newsletters = await findNewsletters({
-    where: {
-      status: { in: ["draft", "published"] },
-      OR: [
-        { slug: { startsWith: "causeartist-weekly" } },
-        { slug: { startsWith: "builder-brief" } },
-        { slug: { startsWith: "monday-momentum" } },
-      ],
-    },
-  })
+  const newsletters = await findNewsletters({})
   const data = getPageData(url, title, description, {
     breadcrumbs: [{ url, title: "Newsletter" }],
     structuredData: [generateCollectionPage(url, title, description)],

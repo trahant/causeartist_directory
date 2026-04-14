@@ -45,7 +45,7 @@ export const findGlossaryTermSlugs = async ({
 export const findGlossaryTerm = async ({
   where,
   ...args
-}: Prisma.GlossaryTermFindFirstArgs) => {
+}: Prisma.GlossaryTermFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("glossary-term", `glossary-term-${where?.slug}`)
@@ -53,7 +53,7 @@ export const findGlossaryTerm = async ({
 
   return db.glossaryTerm.findFirst({
     ...args,
-    where,
+    where: { status: "published", ...where },
     select: glossaryTermOnePayload,
   })
 }

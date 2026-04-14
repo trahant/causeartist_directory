@@ -19,9 +19,7 @@ const description =
   "Plain language definitions for impact investing, ESG, and sustainable business terms."
 
 const getData = cache(async () => {
-  const terms = await findGlossaryTerms({
-    where: { status: { in: ["draft", "published"] } },
-  })
+  const terms = await findGlossaryTerms({})
   const byLetter = terms.reduce<Record<string, GlossaryTermMany[]>>((acc, term) => {
     const letter = (term.term[0] ?? "?").toUpperCase()
     if (!/^[A-Z]$/.test(letter)) {

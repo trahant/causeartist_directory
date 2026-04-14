@@ -23,7 +23,7 @@ type Props = { params: Promise<{ slug: string }> }
 
 const getData = cache(async ({ params }: Props) => {
   const { slug } = await params
-  const post = await findNewsletter({ where: { slug, status: { in: ["draft", "published"] } } })
+  const post = await findNewsletter({ where: { slug } })
 
   if (!post) {
     notFound()
@@ -43,9 +43,7 @@ const getData = cache(async ({ params }: Props) => {
 })
 
 export const generateStaticParams = async () => {
-  const posts = await findNewsletterSlugs({
-    where: { status: { in: ["draft", "published"] } },
-  })
+  const posts = await findNewsletterSlugs({})
   return posts.map(({ slug }) => ({ slug }))
 }
 

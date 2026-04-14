@@ -53,7 +53,7 @@ export const findNewsletterSlugs = async ({
 export const findNewsletter = async ({
   where,
   ...args
-}: Prisma.BlogPostFindFirstArgs) => {
+}: Prisma.BlogPostFindFirstArgs = {}) => {
   "use cache"
 
   cacheTag("newsletter", `newsletter-${where?.slug}`)
@@ -61,7 +61,7 @@ export const findNewsletter = async ({
 
   return db.blogPost.findFirst({
     ...args,
-    where: { status: "published", ...where },
+    where: { status: "published", ...newsletterSlugFilter, ...where },
     select: newsletterOnePayload,
   })
 }
