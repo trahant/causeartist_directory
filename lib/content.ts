@@ -1,3 +1,5 @@
+import { sanitizeHtml } from "~/lib/sanitize"
+
 const FROM_HEADING_LEVELS = new Set(["2", "3"])
 
 const decodeHtmlEntities = (text: string) => {
@@ -97,5 +99,6 @@ export const addHeadingIdsToHtml = (html: string) => {
   })
 }
 
-export const processContent = (html: string) => addHeadingIdsToHtml(html)
+export const processContent = (html: string) =>
+  sanitizeHtml(addHeadingIdsToHtml(html))
 
