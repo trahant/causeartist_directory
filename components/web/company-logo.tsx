@@ -21,6 +21,7 @@ export function CompanyLogo({ logoUrl, name, className }: CompanyLogoProps) {
   if (!logoUrl || error) {
     return (
       <div
+        aria-hidden="true"
         className={`flex shrink-0 items-center justify-center bg-neutral-100 text-xs font-bold text-neutral-500 ${className ?? ""}`}
       >
         {initials || "?"}
@@ -31,7 +32,8 @@ export function CompanyLogo({ logoUrl, name, className }: CompanyLogoProps) {
   return (
     <img
       src={logoUrl}
-      alt={name}
+      alt=""
+      aria-hidden="true"
       className={[className, "shrink-0"].filter(Boolean).join(" ")}
       onError={() => setError(true)}
     />

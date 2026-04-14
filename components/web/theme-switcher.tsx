@@ -36,7 +36,7 @@ export const ThemeSwitcher = ({ className, ...props }: ThemeSwitcherProps) => {
   return (
     <DropdownMenu>
       <NavLink className={className} asChild>
-        <DropdownMenuTrigger {...props}>
+        <DropdownMenuTrigger aria-label="Toggle theme" {...props}>
           {getThemeIcon(resolvedTheme ?? "system")}
         </DropdownMenuTrigger>
       </NavLink>

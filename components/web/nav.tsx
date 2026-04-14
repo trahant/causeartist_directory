@@ -123,6 +123,7 @@ export const Nav = ({ className, title, ...props }: NavProps) => {
             <ExternalLink
               href={url(currentUrl, shareTitle)}
               className={navItemVariants()}
+              aria-label={t("share_on", { platform })}
               eventName="click_share"
               eventProps={{ url: currentUrl, platform }}
             >

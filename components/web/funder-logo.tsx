@@ -23,6 +23,7 @@ export const FunderLogo = forwardRef<HTMLDivElement, FunderLogoProps>(
       return (
         <div
           ref={ref}
+          aria-hidden="true"
           className={`flex shrink-0 items-center justify-center bg-neutral-100 text-xs font-bold text-neutral-500 ${className ?? ""}`}
         >
           {initials || "?"}
@@ -34,7 +35,8 @@ export const FunderLogo = forwardRef<HTMLDivElement, FunderLogoProps>(
       <div ref={ref} className={`shrink-0 overflow-hidden ${className ?? ""}`}>
         <img
           src={logoUrl}
-          alt={name}
+          alt=""
+          aria-hidden="true"
           className="size-full object-contain"
           onError={() => setError(true)}
         />

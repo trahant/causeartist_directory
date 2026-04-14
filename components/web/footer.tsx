@@ -55,25 +55,41 @@ export const Footer = ({ children, className, ...props }: ComponentProps<"div">)
             </Tooltip>
 
             <Tooltip tooltip={t("navigation.social_facebook")}>
-              <ExternalLink href={linksConfig.social.facebook} className={navLinkVariants()}>
+              <ExternalLink
+                href={linksConfig.social.facebook}
+                className={navLinkVariants()}
+                aria-label={t("navigation.social_facebook")}
+              >
                 <BrandFacebookIcon />
               </ExternalLink>
             </Tooltip>
 
             <Tooltip tooltip={t("navigation.social_x")}>
-              <ExternalLink href={linksConfig.social.x} className={navLinkVariants()}>
+              <ExternalLink
+                href={linksConfig.social.x}
+                className={navLinkVariants()}
+                aria-label={t("navigation.social_x")}
+              >
                 <BrandXIcon />
               </ExternalLink>
             </Tooltip>
 
             <Tooltip tooltip={t("navigation.social_instagram")}>
-              <ExternalLink href={linksConfig.social.instagram} className={navLinkVariants()}>
+              <ExternalLink
+                href={linksConfig.social.instagram}
+                className={navLinkVariants()}
+                aria-label={t("navigation.social_instagram")}
+              >
                 <BrandInstagramIcon />
               </ExternalLink>
             </Tooltip>
 
             <Tooltip tooltip={t("navigation.social_linkedin")}>
-              <ExternalLink href={linksConfig.social.linkedin} className={navLinkVariants()}>
+              <ExternalLink
+                href={linksConfig.social.linkedin}
+                className={navLinkVariants()}
+                aria-label={t("navigation.social_linkedin")}
+              >
                 <BrandLinkedInIcon />
               </ExternalLink>
             </Tooltip>

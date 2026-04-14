@@ -7,7 +7,7 @@ import type { ComponentProps } from "react"
 import { Controller, FormProvider as Form } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from "~/components/common/button"
-import { Field, FieldError } from "~/components/common/field"
+import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { Input } from "~/components/common/input"
 import { Stack } from "~/components/common/stack"
 import { useMagicLink } from "~/hooks/use-magic-link"
@@ -35,6 +35,9 @@ export const LoginForm = ({ ...props }: ComponentProps<"form">) => {
             name="email"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name} className="sr-only">
+                  Email address
+                </FieldLabel>
                 <Input
                   id={field.name}
                   type="email"

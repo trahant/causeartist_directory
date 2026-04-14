@@ -20,7 +20,8 @@ export async function POST(req: Request) {
 
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err: unknown) {
-    console.error("Stripe webhook error:", err)
+    const message = err instanceof Error ? err.message : "Unknown error"
+    console.error("Stripe webhook error:", message)
     return Response.json({ error: "Webhook processing failed" }, { status: 400 })
   }
 
@@ -114,7 +115,8 @@ export async function POST(req: Request) {
       }
     }
   } catch (error: unknown) {
-    console.error("Stripe webhook error:", error)
+    const message = error instanceof Error ? error.message : "Unknown error"
+    console.error("Stripe webhook error:", message)
     return Response.json({ error: "Webhook processing failed" }, { status: 400 })
   }
 

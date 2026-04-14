@@ -51,6 +51,7 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
               type="button"
               onClick={() => setNavOpen(!isNavOpen)}
               className="block -m-1 -ml-1.5 lg:hidden"
+              aria-label={isNavOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               <Hamburger className="size-7" />
             </button>
@@ -122,7 +123,13 @@ const Header = ({ className, ...props }: ComponentProps<"div">) => {
           </nav>
 
           <Stack size="sm" wrap={false} className="justify-end max-lg:grow">
-            <Button size="sm" variant="ghost" className="p-1 text-base" onClick={search.open}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="p-1 text-base"
+              onClick={search.open}
+              aria-label="Search companies"
+            >
               <SearchIcon />
             </Button>
 

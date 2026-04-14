@@ -103,8 +103,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     try {
       const redirectsPath = path.join(process.cwd(), "redirects.json")
-      console.log("Loading redirects from:", redirectsPath)
-      console.log("File exists:", fs.existsSync(redirectsPath))
       const raw = fs.readFileSync(redirectsPath, "utf-8")
       const entries: Array<{ old_url: string; new_url: string; status_code: number }> =
         JSON.parse(raw)
