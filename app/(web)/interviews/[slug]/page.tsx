@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import fs from "node:fs"
+import path from "node:path"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { cache, Suspense } from "react"
@@ -13,7 +15,7 @@ import { Section } from "~/components/web/ui/section"
 import { addHeadingIdsToHtml } from "~/lib/content"
 import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateArticleSchema } from "~/lib/schema"
-import { findBlogPost, findBlogPostSlugs } from "~/server/web/blog/queries"
+import { findBlogPost } from "~/server/web/blog/queries"
 import type { Thing } from "schema-dts"
 
 type Props = { params: Promise<{ slug: string }> }
@@ -39,9 +41,21 @@ const getData = cache(async ({ params }: Props) => {
   return { post, ...data }
 })
 
+const getInterviewSlugs = () => {
+  try {
+    const redirectsPath = path.join(process.cwd(), "redirects.json")
+    const redirects = JSON.parse(fs.readFileSync(redirectsPath, "utf-8"))
+    return redirects
+      .filter((r: { new_url: string }) => r.new_url.startsWith("/interviews/"))
+      .map((r: { new_url: string }) => r.new_url.replace("/interviews/", ""))
+  } catch {
+    return []
+  }
+}
+
 export const generateStaticParams = async () => {
-  const posts = await findBlogPostSlugs({})
-  return posts.map(({ slug }) => ({ slug }))
+  const interviewSlugs = getInterviewSlugs()
+  return interviewSlugs.map((slug: string) => ({ slug }))
 }
 
 export const generateMetadata = async (props: Props): Promise<Metadata> => {

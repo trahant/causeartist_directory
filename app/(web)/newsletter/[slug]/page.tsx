@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import fs from "node:fs"
+import path from "node:path"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { cache, Suspense } from "react"
@@ -15,7 +17,6 @@ import { getPageData, getPageMetadata } from "~/lib/pages"
 import { generateArticleSchema } from "~/lib/schema"
 import {
   findNewsletter,
-  findNewsletterSlugs,
 } from "~/server/web/newsletters/queries"
 import type { Thing } from "schema-dts"
 
@@ -42,9 +43,21 @@ const getData = cache(async ({ params }: Props) => {
   return { post, ...data }
 })
 
+const getNewsletterSlugs = () => {
+  try {
+    const redirectsPath = path.join(process.cwd(), "redirects.json")
+    const redirects = JSON.parse(fs.readFileSync(redirectsPath, "utf-8"))
+    return redirects
+      .filter((r: { new_url: string }) => r.new_url.startsWith("/newsletter/"))
+      .map((r: { new_url: string }) => r.new_url.replace("/newsletter/", ""))
+  } catch {
+    return []
+  }
+}
+
 export const generateStaticParams = async () => {
-  const posts = await findNewsletterSlugs({})
-  return posts.map(({ slug }) => ({ slug }))
+  const newsletterSlugs = getNewsletterSlugs()
+  return newsletterSlugs.map((slug: string) => ({ slug }))
 }
 
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
