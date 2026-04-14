@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse, type ProxyConfig } from "next/server"
 import { auth } from "~/lib/auth"
 
 export const config: ProxyConfig = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/auth/:path*", "/submit"],
+  matcher: ["/admin", "/admin/:path*", "/dashboard/:path*", "/auth/:path*", "/submit"],
 }
 
 export default async function (req: NextRequest) {
@@ -29,8 +29,14 @@ export default async function (req: NextRequest) {
   if (sessionCookie && isAdminPage) {
     const session = await auth.api.getSession({ headers: req.headers })
 
-    if (session?.user.role !== "admin") {
-      return NextResponse.redirect(new URL("/", req.url))
+    if (!session) {
+      return NextResponse.redirect(new URL(`/auth/login?next=${pathname}${search}`, req.url))
+    }
+
+    if (session.user.role !== "admin") {
+      const url = new URL("/", req.url)
+      url.searchParams.set("error", "FORBIDDEN")
+      return NextResponse.redirect(url)
     }
   }
 
