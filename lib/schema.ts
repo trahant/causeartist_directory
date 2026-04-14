@@ -1,6 +1,7 @@
 import type { CompanyOne } from "~/server/web/companies/payloads"
 import type { FunderOne } from "~/server/web/funders/payloads"
 import { siteConfig } from "~/config/site"
+import { resolveArticleOgImageUrl } from "~/lib/article-public-meta"
 
 const toAbsoluteUrl = (path: string): string => {
   return path.startsWith("http") ? path : `${siteConfig.url}${path}`
@@ -115,18 +116,51 @@ export function generateArticleSchema(post: {
   title: string
   excerpt?: string | null
   publishedAt?: Date | null
+  updatedAt?: Date | null
   slug: string
   /** Defaults to /blog/[slug] */
   path?: string
+  heroImageUrl?: string | null
+  ogImageUrl?: string | null
+  author?: { name: string } | null
 }): { "@context": string; "@type": string; [key: string]: unknown } {
   const path = post.path ?? `/blog/${post.slug}`
+  const articleUrl = toAbsoluteUrl(path)
+  const absoluteImage = resolveArticleOgImageUrl(post.ogImageUrl, post.heroImageUrl)
+
   return {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": `${articleUrl}#article`,
     headline: post.title,
     description: post.excerpt ?? undefined,
     datePublished: post.publishedAt?.toISOString(),
-    url: toAbsoluteUrl(path),
+    dateModified: post.updatedAt?.toISOString(),
+    url: articleUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    ...(absoluteImage ? { image: [absoluteImage] } : {}),
+    ...(post.author?.name ? { author: { "@type": "Person", name: post.author.name } } : {}),
+    publisher: { "@id": `${siteConfig.url}/#/schema/organization/1` },
+  }
+}
+
+/**
+ * FAQ JSON-LD for article pages (only when editorial FAQ blocks exist).
+ */
+export function generateArticleFaqPageSchema(
+  items: Array<{ question: string; answer: string }>,
+  pagePath: string,
+): { "@context": string; "@type": string; [key: string]: unknown } {
+  const pageUrl = toAbsoluteUrl(pagePath)
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faq`,
+    mainEntity: items.map(q => ({
+      "@type": "Question",
+      name: q.question,
+      acceptedAnswer: { "@type": "Answer", text: q.answer },
+    })),
   }
 }
 

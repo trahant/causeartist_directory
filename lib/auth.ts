@@ -110,4 +110,11 @@ export const getServerSession = cache(async (request?: NextRequest) => {
   })
 })
 
+/** Session lookup for Next.js middleware (pass the incoming `NextRequest`). */
+export function getSessionFromRequest(request: NextRequest) {
+  return auth.api.getSession({
+    headers: request.headers,
+  })
+}
+
 export type Session = typeof auth.$Infer.Session

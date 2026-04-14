@@ -7,6 +7,7 @@ import {
 } from "nuqs/server"
 import * as z from "zod"
 import { getSortingStateParser } from "~/lib/parsers"
+import { articleSeoFormFieldsSchema } from "~/server/admin/shared/article-seo-schema"
 
 export type BlogPostListRow = {
   id: string
@@ -34,18 +35,20 @@ export const blogPostListParams = {
 export const blogPostListSchema = createStandardSchemaV1(blogPostListParams)
 export type BlogPostListParams = inferParserType<typeof blogPostListParams>
 
-export const blogPostUpsertSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().optional(),
-  status: z.string().min(1),
-  excerpt: z.string().optional().nullable(),
-  content: z.string().optional().nullable(),
-  heroImageUrl: z.string().optional().nullable(),
-  seoTitle: z.string().optional().nullable(),
-  seoDescription: z.string().optional().nullable(),
-  publishedAt: z.coerce.date().optional().nullable(),
-  authorId: z.string().optional().nullable(),
-})
+export const blogPostUpsertSchema = z
+  .object({
+    id: z.string(),
+    title: z.string().min(1, "Title is required"),
+    slug: z.string().optional(),
+    status: z.string().min(1),
+    excerpt: z.string().optional().nullable(),
+    content: z.string().optional().nullable(),
+    heroImageUrl: z.string().optional().nullable(),
+    seoTitle: z.string().optional().nullable(),
+    seoDescription: z.string().optional().nullable(),
+    publishedAt: z.coerce.date().optional().nullable(),
+    authorId: z.string().optional().nullable(),
+  })
+  .merge(articleSeoFormFieldsSchema)
 
 export type BlogPostUpsertSchema = z.infer<typeof blogPostUpsertSchema>

@@ -49,6 +49,10 @@ type GetPageMetadataProps = {
   url: string
   ogImage?: OpenGraphParams
   metadata?: Metadata
+  /** When set, used as og:image / twitter image instead of the dynamic `/api/og` URL */
+  absoluteOgImageUrl?: string
+  /** When set, overrides `url` for `alternates.canonical` (typically same-origin absolute) */
+  canonicalUrl?: string
 }
 
 /**
@@ -66,7 +70,13 @@ function metadataTitleString(title: Metadata["title"]): string {
   return siteConfig.name
 }
 
-export const getPageMetadata = ({ url, ogImage, metadata }: GetPageMetadataProps) => {
+export const getPageMetadata = ({
+  url,
+  ogImage,
+  metadata,
+  absoluteOgImageUrl,
+  canonicalUrl,
+}: GetPageMetadataProps) => {
   const defaultMetadata = Object.assign({}, metadataConfig, metadata)
   const { title, description, alternates, openGraph, twitter, ...rest } = defaultMetadata
 
@@ -74,14 +84,16 @@ export const getPageMetadata = ({ url, ogImage, metadata }: GetPageMetadataProps
   const descRaw = typeof description === "string" ? description : ""
   const normalizedDescription = normalizeMetaDescription(descRaw, titleStr)
 
-  const ogImageUrl = getOpenGraphImageUrl(
-    ogImage ?? { title: titleStr, description: normalizedDescription },
-  )
+  const ogImageUrl =
+    absoluteOgImageUrl?.trim() ??
+    getOpenGraphImageUrl(ogImage ?? { title: titleStr, description: normalizedDescription })
+
+  const canonical = canonicalUrl?.trim() || url
 
   return {
     title,
     description: normalizedDescription,
-    alternates: { ...alternates, canonical: url },
+    alternates: { ...alternates, canonical },
     openGraph: {
       ...openGraph,
       title: titleStr,
@@ -94,6 +106,7 @@ export const getPageMetadata = ({ url, ogImage, metadata }: GetPageMetadataProps
       card: "summary_large_image",
       title: titleStr,
       description: normalizedDescription,
+      images: [ogImageUrl],
     },
     ...rest,
   }

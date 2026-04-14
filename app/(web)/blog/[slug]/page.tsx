@@ -12,9 +12,18 @@ import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { Section } from "~/components/web/ui/section"
 import { blogConfig } from "~/config/blog"
+import { ArticleAioBlocks } from "~/components/web/article/article-aio-blocks"
 import { addHeadingIdsToHtml } from "~/lib/content"
+import {
+  articleMetaDescription,
+  articleMetaTitle,
+  mergeArticleRobots,
+  resolveArticleCanonicalForMetadata,
+  resolveArticleOgImageUrl,
+} from "~/lib/article-public-meta"
+import { readFaqItemsFromDb } from "~/lib/article-seo-json"
 import { getPageData, getPageMetadata } from "~/lib/pages"
-import { generateArticleSchema } from "~/lib/schema"
+import { generateArticleFaqPageSchema, generateArticleSchema } from "~/lib/schema"
 import { findBlogPost, findBlogPostSlugs } from "~/server/web/blog/queries"
 import type { Thing } from "schema-dts"
 
@@ -32,12 +41,24 @@ const getData = cache(async ({ params }: Props) => {
   const t = await getTranslations()
   const url = `/blog/${post.slug}`
 
-  const data = getPageData(url, post.title, post.excerpt ?? "", {
+  const metaTitle = articleMetaTitle(post.seoTitle, post.title)
+  const metaDescription = articleMetaDescription(post.seoDescription, post.excerpt, "")
+
+  const faqForSchema = readFaqItemsFromDb(post.faqItems)
+  const structuredData = [
+    generateArticleSchema({
+      ...post,
+      path: url,
+    }),
+    ...(faqForSchema.length > 0 ? [generateArticleFaqPageSchema(faqForSchema, url)] : []),
+  ] as Thing[]
+
+  const data = getPageData(url, metaTitle, metaDescription, {
     breadcrumbs: [
       { url: "/blog", title: t("navigation.blog") },
       { url, title: post.title },
     ],
-    structuredData: [generateArticleSchema(post)] as Thing[],
+    structuredData,
   })
 
   return { post, ...data }
@@ -51,15 +72,29 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const { post, url, metadata } = await getData(props)
 
+  const title = articleMetaTitle(post.seoTitle, post.title)
+  const description = articleMetaDescription(post.seoDescription, post.excerpt, String(metadata.description ?? ""))
+
   const openGraph: Metadata["openGraph"] = {
     type: "article",
     publishedTime: post.publishedAt?.toISOString(),
     modifiedTime: (post.updatedAt ?? post.publishedAt)?.toISOString(),
   }
 
-  const robots = post.status !== "published" ? { index: false, follow: false } : undefined
+  const robots = mergeArticleRobots({
+    isUnpublished: post.status !== "published",
+    metaRobots: post.metaRobots,
+  })
 
-  return getPageMetadata({ url, metadata: { ...metadata, openGraph, robots } })
+  const absoluteOgImageUrl = resolveArticleOgImageUrl(post.ogImageUrl, post.heroImageUrl)
+  const canonicalUrl = resolveArticleCanonicalForMetadata(url, post.canonicalUrl)
+
+  return getPageMetadata({
+    url,
+    canonicalUrl,
+    absoluteOgImageUrl,
+    metadata: { ...metadata, title, description, openGraph, robots },
+  })
 }
 
 export default async function (props: Props) {
@@ -92,16 +127,22 @@ export default async function (props: Props) {
         <>
           <Section>
             <Section.Content>
-              {post.heroImageUrl && (
+              {(post.heroImageUrl || post.ogImageUrl) && (
                 <Image
-                  src={post.heroImageUrl}
-                  alt={post.title}
+                  src={(post.heroImageUrl || post.ogImageUrl) as string}
+                  alt={post.ogImageAlt?.trim() || post.title}
                   width={1200}
                   height={630}
                   loading="eager"
                   className="w-full h-auto aspect-video object-cover rounded-lg"
                 />
               )}
+
+              <ArticleAioBlocks
+                keyTakeaways={post.keyTakeaways}
+                sources={post.sources}
+                faqItems={post.faqItems}
+              />
 
               <Prose
                 className="prose prose-neutral dark:prose-invert max-w-none"

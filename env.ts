@@ -13,7 +13,12 @@ export const env = createEnv({
     DATABASE_URL: z.string().min(1),
     DATABASE_PUBLIC_URL: z.string().optional(),
     CRON_SECRET: z.string().optional(),
-    BETTER_AUTH_SECRET: z.string().min(1).default("replace-me-in-production"),
+    BETTER_AUTH_SECRET: z
+      .string()
+      .min(32)
+      .refine(v => v !== "replace-me-in-production", {
+        message: "BETTER_AUTH_SECRET must not use the insecure placeholder value.",
+      }),
     BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
     REDIS_URL: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
@@ -80,6 +85,12 @@ export const env = createEnv({
    */
   emptyStringAsUndefined: true,
 })
+
+if (process.env.BETTER_AUTH_SECRET === "replace-me-in-production") {
+  throw new Error(
+    "BETTER_AUTH_SECRET must not use the insecure placeholder value \"replace-me-in-production\".",
+  )
+}
 
 export const isProd = process.env.NODE_ENV === "production"
 export const isDev = !isProd

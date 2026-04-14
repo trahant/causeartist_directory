@@ -11,9 +11,18 @@ import { TableOfContents } from "~/components/web/table-of-contents"
 import { Breadcrumbs } from "~/components/web/ui/breadcrumbs"
 import { Intro, IntroDescription, IntroTitle } from "~/components/web/ui/intro"
 import { Section } from "~/components/web/ui/section"
+import { ArticleAioBlocks } from "~/components/web/article/article-aio-blocks"
 import { processContent, sanitizeGhostRichHtmlForDisplay } from "~/lib/content"
+import {
+  articleMetaDescription,
+  articleMetaTitle,
+  mergeArticleRobots,
+  resolveArticleCanonicalForMetadata,
+  resolveArticleOgImageUrl,
+} from "~/lib/article-public-meta"
+import { readFaqItemsFromDb } from "~/lib/article-seo-json"
 import { getPageData, getPageMetadata } from "~/lib/pages"
-import { generateArticleSchema } from "~/lib/schema"
+import { generateArticleFaqPageSchema, generateArticleSchema } from "~/lib/schema"
 import { findCaseStudy, findCaseStudySlugs } from "~/server/web/case-studies/queries"
 import type { Thing } from "schema-dts"
 
@@ -31,23 +40,25 @@ const getData = cache(async ({ params }: Props) => {
 
   const url = `/case-studies/${caseStudy.slug}`
 
-  const data = getPageData(
-    url,
-    caseStudy.title,
-    caseStudy.excerpt ?? "",
-    {
-      breadcrumbs: [
-        { url: "/case-studies", title: "Case Studies" },
-        { url, title: caseStudy.title },
-      ],
-      structuredData: [
-        generateArticleSchema({
-          ...caseStudy,
-          path: `/case-studies/${caseStudy.slug}`,
-        }),
-      ] as Thing[],
-    },
-  )
+  const metaTitle = articleMetaTitle(caseStudy.seoTitle, caseStudy.title)
+  const metaDescription = articleMetaDescription(caseStudy.seoDescription, caseStudy.excerpt, "")
+
+  const faqForSchema = readFaqItemsFromDb(caseStudy.faqItems)
+  const structuredData = [
+    generateArticleSchema({
+      ...caseStudy,
+      path: url,
+    }),
+    ...(faqForSchema.length > 0 ? [generateArticleFaqPageSchema(faqForSchema, url)] : []),
+  ] as Thing[]
+
+  const data = getPageData(url, metaTitle, metaDescription, {
+    breadcrumbs: [
+      { url: "/case-studies", title: "Case Studies" },
+      { url, title: caseStudy.title },
+    ],
+    structuredData,
+  })
 
   return { caseStudy, ...data }
 })
@@ -60,8 +71,12 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async (props: Props): Promise<Metadata> => {
   const { caseStudy, url, metadata } = await getData(props)
 
-  const title = caseStudy.seoTitle ?? metadata.title
-  const description = caseStudy.seoDescription ?? caseStudy.excerpt ?? metadata.description
+  const title = articleMetaTitle(caseStudy.seoTitle, caseStudy.title)
+  const description = articleMetaDescription(
+    caseStudy.seoDescription,
+    caseStudy.excerpt,
+    String(metadata.description ?? ""),
+  )
 
   const openGraph: Metadata["openGraph"] = {
     type: "article",
@@ -69,13 +84,18 @@ export const generateMetadata = async (props: Props): Promise<Metadata> => {
     modifiedTime: (caseStudy.updatedAt ?? caseStudy.publishedAt)?.toISOString(),
   }
 
-  const robots =
-    caseStudy.status !== "published"
-      ? { index: false as const, follow: false as const }
-      : undefined
+  const robots = mergeArticleRobots({
+    isUnpublished: caseStudy.status !== "published",
+    metaRobots: caseStudy.metaRobots,
+  })
+
+  const absoluteOgImageUrl = resolveArticleOgImageUrl(caseStudy.ogImageUrl, caseStudy.heroImageUrl)
+  const canonicalUrl = resolveArticleCanonicalForMetadata(url, caseStudy.canonicalUrl)
 
   return getPageMetadata({
     url,
+    canonicalUrl,
+    absoluteOgImageUrl,
     metadata: { ...metadata, title, description, openGraph, robots },
   })
 }
@@ -106,16 +126,22 @@ export default async function (props: Props) {
         <>
           <Section>
             <Section.Content>
-              {caseStudy.heroImageUrl && (
+              {(caseStudy.heroImageUrl || caseStudy.ogImageUrl) && (
                 <Image
-                  src={caseStudy.heroImageUrl}
-                  alt={caseStudy.title}
+                  src={(caseStudy.heroImageUrl || caseStudy.ogImageUrl) as string}
+                  alt={caseStudy.ogImageAlt?.trim() || caseStudy.title}
                   width={1200}
                   height={630}
                   loading="eager"
                   className="w-full h-auto aspect-video object-cover rounded-lg"
                 />
               )}
+
+              <ArticleAioBlocks
+                keyTakeaways={caseStudy.keyTakeaways}
+                sources={caseStudy.sources}
+                faqItems={caseStudy.faqItems}
+              />
 
               <Prose className="max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
             </Section.Content>

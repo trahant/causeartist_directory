@@ -14,6 +14,7 @@ import { Field, FieldError, FieldLabel } from "~/components/common/field"
 import { H3 } from "~/components/common/heading"
 import { Input } from "~/components/common/input"
 import { Link } from "~/components/common/link"
+import { Note } from "~/components/common/note"
 import {
   Select,
   SelectContent,
@@ -24,6 +25,7 @@ import {
 import { Stack } from "~/components/common/stack"
 import { TextArea } from "~/components/common/textarea"
 import { useComputedField } from "~/hooks/use-computed-field"
+import { articleContentTypes, stringifyArticleJsonField } from "~/lib/article-seo-json"
 import { orpc } from "~/lib/orpc-query"
 import { cx } from "~/lib/utils"
 import type { findBlogPostByIdForAdmin } from "~/server/admin/blog-posts/queries"
@@ -58,6 +60,19 @@ export function BlogPostForm({ className, title, post, ...props }: BlogPostFormP
       seoDescription: post?.seoDescription ?? "",
       publishedAt: post?.publishedAt ?? null,
       authorId: post?.authorId ?? null,
+      canonicalUrl: post?.canonicalUrl ?? "",
+      ogImageUrl: post?.ogImageUrl ?? "",
+      ogImageAlt: post?.ogImageAlt ?? "",
+      metaRobots: post?.metaRobots ?? "",
+      focusKeyword: post?.focusKeyword ?? "",
+      secondaryKeywordsJson: stringifyArticleJsonField(post?.secondaryKeywords),
+      lastReviewedAt: post?.lastReviewedAt ?? null,
+      reviewedBy: post?.reviewedBy ?? "",
+      sourcesJson: stringifyArticleJsonField(post?.sources),
+      faqItemsJson: stringifyArticleJsonField(post?.faqItems),
+      keyTakeawaysJson: stringifyArticleJsonField(post?.keyTakeaways),
+      readingTimeMinutes: post?.readingTimeMinutes ?? null,
+      contentType: post?.contentType ?? "",
     },
   })
 
@@ -246,6 +261,213 @@ export function BlogPostForm({ className, title, post, ...props }: BlogPostFormP
             <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
               <FieldLabel htmlFor={field.name}>SEO description</FieldLabel>
               <TextArea id={field.name} {...field} value={field.value ?? ""} rows={2} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <H3 className="@lg:col-span-2 text-base font-semibold border-t border-border pt-6 mt-2">
+          SEO and AIO
+        </H3>
+
+        <Controller
+          control={form.control}
+          name="canonicalUrl"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Canonical URL</FieldLabel>
+              <Note className="text-xs mb-1">Optional absolute URL, same site only. Leave empty for default.</Note>
+              <Input {...field} id={field.name} value={field.value ?? ""} placeholder="https://…" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="ogImageUrl"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Open Graph image URL</FieldLabel>
+              <Input {...field} id={field.name} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="ogImageAlt"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Hero / OG image alt text</FieldLabel>
+              <Input {...field} id={field.name} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="metaRobots"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Meta robots</FieldLabel>
+              <Note className="text-xs mb-1">When set on published posts, overrides default indexing hints.</Note>
+              <Input {...field} id={field.name} value={field.value ?? ""} placeholder="index,follow" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="focusKeyword"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Focus keyword</FieldLabel>
+              <Input {...field} id={field.name} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="contentType"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Content type</FieldLabel>
+              <Select
+                value={field.value ? field.value : "__none__"}
+                onValueChange={v => field.onChange(v === "__none__" ? "" : v)}
+              >
+                <SelectTrigger id={field.name}>
+                  <SelectValue placeholder="Optional" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">None</SelectItem>
+                  {articleContentTypes.map(ct => (
+                    <SelectItem key={ct} value={ct}>
+                      {ct}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="readingTimeMinutes"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Reading time (minutes)</FieldLabel>
+              <Note className="text-xs mb-1">Leave empty to auto-estimate from content on save.</Note>
+              <Input
+                id={field.name}
+                type="number"
+                min={1}
+                max={999}
+                value={field.value == null ? "" : field.value}
+                onChange={e => {
+                  const v = e.target.value
+                  if (v === "") {
+                    field.onChange(null)
+                    return
+                  }
+                  const n = Number.parseInt(v, 10)
+                  field.onChange(Number.isNaN(n) ? null : n)
+                }}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="lastReviewedAt"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Last reviewed at</FieldLabel>
+              <Input
+                id={field.name}
+                type="datetime-local"
+                value={field.value instanceof Date ? toLocalDatetimeValue(field.value) : ""}
+                onChange={e => {
+                  const v = e.target.value
+                  field.onChange(v ? new Date(v) : null)
+                }}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="reviewedBy"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Reviewed by</FieldLabel>
+              <Input {...field} id={field.name} value={field.value ?? ""} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="secondaryKeywordsJson"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Secondary keywords (JSON array)</FieldLabel>
+              <Note className="text-xs mb-1">Example: [&quot;impact investing&quot;, &quot;ESG&quot;]</Note>
+              <TextArea id={field.name} {...field} value={field.value ?? ""} rows={3} className="font-mono text-sm" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="keyTakeawaysJson"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Key takeaways (JSON array of strings)</FieldLabel>
+              <Note className="text-xs mb-1">Example: [&quot;Point one&quot;, &quot;Point two&quot;]</Note>
+              <TextArea id={field.name} {...field} value={field.value ?? ""} rows={4} className="font-mono text-sm" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="sourcesJson"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>Sources (JSON array)</FieldLabel>
+              <Note className="text-xs mb-1">
+                {`Example: [{"title":"Report","url":"https://…","publisher":"UN","publishedAt":"2024"}]`}
+              </Note>
+              <TextArea id={field.name} {...field} value={field.value ?? ""} rows={5} className="font-mono text-sm" />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="faqItemsJson"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="@lg:col-span-2">
+              <FieldLabel htmlFor={field.name}>FAQ items (JSON array)</FieldLabel>
+              <Note className="text-xs mb-1">{`Example: [{"question":"…?","answer":"…"}]`}</Note>
+              <TextArea id={field.name} {...field} value={field.value ?? ""} rows={6} className="font-mono text-sm" />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

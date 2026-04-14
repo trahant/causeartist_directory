@@ -13,6 +13,20 @@ export const blogPostOnePayload = {
   publishedAt: true,
   createdAt: true,
   updatedAt: true,
+  canonicalUrl: true,
+  ogImageUrl: true,
+  ogImageAlt: true,
+  metaRobots: true,
+  focusKeyword: true,
+  secondaryKeywords: true,
+  lastReviewedAt: true,
+  reviewedBy: true,
+  sources: true,
+  faqItems: true,
+  keyTakeaways: true,
+  readingTimeMinutes: true,
+  contentType: true,
+  author: { select: { name: true, slug: true } },
 } satisfies Prisma.BlogPostSelect
 
 export const blogPostManyPayload = {

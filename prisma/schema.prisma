@@ -464,6 +464,19 @@ model CaseStudy {
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime?
+  canonicalUrl   String?
+  ogImageUrl     String?
+  ogImageAlt     String?
+  metaRobots     String?
+  focusKeyword   String?
+  secondaryKeywords Json?
+  lastReviewedAt DateTime?
+  reviewedBy     String?
+  sources        Json?
+  faqItems       Json?
+  keyTakeaways   Json?
+  readingTimeMinutes Int?
+  contentType    String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   companyId      String?
@@ -481,6 +494,19 @@ model BlogPost {
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime?
+  canonicalUrl   String?
+  ogImageUrl     String?
+  ogImageAlt     String?
+  metaRobots     String?
+  focusKeyword   String?
+  secondaryKeywords Json?
+  lastReviewedAt DateTime?
+  reviewedBy     String?
+  sources        Json?
+  faqItems       Json?
+  keyTakeaways   Json?
+  readingTimeMinutes Int?
+  contentType    String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   authorId       String?
