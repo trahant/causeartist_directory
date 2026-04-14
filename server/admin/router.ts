@@ -7,8 +7,10 @@ import { certificationAdminRouter } from "~/server/admin/certifications/router"
 import { companyRouter } from "~/server/admin/companies/router"
 import { funderRouter } from "~/server/admin/funders/router"
 import { fundingStageRouter } from "~/server/admin/funding-stages/router"
+import { glossaryTermRouter } from "~/server/admin/glossary-terms/router"
 import { locationRouter } from "~/server/admin/locations/router"
 import { metricRouter } from "~/server/admin/metrics/router"
+import { podcastEpisodeRouter } from "~/server/admin/podcast-episodes/router"
 import { postRouter } from "~/server/admin/posts/router"
 import { reportRouter } from "~/server/admin/reports/router"
 import { sectorRouter } from "~/server/admin/sectors/router"
@@ -34,8 +36,10 @@ export const adminRouter = {
   locations: locationRouter,
   fundingStages: fundingStageRouter,
   blogPosts: blogPostRouter,
+  podcastEpisodes: podcastEpisodeRouter,
   caseStudies: caseStudyRouter,
   authors: authorRouter,
+  glossaryTerms: glossaryTermRouter,
 }
 
 export type AdminRouter = typeof adminRouter

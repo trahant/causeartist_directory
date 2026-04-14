@@ -5,6 +5,7 @@ import { cx } from "cva"
 import {
   AwardIcon,
   BookOpenTextIcon,
+  BookTypeIcon,
   Building2Icon,
   CrosshairIcon,
   DockIcon,
@@ -15,6 +16,7 @@ import {
   LineChartIcon,
   LogOutIcon,
   MapPinIcon,
+  MicIcon,
   PenLineIcon,
   MegaphoneIcon,
   TriangleAlertIcon,
@@ -80,6 +82,16 @@ export const Sidebar = () => {
           title: "Blog",
           href: "/admin/blog-posts",
           prefix: <FileTextIcon />,
+        },
+        {
+          title: "Podcast Episodes",
+          href: "/admin/podcast-episodes",
+          prefix: <MicIcon />,
+        },
+        {
+          title: "Glossary",
+          href: "/admin/glossary",
+          prefix: <BookTypeIcon />,
         },
         {
           title: "Case Studies",

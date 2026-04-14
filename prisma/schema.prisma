@@ -311,8 +311,8 @@ model FundingStage {
 model CompanySector {
   companyId String
   sectorId  String
-  company   Company @relation(fields: [companyId], references: [id])
-  sector    Sector  @relation(fields: [sectorId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sector    Sector  @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 
   @@id([companyId, sectorId])
 }
@@ -320,8 +320,8 @@ model CompanySector {
 model CompanyLocation {
   companyId  String
   locationId String
-  company    Company  @relation(fields: [companyId], references: [id])
-  location   Location @relation(fields: [locationId], references: [id])
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@id([companyId, locationId])
 }
@@ -349,8 +349,8 @@ model CompanyRetailLocation {
 model CompanyFunder {
   companyId String
   funderId  String
-  company   Company @relation(fields: [companyId], references: [id])
-  funder    Funder  @relation(fields: [funderId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  funder    Funder  @relation(fields: [funderId], references: [id], onDelete: Cascade)
 
   @@id([companyId, funderId])
 }
@@ -358,8 +358,8 @@ model CompanyFunder {
 model CompanySubcategory {
   companyId     String
   subcategoryId String
-  company       Company     @relation(fields: [companyId], references: [id])
-  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+  company       Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
 
   @@id([companyId, subcategoryId])
 }
@@ -379,8 +379,8 @@ model CompanyAlternative {
 model FunderSector {
   funderId String
   sectorId String
-  funder   Funder @relation(fields: [funderId], references: [id])
-  sector   Sector @relation(fields: [sectorId], references: [id])
+  funder   Funder @relation(fields: [funderId], references: [id], onDelete: Cascade)
+  sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade)
 
   @@id([funderId, sectorId])
 }
@@ -388,8 +388,8 @@ model FunderSector {
 model FunderSubcategory {
   funderId      String
   subcategoryId String
-  funder        Funder      @relation(fields: [funderId], references: [id])
-  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+  funder        Funder      @relation(fields: [funderId], references: [id], onDelete: Cascade)
+  subcategory   Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
 
   @@id([funderId, subcategoryId])
 }
@@ -397,8 +397,8 @@ model FunderSubcategory {
 model FunderStage {
   funderId     String
   stageId      String
-  funder       Funder       @relation(fields: [funderId], references: [id])
-  fundingStage FundingStage @relation(fields: [stageId], references: [id])
+  funder       Funder       @relation(fields: [funderId], references: [id], onDelete: Cascade)
+  fundingStage FundingStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
 
   @@id([funderId, stageId])
 }
@@ -406,8 +406,8 @@ model FunderStage {
 model FunderLocation {
   funderId   String
   locationId String
-  funder     Funder   @relation(fields: [funderId], references: [id])
-  location   Location @relation(fields: [locationId], references: [id])
+  funder     Funder   @relation(fields: [funderId], references: [id], onDelete: Cascade)
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@id([funderId, locationId])
 }
@@ -425,6 +425,9 @@ model PodcastEpisode {
   appleUrl       String?
   youtubeUrl     String?
   excerpt        String?
+  guestName      String?
+  guestTitle     String?
+  guestCompany   String?
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime?
@@ -438,8 +441,8 @@ model PodcastEpisode {
 model CompanyEpisode {
   companyId String
   episodeId String
-  company   Company        @relation(fields: [companyId], references: [id])
-  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
+  company   Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  episode   PodcastEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 
   @@id([companyId, episodeId])
 }
@@ -447,8 +450,8 @@ model CompanyEpisode {
 model FunderEpisode {
   funderId  String
   episodeId String
-  episode   PodcastEpisode @relation(fields: [episodeId], references: [id])
-  funder    Funder         @relation(fields: [funderId], references: [id])
+  episode   PodcastEpisode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  funder    Funder         @relation(fields: [funderId], references: [id], onDelete: Cascade)
 
   @@id([funderId, episodeId])
 }
@@ -552,8 +555,8 @@ model Certification {
 model CompanyCertification {
   companyId       String
   certificationId String
-  certification   Certification @relation(fields: [certificationId], references: [id])
-  company         Company       @relation(fields: [companyId], references: [id])
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade)
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@id([companyId, certificationId])
 }
